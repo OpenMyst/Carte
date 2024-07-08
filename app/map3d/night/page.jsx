@@ -1,5 +1,5 @@
 "use client"
-import { MAPBOX_TOKEN, automnStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
+import { MAPBOX_TOKEN, winterDark } from "@/tool/security";
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -7,7 +7,7 @@ import { database } from "@/tool/firebase";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-const NightMapPage = () => {
+const NightMapComponent = () => {
     const mapContainer = useRef(null);
     const [map, setMap] = useState(null);
     const [lng, setLng] = useState(35.21633);
@@ -17,7 +17,7 @@ const NightMapPage = () => {
     const [showBuilding, setShowBuilding] = useState(true);
     const [season, setSeason] = useState('spring');
     const [mountainHeight, setMountainHeight] = useState(100);
-    const [mapStyle, setMapStyle] = useState(sprintStyle);
+    const [mapStyle, setMapStyle] = useState(winterDark);
     const [evangileEvents, setEvangileEvents] = useState([]);
     const [open, setOpen] = useState(true);
 
@@ -25,23 +25,6 @@ const NightMapPage = () => {
         getAllEvent();
         loadThreeboxScript()
     }, [])
-
-
-    useEffect(() => {
-        if (map) {
-            const styles = {
-                spring: sprintStyle,
-                summer: summerLight,
-                autumn: automnStyle,
-                winter: winterDark,
-            };
-            setMapStyle(styles[season]);
-            map.setStyle(mapStyle);
-            handleCheckboxChange('building-extrusion', 'visibility', 'none');
-
-            loadEvangileMarker(map);
-        }
-    }, [season, mapStyle, evangileEvents]);
 
     const getAllEvent = () => {
         const q = query(collection(database, 'events'))
@@ -53,28 +36,6 @@ const NightMapPage = () => {
             })
             setEvangileEvents(eventsArray);
         })
-    }
-
-    const createMap2D = () => {
-        const map2d = new mapboxgl.Map({
-            container: mapContainer.current,
-            style: mapStyle,
-            center: [lng, lat],
-            zoom: zoom,
-            pitch: 0,
-            bearing: -20,
-        });
-        map2d.on('style.load', () => {
-            map2d.addSource('mapbox-dem', {
-                type: 'raster-dem',
-                url: 'mapbox://mapbox.terrain-rgb'
-            });
-
-            map2d.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-
-            loadEvangileMarker(map2d);
-        });
-        setMap(map);
     }
 
     const loadThreeboxScript = () => {
@@ -102,10 +63,6 @@ const NightMapPage = () => {
 
                     map.addControl(new mapboxgl.NavigationControl());
 
-                    map.on('load', () => {
-                        updateMapStyle();
-                    });
-
                     const tb = (window.tb = new Threebox(
                         map,
                         map.getCanvas().getContext('webgl'),
@@ -115,12 +72,12 @@ const NightMapPage = () => {
                     ));
 
                     map.on('style.load', () => {
-                        map.addSource('mapbox-dem', {
-                            type: 'raster-dem',
-                            url: 'mapbox://mapbox.terrain-rgb'
-                        });
+                        // map.addSource('mapbox-dem', {
+                        //     type: 'raster-dem',
+                        //     url: 'mapbox://mapbox.terrain-rgb'
+                        // });
 
-                        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+                        // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
 
                         loadEvangileMarker(map);
                         map.addLayer({
@@ -187,22 +144,11 @@ const NightMapPage = () => {
                     zoom: 15
                 });
 
-                setMountainHeight(150)
+                // setMountainHeight(150)
 
                 loadThreeboxScript()
             }
         });
-    };
-
-    const updateMapStyle = () => {
-        if (map) {
-            const dayNightMode = document.getElementById('dayNightMode').value;
-            if (dayNightMode === 'night') {
-                map.setStyle("mapbox://styles/ads-eo/clxyac48g000g01pic1548rol");
-            } else {
-                map.setStyle("mapbox://styles/ads-eo/clxy9r3e5000p01nw44s08gaw");
-            }
-        }
     };
 
     const addLocations = (map) => {
@@ -269,4 +215,4 @@ const NightMapPage = () => {
     );
 };
 
-export default NightMapPage;
+export default NightMapComponent;

@@ -26,23 +26,6 @@ const MapComponent = () => {
         loadThreeboxScript()
     }, [])
 
-
-    useEffect(() => {
-        if (map) {
-            const styles = {
-                spring: sprintStyle,
-                summer: summerLight,
-                autumn: automnStyle,
-                winter: winterDark,
-            };
-            setMapStyle(styles[season]);
-            map.setStyle(mapStyle);
-            handleCheckboxChange('building-extrusion', 'visibility', 'none');
-
-            loadEvangileMarker(map);
-        }
-    }, [season, mapStyle, evangileEvents]);
-
     const getAllEvent = () => {
         const q = query(collection(database, 'events'))
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -53,28 +36,6 @@ const MapComponent = () => {
             })
             setEvangileEvents(eventsArray);
         })
-    }
-
-    const createMap2D = () => {
-        const map2d = new mapboxgl.Map({
-            container: mapContainer.current,
-            style: mapStyle,
-            center: [lng, lat],
-            zoom: zoom,
-            pitch: 0,
-            bearing: -20,
-        });
-        map2d.on('style.load', () => {
-            map2d.addSource('mapbox-dem', {
-                type: 'raster-dem',
-                url: 'mapbox://mapbox.terrain-rgb'
-            });
-
-            map2d.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-
-            loadEvangileMarker(map2d);
-        });
-        setMap(map);
     }
 
     const loadThreeboxScript = () => {
@@ -101,10 +62,6 @@ const MapComponent = () => {
                     });
 
                     map.addControl(new mapboxgl.NavigationControl());
-
-                    map.on('load', () => {
-                        updateMapStyle();
-                    });
 
                     const tb = (window.tb = new Threebox(
                         map,
@@ -192,17 +149,6 @@ const MapComponent = () => {
                 loadThreeboxScript()
             }
         });
-    };
-
-    const updateMapStyle = () => {
-        if (map) {
-            const dayNightMode = document.getElementById('dayNightMode').value;
-            if (dayNightMode === 'night') {
-                map.setStyle("mapbox://styles/ads-eo/clxyac48g000g01pic1548rol");
-            } else {
-                map.setStyle("mapbox://styles/ads-eo/clxy9r3e5000p01nw44s08gaw");
-            }
-        }
     };
 
     const addLocations = (map) => {
