@@ -115,12 +115,12 @@ const MapComponent = () => {
                     ));
 
                     map.on('style.load', () => {
-                        map.addSource('mapbox-dem', {
-                            type: 'raster-dem',
-                            url: 'mapbox://mapbox.terrain-rgb'
-                        });
+                        // map.addSource('mapbox-dem', {
+                        //     type: 'raster-dem',
+                        //     url: 'mapbox://mapbox.terrain-rgb'
+                        // });
 
-                        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+                        // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
 
                         loadEvangileMarker(map);
                         map.addLayer({
@@ -187,7 +187,7 @@ const MapComponent = () => {
                     zoom: 15
                 });
 
-                setMountainHeight(150)
+                // setMountainHeight(150)
 
                 loadThreeboxScript()
             }
