@@ -95,7 +95,7 @@ const MapComponent = () => {
                                 };
 
                                 tb.loadObj(options, (model) => {
-                                    model.setCoords([35.2296, 31.7787]);
+                                    model.setCoords([35.2310, 31.7794]);
                                     model.setRotation({ x: 0, y: 0, z: 241 });
                                     tb.add(model);
                                 });
