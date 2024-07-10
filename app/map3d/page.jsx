@@ -26,6 +26,12 @@ const MapComponent = () => {
         loadThreeboxScript()
     }, [])
 
+    useEffect(() => {
+        if (map) {
+            loadEvangileMarker(map);
+        }
+    }, [evangileEvents, map]);
+
     const getAllEvent = () => {
         const q = query(collection(database, 'events'))
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
