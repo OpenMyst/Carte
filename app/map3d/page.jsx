@@ -112,7 +112,7 @@ const MapComponent = () => {
                 initializeMap();
             }
         };
-        if(showBuilding) {
+        if (showBuilding) {
             document.head.appendChild(script);
         } else {
             document.head.removeChild(script);
@@ -137,6 +137,13 @@ const MapComponent = () => {
                 .setLngLat([location.longitude, location.latitude])
                 .setPopup(popup)  // Associe le popup au marqueur
                 .addTo(mapEvent);
+
+            marker.getElement().addEventListener('click', () => {
+                mapEvent.flyTo({
+                    center: [location.longitude, location.latitude],
+                    zoom: 20
+                });
+            })
 
             if (location.isPlay) {
                 mapEvent.flyTo({

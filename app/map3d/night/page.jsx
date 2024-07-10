@@ -135,19 +135,12 @@ const NightMapComponent = () => {
                 .setLngLat([location.longitude, location.latitude])
                 .setPopup(popup)  // Associe le popup au marqueur
                 .addTo(mapEvent);
+                
             marker.getElement().addEventListener('click', () => {
                 mapEvent.flyTo({
                     center: [location.longitude, location.latitude],
                     zoom: 20
                 });
-                const day = location.detail_jour;
-                if (day === "Nuit") {
-                    setMapStyle(winterDark);
-                } else if (day === "Matin") {
-                    setMapStyle(summerLight);
-                } else {
-                    setMapStyle(winterDark);
-                }
             })
 
             if (location.isPlay) {
