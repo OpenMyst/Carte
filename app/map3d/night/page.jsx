@@ -1,5 +1,5 @@
 "use client"
-import { MAPBOX_TOKEN, winterDark } from "@/tool/security";
+import { MAPBOX_TOKEN, sprintStyleNight } from "@/tool/security";
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -17,7 +17,7 @@ const NightMapComponent = () => {
     const [showBuilding, setShowBuilding] = useState(true);
     const [season, setSeason] = useState('spring');
     const [mountainHeight, setMountainHeight] = useState(100);
-    const [mapStyle, setMapStyle] = useState(winterDark);
+    const [mapStyle, setMapStyle] = useState(sprintStyleNight);
     const [evangileEvents, setEvangileEvents] = useState([]);
     const [open, setOpen] = useState(true);
 
@@ -25,6 +25,12 @@ const NightMapComponent = () => {
         getAllEvent();
         loadThreeboxScript()
     }, [])
+
+    useEffect(() => {
+        if (map) {
+            loadEvangileMarker(map);
+        }
+    }, [evangileEvents, map]);
 
     const getAllEvent = () => {
         const q = query(collection(database, 'events'))
@@ -35,7 +41,7 @@ const NightMapComponent = () => {
                 eventsArray.push({ ...doc.data(), id: doc.id })
             })
             setEvangileEvents(eventsArray);
-        })
+        });
     }
 
     const loadThreeboxScript = () => {
@@ -72,13 +78,6 @@ const NightMapComponent = () => {
                     ));
 
                     map.on('style.load', () => {
-                        // map.addSource('mapbox-dem', {
-                        //     type: 'raster-dem',
-                        //     url: 'mapbox://mapbox.terrain-rgb'
-                        // });
-
-                        // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-
                         loadEvangileMarker(map);
                         map.addLayer({
                             id: 'custom-threebox-model',
@@ -112,14 +111,13 @@ const NightMapComponent = () => {
                 initializeMap();
             }
         };
-        if(showBuilding) {
-            document.head.appendChild(script);
-        } else {
-            document.head.removeChild(script);
-        }
+        
+        document.head.appendChild(script);
+        
     };
 
     const loadEvangileMarker = (mapEvent) => {
+        console.log(evangileEvents)
         evangileEvents.forEach((location) => {
             const popup = new mapboxgl.Popup().setHTML(`
             <div class="flex flex-row h-[300px] w-[220px]  static">
@@ -137,6 +135,20 @@ const NightMapComponent = () => {
                 .setLngLat([location.longitude, location.latitude])
                 .setPopup(popup)  // Associe le popup au marqueur
                 .addTo(mapEvent);
+            marker.getElement().addEventListener('click', () => {
+                mapEvent.flyTo({
+                    center: [location.longitude, location.latitude],
+                    zoom: 20
+                });
+                const day = location.detail_jour;
+                if (day === "Nuit") {
+                    setMapStyle(winterDark);
+                } else if (day === "Matin") {
+                    setMapStyle(summerLight);
+                } else {
+                    setMapStyle(winterDark);
+                }
+            })
 
             if (location.isPlay) {
                 mapEvent.flyTo({
@@ -144,9 +156,7 @@ const NightMapComponent = () => {
                     zoom: 15
                 });
 
-                // setMountainHeight(150)
-
-                loadThreeboxScript()
+                loadThreeboxScript();
             }
         });
     };
@@ -176,16 +186,17 @@ const NightMapComponent = () => {
             <div ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
             <div className="map-overlay top w-[20vw]">
                 <div className="map-overlay-inner">
-                    {/*<fieldset>
-                        <label>Show 3D map</label>
+                    <fieldset>
+                        <label>Show Building</label>
                         <input
                             type="checkbox"
                             checked={showBuilding}
                             onChange={(e) => {
                                 setShowBuilding(e.target.checked);
+                                handleCheckboxChange('building-extrusion', 'visibility', e.target.checked);
                             }}
                         />
-                    </fieldset>*/}
+                    </fieldset>
                     <fieldset>
                         <label>Show Road</label>
                         <input
