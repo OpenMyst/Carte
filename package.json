@@ -11,7 +11,6 @@
   "dependencies": {
     "@react-three/drei": "^9.108.3",
     "@react-three/fiber": "^8.16.8",
-    "@sakitam-gis/mapbox-wind": "^2.0.4",
     "firebase": "^10.12.2",
     "mapbox-gl": "^3.4.0",
     "next": "14.2.4",
