@@ -11,6 +11,7 @@
   "dependencies": {
     "@react-three/drei": "^9.108.3",
     "@react-three/fiber": "^8.16.8",
+    "@sakitam-gis/mapbox-wind": "^2.0.4",
     "firebase": "^10.12.2",
     "mapbox-gl": "^3.4.0",
     "next": "14.2.4",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "webpack-glsl-loader": "^1.0.1"
   }
 }

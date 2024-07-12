@@ -118,6 +118,38 @@ const RainingMapComponent = () => {
 
     };
 
+    const addWindLayer = (map) => {
+        for (let i = 0; i < 1000; i++) {
+          const el = document.createElement("div");
+          el.className = "wind-blow";
+          el.style.width = "10px";
+          el.style.height = "2px";
+          el.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
+          el.style.position = "absolute";
+          el.style.top = `${Math.random() * window.innerHeight}px`;
+          el.style.left = `${Math.random() * window.innerWidth}px`;
+          el.style.animation = `blow ${Math.random() * 3 + 2}s linear infinite`;
+      
+          map.getCanvasContainer().appendChild(el);
+        }
+      
+        const styleElement = document.createElement("style");
+        styleElement.innerHTML = `
+          @keyframes blow {
+            0% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+            100% {
+              transform: translateX(${window.innerWidth}px);
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(styleElement);
+      };
+      
+
     const addRainLayer = (map) => {
         const rainCoordinates = [lng, lat];
     

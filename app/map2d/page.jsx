@@ -1,5 +1,5 @@
 "use client";
-import { MAPBOX_TOKEN, automnStyle, sprintStyle, winterDark, sprintStyleNight, summerLight } from "@/tool/security";
+import { MAPBOX_TOKEN, automnStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -8,7 +8,7 @@ import Link from "next/link";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-export default function Home() {
+export default function Map2DComponent() {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [lng, setLng] = useState(35.21633);
@@ -35,8 +35,8 @@ export default function Home() {
       style: mapStyle,
       center: [lng, lat],
       zoom: zoom,
-      pitch: 62,
-      bearing: -20,
+      pitch: 0,
+      bearing: 0,
     });
 
     map.current.on('move', () => {
@@ -60,12 +60,6 @@ export default function Home() {
     console.log(map)
 
   }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
-
-  useEffect(() => {
-    if (map.current) {
-      map.current.setPitch(showMap3D ? 62 : 0);
-    }
-  }, [showMap3D]);
 
   useEffect(() => {
     if (map.current) {
@@ -143,152 +137,15 @@ export default function Home() {
 
         const day = location.detail_jour;
         if (day === "Nuit") {
-          setMapStyle(sprintStyleNight);
-        } else if (day === "Matin" ) {
+          setMapStyle(winterDark);
+        } else if (day === "Matin") {
           setMapStyle(summerLight);
         } else {
           setMapStyle(winterDark);
-          addSnowLayer(map.current)
-        }
-
-        const meteo = location.meteo;
-        if(meteo === "Pluvieux") {
-          addRainLayer(map.current)
-        } else if(meteo === "Neigeux") {
-          addSnowLayer(map.current)
         }
       }
     });
   };
-
-  const addCloudLayer = (map) => {
-    for (let i = 0; i < 100; i++) {
-      const el = document.createElement("div");
-      el.className = "cloud";
-      el.style.width = "100px";
-      el.style.height = "60px";
-      el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-      el.style.borderRadius = "50%";
-      el.style.position = "absolute";
-      el.style.top = `${Math.random() * (window.innerHeight / 2)}px`;
-      el.style.left = `${Math.random() * window.innerWidth}px`;
-      el.style.animation = `float ${Math.random() * 10 + 10}s linear infinite`;
-      map.getCanvasContainer().appendChild(el);
-    }
-  
-    const styleElement = document.createElement("style");
-    styleElement.innerHTML = `
-      @keyframes float {
-        0% {
-          transform: translateX(0);
-        }
-        100% {
-          transform: translateX(${window.innerWidth}px);
-        }
-      }
-    `;
-    document.head.appendChild(styleElement);
-  };
-  
-
-  const addSnowLayer = (map) => {
-    const snowCoordinates = [lng, lat];
-
-    for (let i = 0; i < 1000; i++) {
-      const el = document.createElement("div");
-      el.className = "snow-flake";
-      el.style.width = "5px";
-      el.style.height = "5px";
-      el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-      el.style.borderRadius = "50%";
-      el.style.position = "absolute";
-      el.style.top = `${Math.random() * window.innerHeight}px`;
-      el.style.left = `${Math.random() * window.innerWidth}px`;
-      el.style.animation = `fall ${Math.random() * 2 + 3}s linear infinite`;
-
-      map.getCanvasContainer().appendChild(el);
-    }
-
-    const styleElement = document.createElement("style");
-    styleElement.innerHTML = `
-      @keyframes fall {
-        0% {
-          transform: translateY(0);
-          opacity: 1;
-        }
-        100% {
-          transform: translateY(${window.innerHeight}px);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(styleElement);
-  };
-
-  const addRainLayer = (map) => {
-    const rainCoordinates = [lng, lat];
-
-    for (let i = 0; i < 1000; i++) {
-      const el = document.createElement("div");
-      el.className = "rain-drop";
-      el.style.width = "2px";
-      el.style.height = "10px";
-      el.style.backgroundColor = "rgba(0, 150, 255, 0.7)";
-      el.style.position = "absolute";
-      el.style.top = `${Math.random() * window.innerHeight}px`;
-      el.style.left = `${Math.random() * window.innerWidth}px`;
-      el.style.animation = `fall ${Math.random() * 2 + 1}s linear infinite`;
-
-      map.getCanvasContainer().appendChild(el);
-    }
-
-    const styleElement = document.createElement("style");
-    styleElement.innerHTML = `
-      @keyframes fall {
-        0% {
-          transform: translateY(0);
-          opacity: 1;
-        }
-        100% {
-          transform: translateY(${window.innerHeight}px);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(styleElement);
-  };
-
-  const addWindLayer = (map) => {
-    for (let i = 0; i < 1000; i++) {
-      const el = document.createElement("div");
-      el.className = "wind-blow";
-      el.style.width = "10px";
-      el.style.height = "2px";
-      el.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
-      el.style.position = "absolute";
-      el.style.top = `${Math.random() * window.innerHeight}px`;
-      el.style.left = `${Math.random() * window.innerWidth}px`;
-      el.style.animation = `blow ${Math.random() * 3 + 2}s linear infinite`;
-  
-      map.getCanvasContainer().appendChild(el);
-    }
-  
-    const styleElement = document.createElement("style");
-    styleElement.innerHTML = `
-      @keyframes blow {
-        0% {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        100% {
-          transform: translateX(${window.innerWidth}px);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(styleElement);
-  };
-  
 
 
   const getAllEvent = () => {
@@ -327,17 +184,6 @@ export default function Home() {
           </svg>
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
-
-          <fieldset>
-            <label>Passer la carte en 3D</label>
-            <input
-              type="checkbox"
-              checked={showMap3D}
-              onChange={(e) => {
-                setShowMap3D(e.target.checked);
-              }}
-            />
-          </fieldset>
           <fieldset>
             <Link href="/map">
               <label>Afficher les Batiments</label>
