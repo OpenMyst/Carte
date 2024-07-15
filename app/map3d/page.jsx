@@ -8,126 +8,155 @@ import { database } from "@/tool/firebase";
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const MapComponent = () => {
-    const mapContainer = useRef(null);
-    const [map, setMap] = useState(null);
-    const [lng, setLng] = useState(35.21633);
-    const [lat, setLat] = useState(31.76904);
-    const [zoom, setZoom] = useState(9);
-    const [showRoad, setShowRoad] = useState(true);
-    const [showBuilding, setShowBuilding] = useState(true);
-    const [season, setSeason] = useState('spring');
-    const [mountainHeight, setMountainHeight] = useState(100);
-    const [mapStyle, setMapStyle] = useState(sprintStyle);
-    const [evangileEvents, setEvangileEvents] = useState([]);
-    const [open, setOpen] = useState(true);
+  const mapContainer = useRef(null);
+  const [map, setMap] = useState(null);
+  const [lng, setLng] = useState(35.21633);
+  const [lat, setLat] = useState(31.76904);
+  const [zoom, setZoom] = useState(9);
+  const [showRoad, setShowRoad] = useState(true);
+  const [showBuilding, setShowBuilding] = useState(true);
+  const [season, setSeason] = useState('spring');
+  const [mountainHeight, setMountainHeight] = useState(100);
+  const [mapStyle, setMapStyle] = useState(sprintStyle);
+  const [evangileEvents, setEvangileEvents] = useState([]);
+  const [open, setOpen] = useState(true);
 
-    useEffect(() => {
-        getAllEvent();
-        loadThreeboxScript()
-    }, [])
+  useEffect(() => {
+    getAllEvent();
+    loadThreeboxScript()
+  }, [])
 
-    useEffect(() => {
-        if (map) {
-            loadEvangileMarker(map);
-        }
-    }, [evangileEvents, map]);
-
-    const getAllEvent = () => {
-        const q = query(collection(database, 'events'))
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            let eventsArray = []
-
-            querySnapshot.forEach(doc => {
-                eventsArray.push({ ...doc.data(), id: doc.id })
-            })
-            setEvangileEvents(eventsArray);
-        })
+  useEffect(() => {
+    if (map) {
+      loadEvangileMarker(map);
     }
+  }, [evangileEvents, map]);
 
-    const loadThreeboxScript = () => {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/gh/jscastro76/threebox@v.2.2.2/dist/threebox.min.js';
-        script.type = 'text/javascript';
-        script.async = true;
-        script.onload = () => {
-            if (mapContainer.current && !map) {
-                const initializeMap = () => {
-                    const map = new mapboxgl.Map({
-                        container: mapContainer.current,
-                        style: mapStyle,
-                        center: [lng, lat],
-                        zoom: zoom,
-                        pitch: 62,
-                        bearing: -20,
-                    });
+  const getAllEvent = () => {
+    const q = query(collection(database, 'events'))
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let eventsArray = []
 
-                    map.on('move', () => {
-                        setLng(map.getCenter().lng.toFixed(4));
-                        setLat(map.getCenter().lat.toFixed(4));
-                        setZoom(map.getZoom().toFixed(2));
-                    });
+      querySnapshot.forEach(doc => {
+        eventsArray.push({ ...doc.data(), id: doc.id })
+      })
+      setEvangileEvents(eventsArray);
+    })
+  }
 
-                    map.addControl(new mapboxgl.NavigationControl());
+  const loadThreeboxScript = () => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/gh/jscastro76/threebox@v.2.2.2/dist/threebox.min.js';
+    script.type = 'text/javascript';
+    script.async = true;
+    script.onload = () => {
+      if (mapContainer.current && !map) {
+        const initializeMap = () => {
+          const map = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: mapStyle,
+            center: [lng, lat],
+            zoom: zoom,
+            pitch: 62,
+            bearing: -20,
+          });
 
-                    const tb = (window.tb = new Threebox(
-                        map,
-                        map.getCanvas().getContext('webgl'),
-                        {
-                            defaultLights: true
-                        }
-                    ));
+          map.on('move', () => {
+            setLng(map.getCenter().lng.toFixed(4));
+            setLat(map.getCenter().lat.toFixed(4));
+            setZoom(map.getZoom().toFixed(2));
+          });
 
-                    map.on('style.load', () => {
-                        // map.addSource('mapbox-dem', {
-                        //     type: 'raster-dem',
-                        //     url: 'mapbox://mapbox.terrain-rgb'
-                        // });
+          map.addControl(new mapboxgl.NavigationControl());
 
-                        // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+          const tb = (window.tb = new Threebox(
+            map,
+            map.getCanvas().getContext('webgl'),
+            {
+              defaultLights: true
+            }
+          ));
 
-                        loadEvangileMarker(map);
-                        map.addLayer({
-                            id: 'custom-threebox-model',
-                            type: 'custom',
-                            renderingMode: '3d',
-                            onAdd: function () {
-                                const scale = 10;
-                                const options = {
-                                    obj: '/assets/JERUSALEM.gltf',
-                                    type: 'gltf',
-                                    scale: { x: scale, y: scale * 2, z: 15 },
-                                    units: 'meters',
-                                    rotation: { x: 90, y: -90, z: 0 }
-                                };
+          map.on('style.load', () => {
+            // map.addSource('mapbox-dem', {
+            //     type: 'raster-dem',
+            //     url: 'mapbox://mapbox.terrain-rgb'
+            // });
 
-                                tb.loadObj(options, (model) => {
-                                    model.setCoords([35.2310, 31.7794]);
-                                    model.setRotation({ x: 0, y: 0, z: 241 });
-                                    tb.add(model);
-                                });
-                            },
-                            render: function () {
-                                tb.update();
-                            }
-                        });
-                    });
+            // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
 
-                    setMap(map);
+            loadEvangileMarker(map);
+            map.addLayer({
+              id: 'custom-threebox-model',
+              type: 'custom',
+              renderingMode: '3d',
+              onAdd: function () {
+                const scale = 10;
+                const options = {
+                  obj: '/assets/JERUSALEM.gltf',
+                  type: 'gltf',
+                  scale: { x: scale, y: scale * 2, z: 15 },
+                  units: 'meters',
+                  rotation: { x: 90, y: -90, z: 0 }
                 };
 
-                initializeMap();
-            }
-        };
-        if (showBuilding) {
-            document.head.appendChild(script);
-        } else {
-            document.head.removeChild(script);
-        }
-    };
+                tb.loadObj(options, (model) => {
+                  model.setCoords([35.2310, 31.7794]);
+                  model.setRotation({ x: 0, y: 0, z: 241 });
+                  tb.add(model);
+                });
+              },
+              render: function () {
+                tb.update();
+              }
+            });
+            addRouteLayer(map)
+          });
 
-    const loadEvangileMarker = (mapEvent) => {
-        evangileEvents.forEach((location) => {
-            const popup = new mapboxgl.Popup().setHTML(`
+          setMap(map);
+        };
+
+        initializeMap();
+      }
+    };
+    if (showBuilding) {
+      document.head.appendChild(script);
+    } else {
+      document.head.removeChild(script);
+    }
+  };
+
+  const addRouteLayer = async (map) => {
+    try {
+      const response = await fetch('/assets/route_israel.geojson'); // Assurez-vous que le chemin est correct
+      const routeData = await response.json();
+
+      map.addSource('route', {
+        'type': 'geojson',
+        'data': routeData
+      });
+
+      map.addLayer({
+        'id': 'route',
+        'type': 'line',
+        'source': 'route',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': '#888',
+          'line-width': 8
+        }
+      });
+    } catch (error) {
+      console.error('Error loading route data:', error);
+    }
+  };
+
+  const loadEvangileMarker = (mapEvent) => {
+    evangileEvents.forEach((location) => {
+      const popup = new mapboxgl.Popup().setHTML(`
             <div class="flex flex-row h-[300px] w-[220px]  static">
               <div class="w-full h-[5vw] bg-red relative">
                 <img src="${location.image}" alt="${location.label}" class="w-full sm:h-[120px] md:h-[80px]"/>
@@ -139,64 +168,64 @@ const MapComponent = () => {
             </div>
           `);
 
-            const marker = new mapboxgl.Marker()
-                .setLngLat([location.longitude, location.latitude])
-                .setPopup(popup)  // Associe le popup au marqueur
-                .addTo(mapEvent);
+      const marker = new mapboxgl.Marker()
+        .setLngLat([location.longitude, location.latitude])
+        .setPopup(popup)  // Associe le popup au marqueur
+        .addTo(mapEvent);
 
-            marker.getElement().addEventListener('click', () => {
-                mapEvent.flyTo({
-                    center: [location.longitude, location.latitude],
-                    zoom: 20
-                });
-            })
-
-            if (location.isPlay) {
-                mapEvent.flyTo({
-                    center: [location.longitude, location.latitude],
-                    zoom: 15
-                });
-
-
-                const day = location.detail_jour;
-                if (day === "Nuit") {
-                    mapEvent.setStyle(sprintStyleNight);
-                } else if (day === "Matin") {
-                    mapEvent.setStyle(summerLight);
-                } else {
-                    mapEvent.setStyle(winterDark);
-                    addSnowLayer(mapEvent)
-                }
-
-                const meteo = location.meteo;
-                if (meteo === "Pluvieux") {
-                    addRainLayer(mapEvent)
-                } else if (meteo === "Neigeux") {
-                    addSnowLayer(mapEvent)
-                }
-
-                loadThreeboxScript()
-            }
+      marker.getElement().addEventListener('click', () => {
+        mapEvent.flyTo({
+          center: [location.longitude, location.latitude],
+          zoom: 20
         });
-    };
+      })
 
-    const addCloudLayer = (map) => {
-        for (let i = 0; i < 100; i++) {
-          const el = document.createElement("div");
-          el.className = "cloud";
-          el.style.width = "100px";
-          el.style.height = "60px";
-          el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-          el.style.borderRadius = "50%";
-          el.style.position = "absolute";
-          el.style.top = `${Math.random() * (window.innerHeight / 2)}px`;
-          el.style.left = `${Math.random() * window.innerWidth}px`;
-          el.style.animation = `float ${Math.random() * 10 + 10}s linear infinite`;
-          map.getCanvasContainer().appendChild(el);
+      if (location.isPlay) {
+        mapEvent.flyTo({
+          center: [location.longitude, location.latitude],
+          zoom: 15
+        });
+
+
+        const day = location.detail_jour;
+        if (day === "Nuit") {
+          mapEvent.setStyle(sprintStyleNight);
+        } else if (day === "Matin") {
+          mapEvent.setStyle(summerLight);
+        } else {
+          mapEvent.setStyle(winterDark);
+          addSnowLayer(mapEvent)
         }
-      
-        const styleElement = document.createElement("style");
-        styleElement.innerHTML = `
+
+        const meteo = location.meteo;
+        if (meteo === "Pluvieux") {
+          addRainLayer(mapEvent)
+        } else if (meteo === "Neigeux") {
+          addSnowLayer(mapEvent)
+        }
+
+        loadThreeboxScript()
+      }
+    });
+  };
+
+  const addCloudLayer = (map) => {
+    for (let i = 0; i < 100; i++) {
+      const el = document.createElement("div");
+      el.className = "cloud";
+      el.style.width = "100px";
+      el.style.height = "60px";
+      el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+      el.style.borderRadius = "50%";
+      el.style.position = "absolute";
+      el.style.top = `${Math.random() * (window.innerHeight / 2)}px`;
+      el.style.left = `${Math.random() * window.innerWidth}px`;
+      el.style.animation = `float ${Math.random() * 10 + 10}s linear infinite`;
+      map.getCanvasContainer().appendChild(el);
+    }
+
+    const styleElement = document.createElement("style");
+    styleElement.innerHTML = `
           @keyframes float {
             0% {
               transform: translateX(0);
@@ -206,30 +235,30 @@ const MapComponent = () => {
             }
           }
         `;
-        document.head.appendChild(styleElement);
-      };
-      
-    
-      const addSnowLayer = (map) => {
-        const snowCoordinates = [lng, lat];
-    
-        for (let i = 0; i < 1000; i++) {
-          const el = document.createElement("div");
-          el.className = "snow-flake";
-          el.style.width = "5px";
-          el.style.height = "5px";
-          el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-          el.style.borderRadius = "50%";
-          el.style.position = "absolute";
-          el.style.top = `${Math.random() * window.innerHeight}px`;
-          el.style.left = `${Math.random() * window.innerWidth}px`;
-          el.style.animation = `fall ${Math.random() * 2 + 3}s linear infinite`;
-    
-          map.getCanvasContainer().appendChild(el);
-        }
-    
-        const styleElement = document.createElement("style");
-        styleElement.innerHTML = `
+    document.head.appendChild(styleElement);
+  };
+
+
+  const addSnowLayer = (map) => {
+    const snowCoordinates = [lng, lat];
+
+    for (let i = 0; i < 1000; i++) {
+      const el = document.createElement("div");
+      el.className = "snow-flake";
+      el.style.width = "5px";
+      el.style.height = "5px";
+      el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+      el.style.borderRadius = "50%";
+      el.style.position = "absolute";
+      el.style.top = `${Math.random() * window.innerHeight}px`;
+      el.style.left = `${Math.random() * window.innerWidth}px`;
+      el.style.animation = `fall ${Math.random() * 2 + 3}s linear infinite`;
+
+      map.getCanvasContainer().appendChild(el);
+    }
+
+    const styleElement = document.createElement("style");
+    styleElement.innerHTML = `
           @keyframes fall {
             0% {
               transform: translateY(0);
@@ -241,28 +270,28 @@ const MapComponent = () => {
             }
           }
         `;
-        document.head.appendChild(styleElement);
-      };
-    
-      const addRainLayer = (map) => {
-        const rainCoordinates = [lng, lat];
-    
-        for (let i = 0; i < 1000; i++) {
-          const el = document.createElement("div");
-          el.className = "rain-drop";
-          el.style.width = "2px";
-          el.style.height = "10px";
-          el.style.backgroundColor = "rgba(0, 150, 255, 0.7)";
-          el.style.position = "absolute";
-          el.style.top = `${Math.random() * window.innerHeight}px`;
-          el.style.left = `${Math.random() * window.innerWidth}px`;
-          el.style.animation = `fall ${Math.random() * 2 + 1}s linear infinite`;
-    
-          map.getCanvasContainer().appendChild(el);
-        }
-    
-        const styleElement = document.createElement("style");
-        styleElement.innerHTML = `
+    document.head.appendChild(styleElement);
+  };
+
+  const addRainLayer = (map) => {
+    const rainCoordinates = [lng, lat];
+
+    for (let i = 0; i < 1000; i++) {
+      const el = document.createElement("div");
+      el.className = "rain-drop";
+      el.style.width = "2px";
+      el.style.height = "10px";
+      el.style.backgroundColor = "rgba(0, 150, 255, 0.7)";
+      el.style.position = "absolute";
+      el.style.top = `${Math.random() * window.innerHeight}px`;
+      el.style.left = `${Math.random() * window.innerWidth}px`;
+      el.style.animation = `fall ${Math.random() * 2 + 1}s linear infinite`;
+
+      map.getCanvasContainer().appendChild(el);
+    }
+
+    const styleElement = document.createElement("style");
+    styleElement.innerHTML = `
           @keyframes fall {
             0% {
               transform: translateY(0);
@@ -274,26 +303,26 @@ const MapComponent = () => {
             }
           }
         `;
-        document.head.appendChild(styleElement);
-      };
-    
-      const addWindLayer = (map) => {
-        for (let i = 0; i < 1000; i++) {
-          const el = document.createElement("div");
-          el.className = "wind-blow";
-          el.style.width = "10px";
-          el.style.height = "2px";
-          el.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
-          el.style.position = "absolute";
-          el.style.top = `${Math.random() * window.innerHeight}px`;
-          el.style.left = `${Math.random() * window.innerWidth}px`;
-          el.style.animation = `blow ${Math.random() * 3 + 2}s linear infinite`;
-      
-          map.getCanvasContainer().appendChild(el);
-        }
-      
-        const styleElement = document.createElement("style");
-        styleElement.innerHTML = `
+    document.head.appendChild(styleElement);
+  };
+
+  const addWindLayer = (map) => {
+    for (let i = 0; i < 1000; i++) {
+      const el = document.createElement("div");
+      el.className = "wind-blow";
+      el.style.width = "10px";
+      el.style.height = "2px";
+      el.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
+      el.style.position = "absolute";
+      el.style.top = `${Math.random() * window.innerHeight}px`;
+      el.style.left = `${Math.random() * window.innerWidth}px`;
+      el.style.animation = `blow ${Math.random() * 3 + 2}s linear infinite`;
+
+      map.getCanvasContainer().appendChild(el);
+    }
+
+    const styleElement = document.createElement("style");
+    styleElement.innerHTML = `
           @keyframes blow {
             0% {
               transform: translateX(0);
@@ -305,20 +334,20 @@ const MapComponent = () => {
             }
           }
         `;
-        document.head.appendChild(styleElement);
-      };
+    document.head.appendChild(styleElement);
+  };
 
 
-    const handleCheckboxChange = (layerId, property, value) => {
-        map.setLayoutProperty(layerId, property, value);
-    };
+  const handleCheckboxChange = (layerId, property, value) => {
+    map.setLayoutProperty(layerId, property, value);
+  };
 
-    return (
-        <div>
-            <div ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
-            <div className="map-overlay top w-[20vw]">
-                <div className="map-overlay-inner">
-                    {/*<fieldset>
+  return (
+    <div>
+      <div ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
+      <div className="map-overlay top w-[20vw]">
+        <div className="map-overlay-inner">
+          {/*<fieldset>
                         <label>Show 3D map</label>
                         <input
                             type="checkbox"
@@ -328,33 +357,33 @@ const MapComponent = () => {
                             }}
                         />
                     </fieldset>*/}
-                    <fieldset>
-                        <label>Show Road</label>
-                        <input
-                            type="checkbox"
-                            id="showRoad"
-                            checked={showRoad}
-                            onChange={() => {
-                                setShowRoad(!showRoad);
-                                handleCheckboxChange('road-primary-navigation', 'visibility', showRoad ? 'visible' : 'none');
-                                handleCheckboxChange('road-secondary-tertiary-navigation', 'visibility', showRoad ? 'visible' : 'none');
-                                handleCheckboxChange('road-street-navigation', 'visibility', showRoad ? 'visible' : 'none');
-                                handleCheckboxChange('road-minor-navigation', 'visibility', showRoad ? 'visible' : 'none');
-                            }}
-                        />
-                    </fieldset>
-                    <fieldset>
-                        <label>Longitude</label>
-                        <input type="number" value={lng} step="any" className="lat-lng" readOnly />
-                    </fieldset>
-                    <fieldset>
-                        <label>Latitude</label>
-                        <input type="number" value={lat} step="any" className="lat-lng" readOnly />
-                    </fieldset>
-                </div>
-            </div>
+          <fieldset>
+            <label>Show Road</label>
+            <input
+              type="checkbox"
+              id="showRoad"
+              checked={showRoad}
+              onChange={() => {
+                setShowRoad(!showRoad);
+                handleCheckboxChange('road-primary-navigation', 'visibility', showRoad ? 'visible' : 'none');
+                handleCheckboxChange('road-secondary-tertiary-navigation', 'visibility', showRoad ? 'visible' : 'none');
+                handleCheckboxChange('road-street-navigation', 'visibility', showRoad ? 'visible' : 'none');
+                handleCheckboxChange('road-minor-navigation', 'visibility', showRoad ? 'visible' : 'none');
+              }}
+            />
+          </fieldset>
+          <fieldset>
+            <label>Longitude</label>
+            <input type="number" value={lng} step="any" className="lat-lng" readOnly />
+          </fieldset>
+          <fieldset>
+            <label>Latitude</label>
+            <input type="number" value={lat} step="any" className="lat-lng" readOnly />
+          </fieldset>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default MapComponent;

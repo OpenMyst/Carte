@@ -15,7 +15,7 @@ export default function Map2DComponent() {
   const [lat, setLat] = useState(31.76904);
   const [zoom, setZoom] = useState(9);
   const [mapStyle, setMapStyle] = useState(sprintStyle);
-  const [showBuilding, setShowBuilding] = useState(true);
+  const [showBuilding, setShowBuilding] = useState(false);
   const [showMap3D, setShowMap3D] = useState(true);
   const [showRoad, setShowRoad] = useState(true);
   const [season, setSeason] = useState('spring');
@@ -52,10 +52,12 @@ export default function Map2DComponent() {
         type: 'raster-dem',
         url: 'mapbox://mapbox.terrain-rgb'
       });
-
+      
+      handleCheckboxChange('building-extrusion', 'visibility', false);
       // map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight });
 
       loadEvangileMarker();
+      addRouteLayer(map.current);
     });
     console.log(map)
 
@@ -145,6 +147,34 @@ export default function Map2DComponent() {
         }
       }
     });
+  };
+
+  const addRouteLayer = async (map) => {
+    try {
+      const response = await fetch('/assets/route_israel.geojson'); // Assurez-vous que le chemin est correct
+      const routeData = await response.json();
+
+      map.addSource('route', {
+        'type': 'geojson',
+        'data': routeData
+      });
+
+      map.addLayer({
+        'id': 'route',
+        'type': 'line',
+        'source': 'route',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': '#888',
+          'line-width': 2
+        }
+      });
+    } catch (error) {
+      console.error('Error loading route data:', error);
+    }
   };
 
 

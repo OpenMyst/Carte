@@ -54,7 +54,7 @@ const SnowingMapComponent = () => {
                 const initializeMap = () => {
                     const map = new mapboxgl.Map({
                         container: mapContainer.current,
-                        style: mapStyle,
+                        style: "mapbox://styles/ads-eo/clygvjmcy00v601pgbeuy1vab",
                         center: [lng, lat],
                         zoom: zoom,
                         pitch: 62,
@@ -86,6 +86,7 @@ const SnowingMapComponent = () => {
                         map.setTerrain({ source: 'mapbox-dem', exaggeration: 0 });
                         addSnowLayer(map);
                         addSnowCoveredAreas(map);
+                        addRouteLayer(map);
                         loadEvangileMarker(map);
                         map.addLayer({
                             id: 'custom-threebox-model',
@@ -111,7 +112,7 @@ const SnowingMapComponent = () => {
                                 tb.update();
                             }
                         });
-                        
+
                     });
 
                     setMap(map);
@@ -127,22 +128,22 @@ const SnowingMapComponent = () => {
 
     const addSnowLayer = (map) => {
         const snowCoordinates = [lng, lat];
-    
+
         for (let i = 0; i < 100; i++) {
-          const el = document.createElement("div");
-          el.className = "snow-flake";
-          el.style.width = "5px";
-          el.style.height = "5px";
-          el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-          el.style.borderRadius = "50%";
-          el.style.position = "absolute";
-          el.style.top = `${Math.random() * window.innerHeight}px`;
-          el.style.left = `${Math.random() * window.innerWidth}px`;
-          el.style.animation = `fall ${Math.random() * 2 + 3}s linear infinite`;
-    
-          map.getCanvasContainer().appendChild(el);
+            const el = document.createElement("div");
+            el.className = "snow-flake";
+            el.style.width = "5px";
+            el.style.height = "5px";
+            el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+            el.style.borderRadius = "50%";
+            el.style.position = "absolute";
+            el.style.top = `${Math.random() * window.innerHeight}px`;
+            el.style.left = `${Math.random() * window.innerWidth}px`;
+            el.style.animation = `fall ${Math.random() * 2 + 3}s linear infinite`;
+
+            map.getCanvasContainer().appendChild(el);
         }
-    
+
         const styleElement = document.createElement("style");
         styleElement.innerHTML = `
           @keyframes fall {
@@ -157,42 +158,70 @@ const SnowingMapComponent = () => {
           }
         `;
         document.head.appendChild(styleElement);
-      };
-    
-      const addSnowCoveredAreas = (map) => {
+    };
+
+    const addSnowCoveredAreas = (map) => {
         map.addLayer({
-          id: "snow-covered-areas",
-          type: "fill",
-          source: {
-            type: "geojson",
-            data: {
-              type: "FeatureCollection",
-              features: [
-                {
-                  type: "Feature",
-                  geometry: {
-                    type: "Polygon",
-                    coordinates: [
-                      [
-                        [lng - 0.05, lat - 0.05],
-                        [lng + 0.05, lat - 0.05],
-                        [lng + 0.05, lat + 0.05],
-                        [lng - 0.05, lat + 0.05],
-                        [lng - 0.05, lat - 0.05],
-                      ],
+            id: "snow-covered-areas",
+            type: "fill",
+            source: {
+                type: "geojson",
+                data: {
+                    type: "FeatureCollection",
+                    features: [
+                        {
+                            type: "Feature",
+                            geometry: {
+                                type: "Polygon",
+                                coordinates: [
+                                    [
+                                        [lng - 0.05, lat - 0.05],
+                                        [lng + 0.05, lat - 0.05],
+                                        [lng + 0.05, lat + 0.05],
+                                        [lng - 0.05, lat + 0.05],
+                                        [lng - 0.05, lat - 0.05],
+                                    ],
+                                ],
+                            },
+                            properties: {},
+                        },
                     ],
-                  },
-                  properties: {},
                 },
-              ],
             },
-          },
-          paint: {
-            "fill-color": "rgba(255, 255, 255, 0.7)",
-            "fill-opacity": 0.7,
-          },
+            paint: {
+                "fill-color": "rgba(255, 255, 255, 0.7)",
+                "fill-opacity": 0.7,
+            },
         });
-      };
+    };
+
+    const addRouteLayer = async (map) => {
+        try {
+            const response = await fetch('/assets/route_israel.geojson'); // Assurez-vous que le chemin est correct
+            const routeData = await response.json();
+
+            map.addSource('route', {
+                'type': 'geojson',
+                'data': routeData
+            });
+
+            map.addLayer({
+                'id': 'route',
+                'type': 'line',
+                'source': 'route',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': '#888',
+                    'line-width': 8
+                }
+            });
+        } catch (error) {
+            console.error('Error loading route data:', error);
+        }
+    };
 
     const loadEvangileMarker = (mapEvent) => {
         console.log(evangileEvents)
