@@ -128,7 +128,7 @@ const MapComponent = () => {
 
   const addRouteLayer = async (map) => {
     try {
-      const response = await fetch('/assets/route_israel.geojson'); // Assurez-vous que le chemin est correct
+      const response = await fetch('/assets/route_palestine.geojson'); // Assurez-vous que le chemin est correct
       const routeData = await response.json();
 
       map.addSource('route', {
