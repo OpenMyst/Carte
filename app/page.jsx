@@ -54,7 +54,7 @@ export default function Home() {
       });
 
       // map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight });
-
+      addRouteLayer(map.current)
       loadEvangileMarker();
     });
     console.log(map)
@@ -115,10 +115,8 @@ export default function Home() {
           console.log(terre)
           handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
         });
-       
         
-        
-        console.log(mountainHeight)
+        // console.log(mountainHeight)
       } else {
         setMountainHeight(0)
         setShowBuilding(true)
@@ -131,8 +129,6 @@ export default function Home() {
           console.log(terre)
           handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
         });
-        
-        console.log(mountainHeight)
       }
 
       if (location.isPlay) {
@@ -159,6 +155,34 @@ export default function Home() {
         }
       }
     });
+  };
+
+  const addRouteLayer = async (map) => {
+    try {
+      const response = await fetch('/assets/route_palestine.geojson'); // Assurez-vous que le chemin est correct
+      const routeData = await response.json();
+
+      map.addSource('route', {
+        'type': 'geojson',
+        'data': routeData
+      });
+
+      map.addLayer({
+        'id': 'route',
+        'type': 'line',
+        'source': 'route',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': '#888',
+          'line-width': 2
+        }
+      });
+    } catch (error) {
+      console.error('Error loading route data:', error);
+    }
   };
 
   const addCloudLayer = (map) => {

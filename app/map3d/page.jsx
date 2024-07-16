@@ -195,10 +195,6 @@ const MapComponent = () => {
           console.log(terre)
           handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
         });
-       
-        
-        
-        console.log(mountainHeight)
       } else {
         setMountainHeight(0)
         setShowBuilding(true)
@@ -211,8 +207,6 @@ const MapComponent = () => {
           console.log(terre)
           handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
         });
-        
-        console.log(mountainHeight)
       }
 
       if (location.isPlay) {
