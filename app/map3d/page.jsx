@@ -16,7 +16,7 @@ const MapComponent = () => {
   const [showRoad, setShowRoad] = useState(true);
   const [showBuilding, setShowBuilding] = useState(true);
   const [season, setSeason] = useState('spring');
-  const [mountainHeight, setMountainHeight] = useState(100);
+  const [mountainHeight, setMountainHeight] = useState(10);
   const [mapStyle, setMapStyle] = useState(sprintStyle);
   const [evangileEvents, setEvangileEvents] = useState([]);
   const [open, setOpen] = useState(true);
