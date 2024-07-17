@@ -14,7 +14,7 @@ const MapComponent = () => {
   const [lat, setLat] = useState(31.76904);
   const [zoom, setZoom] = useState(9);
   const [showRoad, setShowRoad] = useState(true);
-  const [showBuilding, setShowBuilding] = useState(true);
+  const [showBuilding, setShowBuilding] = useState(false);
   const [season, setSeason] = useState('spring');
   const [mountainHeight, setMountainHeight] = useState(10);
   const [mapStyle, setMapStyle] = useState(sprintStyle);
@@ -28,9 +28,18 @@ const MapComponent = () => {
 
   useEffect(() => {
     if (map) {
-      loadEvangileMarker(map);
+      loadEvangileMarker(map);      
     }
   }, [evangileEvents, map]);
+
+  useEffect(() => {
+    if(map) {
+      map.on("style.load", () => {
+        handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+      })
+    }
+  }, [showBuilding])
+
 
   const getAllEvent = () => {
     const q = query(collection(database, 'events'))
@@ -79,10 +88,10 @@ const MapComponent = () => {
 
           map.on('style.load', () => {
             map.addSource('mapbox-dem', {
-                type: 'raster-dem',
-                url: 'mapbox://mapbox.terrain-rgb'
+              type: 'raster-dem',
+              url: 'mapbox://mapbox.terrain-rgb'
             });
-            handleCheckboxChange('building-extrusion', 'visibility', false);
+            handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
 
             map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
 
@@ -120,11 +129,9 @@ const MapComponent = () => {
         initializeMap();
       }
     };
-    if (showBuilding) {
-      document.head.appendChild(script);
-    } else {
-      document.head.removeChild(script);
-    }
+
+    document.head.appendChild(script);
+
   };
 
   const addRouteLayer = async (map) => {
@@ -181,39 +188,41 @@ const MapComponent = () => {
         });
       })
 
-      const anneeEvent = parseInt(location.event_date)
-      if ( anneeEvent > 0) {
-        console.log(location.event_date)
-        setMountainHeight(100)
-        setShowBuilding(false)
-        map.on('style.load', () => {
-          map.current.addSource('mapbox-dem', {
-            type: 'raster-dem',
-            url: 'mapbox://mapbox.terrain-rgb'
-          });
-          const terre = map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-          console.log(terre)
-          handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
-        });
-      } else {
-        setMountainHeight(0)
-        setShowBuilding(true)
-        map.on('style.load', () => {
-          map.addSource('mapbox-dem', {
-            type: 'raster-dem',
-            url: 'mapbox://mapbox.terrain-rgb'
-          });
-          const terre = map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-          console.log(terre)
-          handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
-        });
-      }
-
       if (location.isPlay) {
         mapEvent.flyTo({
           center: [location.longitude, location.latitude],
           zoom: 15
         });
+
+        const anneeEvent = parseInt(location.event_date)
+        if (anneeEvent < 0) {
+          console.log(location.event_date)
+          setMountainHeight(100)
+          setShowBuilding(false)
+          console.log("mountain: " + mountainHeight + "\n show building: " + showBuilding)
+          map.on('style.load', () => {
+            map.current.addSource('mapbox-dem', {
+              type: 'raster-dem',
+              url: 'mapbox://mapbox.terrain-rgb'
+            });
+            const terre = map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+            console.log(terre)
+            handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+          });
+        } else {
+          setMountainHeight(0)
+          setShowBuilding(true)
+          console.log("mountain: " + mountainHeight + "\n show building: " + showBuilding)
+          map.on('style.load', () => {
+            map.addSource('mapbox-dem', {
+              type: 'raster-dem',
+              url: 'mapbox://mapbox.terrain-rgb'
+            });
+            const terre = map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+            console.log(terre)
+            handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+          });
+        }
 
 
         const day = location.detail_jour;
@@ -366,10 +375,9 @@ const MapComponent = () => {
     document.head.appendChild(styleElement);
   };
 
-
   const handleCheckboxChange = (layerId, property, value) => {
-    if(map) {
-      map.setLayoutProperty(layerId, property, value);
+    if (map) {
+      map.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
     }
   };
 
@@ -378,16 +386,17 @@ const MapComponent = () => {
       <div ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
       <div className="map-overlay top w-[20vw]">
         <div className="map-overlay-inner">
-          {/*<fieldset>
-                        <label>Show 3D map</label>
-                        <input
-                            type="checkbox"
-                            checked={showBuilding}
-                            onChange={(e) => {
-                                setShowBuilding(e.target.checked);
-                            }}
-                        />
-                    </fieldset>*/}
+          <fieldset>
+            <label>Show 3D map</label>
+            <input
+              type="checkbox"
+              checked={showBuilding}
+              onChange={(e) => {
+                setShowBuilding(e.target.checked);
+                handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+              }}
+            />
+          </fieldset>
           <fieldset>
             <label>Show Road</label>
             <input
