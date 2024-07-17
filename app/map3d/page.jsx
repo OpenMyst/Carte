@@ -16,7 +16,7 @@ const MapComponent = () => {
   const [showRoad, setShowRoad] = useState(true);
   const [showBuilding, setShowBuilding] = useState(false);
   const [season, setSeason] = useState('spring');
-  const [mountainHeight, setMountainHeight] = useState(10);
+  const [mountainHeight, setMountainHeight] = useState(100);
   const [mapStyle, setMapStyle] = useState(sprintStyle);
   const [evangileEvents, setEvangileEvents] = useState([]);
   const [open, setOpen] = useState(true);
@@ -28,10 +28,15 @@ const MapComponent = () => {
 
   useEffect(() => {
     if (map) {
-      loadEvangileMarker(map);      
+      loadEvangileMarker(map);
     }
-  }, [evangileEvents, map]);
+  }, [evangileEvents, map, mountainHeight]);
 
+  useEffect(() => {
+    if (map) {
+      initializeMap();
+    }
+  }, [mountainHeight]);
 
   const getAllEvent = () => {
     const q = query(collection(database, 'events'))
@@ -52,78 +57,77 @@ const MapComponent = () => {
     script.async = true;
     script.onload = () => {
       if (mapContainer.current && !map) {
-        const initializeMap = () => {
-          const map = new mapboxgl.Map({
-            container: mapContainer.current,
-            style: mapStyle,
-            center: [lng, lat],
-            zoom: zoom,
-            pitch: 62,
-            bearing: -20,
-          });
-
-          map.on('move', () => {
-            setLng(map.getCenter().lng.toFixed(4));
-            setLat(map.getCenter().lat.toFixed(4));
-            setZoom(map.getZoom().toFixed(2));
-          });
-
-          map.addControl(new mapboxgl.NavigationControl());
-
-          const tb = (window.tb = new Threebox(
-            map,
-            map.getCanvas().getContext('webgl'),
-            {
-              defaultLights: true
-            }
-          ));
-
-          map.on('style.load', () => {
-            map.addSource('mapbox-dem', {
-              type: 'raster-dem',
-              url: 'mapbox://mapbox.terrain-rgb'
-            });
-            map.setLayoutProperty('building-extrusion', 'visibility', "none");
-
-            map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-
-            loadEvangileMarker(map);
-            map.addLayer({
-              id: 'custom-threebox-model',
-              type: 'custom',
-              renderingMode: '3d',
-              onAdd: function () {
-                const scale = 10;
-                const options = {
-                  obj: '/assets/JERUSALEM.gltf',
-                  type: 'gltf',
-                  scale: { x: scale, y: scale * 2, z: 15 },
-                  units: 'meters',
-                  rotation: { x: 90, y: -90, z: 0 }
-                };
-
-                tb.loadObj(options, (model) => {
-                  model.setCoords([35.2310, 31.7794]);
-                  model.setRotation({ x: 0, y: 0, z: 241 });
-                  tb.add(model);
-                });
-              },
-              render: function () {
-                tb.update();
-              }
-            });
-            addRouteLayer(map)
-          });
-
-          setMap(map);
-        };
-
         initializeMap();
       }
     };
-
     document.head.appendChild(script);
+  };
 
+  const initializeMap = () => {
+    const map = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: mapStyle,
+      center: [lng, lat],
+      zoom: zoom,
+      pitch: 62,
+      bearing: -20,
+    });
+
+    map.on('move', () => {
+      setLng(map.getCenter().lng.toFixed(4));
+      setLat(map.getCenter().lat.toFixed(4));
+      setZoom(map.getZoom().toFixed(2));
+    });
+
+    map.addControl(new mapboxgl.NavigationControl());
+
+    const tb = (window.tb = new Threebox(
+      map,
+      map.getCanvas().getContext('webgl'),
+      {
+        defaultLights: true
+      }
+    ));
+
+    map.on('style.load', () => {
+      map.addSource('mapbox-dem', {
+        type: 'raster-dem',
+        url: 'mapbox://mapbox.terrain-rgb'
+      });
+      map.setLayoutProperty('building-extrusion', 'visibility', "none");
+
+      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+
+      loadEvangileMarker(map);
+      map.addLayer({
+        id: 'custom-threebox-model',
+        type: 'custom',
+        renderingMode: '3d',
+        onAdd: function () {
+          const scale = 10;
+          const heightMultiple = mountainHeight !== 100 ? 2 : 6;
+          const options = {
+            obj: '/assets/JERUSALEM.gltf',
+            type: 'gltf',
+            scale: { x: scale, y: scale * heightMultiple, z: 15 },
+            units: 'meters',
+            rotation: { x: 90, y: -90, z: 0 }
+          };
+
+          tb.loadObj(options, (model) => {
+            model.setCoords([35.2310, 31.7794]);
+            model.setRotation({ x: 0, y: 0, z: 241 });
+            tb.add(model);
+          });
+        },
+        render: function () {
+          tb.update();
+        }
+      });
+      addRouteLayer(map)
+    });
+
+    setMap(map);
   };
 
   const addRouteLayer = async (map) => {
@@ -146,7 +150,7 @@ const MapComponent = () => {
         },
         'paint': {
           'line-color': '#888',
-          'line-width': 2
+          'line-width': mountainHeight !== 100 ? 2 : 8
         }
       });
     } catch (error) {
@@ -187,7 +191,7 @@ const MapComponent = () => {
         });
 
         const anneeEvent = parseInt(location.event_date)
-        if (anneeEvent < 0) {
+        if (anneeEvent > 0) {
           console.log(location.event_date)
           setMountainHeight(100)
           setShowBuilding(false)
@@ -199,7 +203,6 @@ const MapComponent = () => {
           console.log("mountain: " + mountainHeight + "\n show building: " + showBuilding)
           updateTerrain(map, 10, true)
         }
-
 
         const day = location.detail_jour;
         if (day === "Nuit") {
@@ -217,18 +220,13 @@ const MapComponent = () => {
         } else if (meteo === "Neigeux") {
           addSnowLayer(mapEvent)
         }
-
-        loadThreeboxScript()
       }
     });
   };
 
   const updateTerrain = (map, height, show) => {
+    console.log(height)
     map.on('style.load', () => {
-      map.addSource('mapbox-dem', {
-        type: 'raster-dem',
-        url: 'mapbox://mapbox.terrain-rgb'
-      });
       map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
       handleCheckboxChange('building-extrusion', 'visibility', show);
     });
