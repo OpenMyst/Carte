@@ -53,6 +53,8 @@ export default function Home() {
         url: 'mapbox://mapbox.terrain-rgb'
       });
 
+      handleCheckboxChange('building-extrusion', 'visibility', false);
+
       // map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight });
       addRouteLayer(map.current)
       loadEvangileMarker();
@@ -361,11 +363,6 @@ export default function Home() {
                 setShowMap3D(e.target.checked);
               }}
             />
-          </fieldset>
-          <fieldset>
-            <Link href="/map">
-              <label>Afficher les Batiments</label>
-            </Link>
           </fieldset>
           <fieldset>
             <label>Montrer le batiment</label>
