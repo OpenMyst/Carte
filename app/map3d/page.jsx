@@ -191,7 +191,7 @@ const MapComponent = () => {
         });
 
         const anneeEvent = parseInt(location.event_date)
-        if (anneeEvent > 0) {
+        if (anneeEvent < 0) {
           console.log(location.event_date)
           setMountainHeight(100)
           setShowBuilding(false)
