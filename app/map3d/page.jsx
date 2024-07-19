@@ -21,7 +21,6 @@ const MapComponent = () => {
   const [mountainHeight, setMountainHeight] = useState(100);
   const [mapStyle, setMapStyle] = useState(sprintStyle);
   const [evangileEvents, setEvangileEvents] = useState([]);
-  const [open, setOpen] = useState(true);
 
   useEffect(() => {
     getAllEvent();
@@ -196,15 +195,12 @@ const MapComponent = () => {
 
         const anneeEvent = parseInt(location.event_date)
         if (anneeEvent < 0) {
-          console.log(location.event_date)
           setMountainHeight(100)
           setShowBuilding(false)
-          console.log("mountain: " + mountainHeight + "\n show building: " + showBuilding)
           updateTerrain(map, 100, false)
         } else {
           setMountainHeight(0)
           setShowBuilding(true)
-          console.log("mountain: " + mountainHeight + "\n show building: " + showBuilding)
           updateTerrain(map, 10, true)
         }
 
@@ -229,7 +225,6 @@ const MapComponent = () => {
   };
 
   const updateTerrain = (map, height, show) => {
-    console.log(height)
     map.on('style.load', () => {
       map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
       handleCheckboxChange('building-extrusion', 'visibility', show);
