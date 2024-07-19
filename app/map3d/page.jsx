@@ -16,7 +16,7 @@ const MapComponent = () => {
   const [zoom, setZoom] = useState(9);
   const [showRoad, setShowRoad] = useState(true);
   const [showBuilding, setShowBuilding] = useState(false);
-  const [showTemple, setShowTemple] = useState(false);
+  const [showTemple, setShowTemple] = useState(true);
   const [season, setSeason] = useState('spring');
   const [mountainHeight, setMountainHeight] = useState(100);
   const [mapStyle, setMapStyle] = useState(sprintStyle);
@@ -24,7 +24,8 @@ const MapComponent = () => {
 
   useEffect(() => {
     getAllEvent();
-    loadThreeboxScript()
+    getCurrentTime();
+    loadThreeboxScript();
   }, [])
 
   useEffect(() => {
@@ -48,6 +49,18 @@ const MapComponent = () => {
         eventsArray.push({ ...doc.data(), id: doc.id })
       })
       setEvangileEvents(eventsArray);
+    })
+  }
+
+  const getCurrentTime = () => {
+    const q = query(collection(database, 'current_time'))
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let eventsArray = []
+
+      querySnapshot.forEach(doc => {
+        eventsArray.push({ ...doc.data(), id: doc.id })
+      })
+      console.log(eventsArray)
     })
   }
 
@@ -197,10 +210,12 @@ const MapComponent = () => {
         if (anneeEvent < 0) {
           setMountainHeight(100)
           setShowBuilding(false)
+          setShowTemple(true)
           updateTerrain(map, 100, false)
         } else {
           setMountainHeight(0)
           setShowBuilding(true)
+          setShowTemple(false)
           updateTerrain(map, 10, true)
         }
 
