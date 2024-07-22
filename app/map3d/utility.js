@@ -16,11 +16,7 @@ export const calculateDistance = (coord1, coord2) => {
     return distance;
 };
 
-export const traceRouteRed = (map, routeData) => {
-    // Coordonnées du point de départ et d'arrivée de la route additionnelle
-    const startCoord = [35.21633, 31.76904];
-    const endCoord = [35.207639, 31.704306];
-
+export const traceRouteRed = (map, routeData, startCoord, endCoord) => {
     // Trouver les segments de la route qui passent par les points spécifiés
     const filteredRoute = [
       {

@@ -11,14 +11,19 @@
   "dependencies": {
     "@react-three/drei": "^9.108.3",
     "@react-three/fiber": "^8.16.8",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "firebase": "^10.12.2",
+    "lucide-react": "^0.412.0",
     "mapbox-gl": "^3.4.0",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",
     "react-force-graph": "^1.44.4",
     "react-force-graph-3d": "^1.24.3",
-    "react-map-gl": "^7.1.7"
+    "react-map-gl": "^7.1.7",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "postcss": "^8",
