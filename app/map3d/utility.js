@@ -82,8 +82,6 @@ export const traceRouteRed = (map, routeData, startCoord, endCoord) => {
         }
       }
     }
-    
-    console.log(filteredRoute)
 
     // Ajout de la source pour la route additionnelle
     map.addSource('additionalRoute', {

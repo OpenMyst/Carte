@@ -303,7 +303,7 @@ const MapComponent = () => {
               checked={showBuilding}
               onChange={(e) => {
                 setShowBuilding(e.target.checked);
-                handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+                handleCheckboxChange('building-extrusion', 'visibility', e.target.checked);
               }}
             />
           </fieldset>
