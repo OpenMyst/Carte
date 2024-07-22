@@ -61,8 +61,6 @@ export const addSnowLayer = (map) => {
   };
 
 export const addRainLayer = (map) => {
-    const rainCoordinates = [lng, lat];
-
     for (let i = 0; i < 1000; i++) {
       const el = document.createElement("div");
       el.className = "rain-drop";

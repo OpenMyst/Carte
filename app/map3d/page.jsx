@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
-import { addSnowLayer } from "./climat";
+import { addSnowLayer, addRainLayer, } from "./climat";
 import { traceRouteRed } from "./utility";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -16,10 +16,10 @@ const MapComponent = () => {
   const [lat, setLat] = useState(31.76904);
   const [zoom, setZoom] = useState(9);
   const [showRoad, setShowRoad] = useState(true);
-  const [showBuilding, setShowBuilding] = useState(false);
+  const [showBuilding, setShowBuilding] = useState(true);
   const [showTemple, setShowTemple] = useState(true);
   const [season, setSeason] = useState('spring');
-  const [mountainHeight, setMountainHeight] = useState(100);
+  const [mountainHeight, setMountainHeight] = useState(50);
   const [mapStyle, setMapStyle] = useState(sprintStyle);
   const [evangileEvents, setEvangileEvents] = useState([]);
   const [startTravel, setStartTravel] = useState([]);
@@ -111,7 +111,7 @@ const MapComponent = () => {
         type: 'raster-dem',
         url: 'mapbox://mapbox.terrain-rgb'
       });
-      map.setLayoutProperty('building-extrusion', 'visibility', "none");
+      handleCheckboxChange('building-extrusion', 'visibility', false);
 
       map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
 
@@ -122,9 +122,9 @@ const MapComponent = () => {
         renderingMode: '3d',
         onAdd: function () {
           const scale = 10;
-          const heightMultiple = mountainHeight !== 100 ? 2 : showTemple ? 4 : 8;
+          const heightMultiple = mountainHeight !== 100 ? 1 : 2;
           const options = {
-            obj: showTemple ? '/assets/JERUSALEM_temple.glb' : '/assets/JERUSALEM.gltf',
+            obj: '/assets/israel.gltf',
             type: 'gltf',
             scale: { x: scale, y: scale * heightMultiple, z: 15 },
             units: 'meters',
@@ -211,13 +211,13 @@ const MapComponent = () => {
 
         const anneeEvent = parseInt(location.event_date)
         if (anneeEvent < 0) {
-          setMountainHeight(100)
+          setMountainHeight(20)
           setShowBuilding(false)
           setShowTemple(true)
-          updateTerrain(map, 100, false)
+          updateTerrain(map, 20, false)
         } else {
           setMountainHeight(0)
-          setShowBuilding(true)
+          setShowBuilding(false)
           setShowTemple(false)
           updateTerrain(map, 10, true)
         }
@@ -225,6 +225,7 @@ const MapComponent = () => {
         const day = location.detail_jour;
         if (day === "Nuit") {
           mapEvent.setStyle(sprintStyleNight);
+          setShowTemple(true);
         } else if (day === "Matin") {
           mapEvent.setStyle(summerLight);
         } else {
