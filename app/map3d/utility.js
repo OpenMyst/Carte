@@ -1,4 +1,33 @@
 import mapboxgl from 'mapbox-gl';
+
+export const add3DObjectInMap = (map, object3D, mountainHeight) => {
+  map.addLayer({
+    id: 'custom-threebox-model',
+    type: 'custom',
+    renderingMode: '3d',
+    onAdd: function () {
+      const scale = 10;
+      const heightMultiple = mountainHeight !== 100 ? 2 : 3;
+      const options = {
+        obj: object3D,
+        type: 'gltf',
+        scale: { x: scale, y: scale * heightMultiple, z: 15 },
+        units: 'meters',
+        rotation: { x: 90, y: -90, z: 0 }
+      };
+
+      tb.loadObj(options, (model) => {
+        model.setCoords([35.2310, 31.7794]);
+        model.setRotation({ x: 0, y: 0, z: 241 });
+        tb.add(model);
+      });
+    },
+    render: function () {
+      tb.update();
+    }
+  });
+}
+
 export const calculateDistance = (coord1, coord2) => {
     const [lon1, lat1] = coord1;
     const [lon2, lat2] = coord2;

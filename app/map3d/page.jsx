@@ -74,77 +74,90 @@ const MapComponent = () => {
     script.async = true;
     script.onload = () => {
       if (mapContainer.current && !map) {
-        initializeMap();
+        const map = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: mapStyle,
+          center: [lng, lat],
+          zoom: zoom,
+          pitch: 62,
+          bearing: -20,
+        });
+    
+        map.on('move', () => {
+          setLng(map.getCenter().lng.toFixed(4));
+          setLat(map.getCenter().lat.toFixed(4));
+          setZoom(map.getZoom().toFixed(2));
+        });
+    
+        map.addControl(new mapboxgl.NavigationControl());
+        const tb = (window.tb = new Threebox(
+          map,
+          map.getCanvas().getContext('webgl'),
+          {
+            defaultLights: true
+          }
+        ));
+        initializeMap(map, tb);
+        setMap(map)
       }
     };
     document.head.appendChild(script);
   };
 
-  const initializeMap = () => {
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: mapStyle,
-      center: [lng, lat],
-      zoom: zoom,
-      pitch: 62,
-      bearing: -20,
-    });
-
-    map.on('move', () => {
-      setLng(map.getCenter().lng.toFixed(4));
-      setLat(map.getCenter().lat.toFixed(4));
-      setZoom(map.getZoom().toFixed(2));
-    });
-
-    map.addControl(new mapboxgl.NavigationControl());
-
-    const tb = (window.tb = new Threebox(
-      map,
-      map.getCanvas().getContext('webgl'),
-      {
-        defaultLights: true
-      }
-    ));
-
-    map.on('style.load', () => {
-      map.addSource('mapbox-dem', {
-        type: 'raster-dem',
-        url: 'mapbox://mapbox.terrain-rgb'
-      });
-      handleCheckboxChange('building-extrusion', 'visibility', false);
-
-      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-
-      loadEvangileMarker(map);
-      map.addLayer({
-        id: 'custom-threebox-model',
-        type: 'custom',
-        renderingMode: '3d',
-        onAdd: function () {
-          const scale = 10;
-          const heightMultiple = mountainHeight !== 100 ? 1 : 2;
-          const options = {
-            obj: '/assets/israel.gltf',
-            type: 'gltf',
-            scale: { x: scale, y: scale * heightMultiple, z: 15 },
-            units: 'meters',
-            rotation: { x: 90, y: -90, z: 0 }
-          };
-
-          tb.loadObj(options, (model) => {
+  const initializeMap = (map, tb) => {
+    if(map) {
+      map.on('style.load', () => {
+        map.addSource('mapbox-dem', {
+          type: 'raster-dem',
+          url: 'mapbox://mapbox.terrain-rgb'
+        });
+        handleCheckboxChange('building-extrusion', 'visibility', false);
+  
+        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+  
+        loadEvangileMarker(map);
+        map.addLayer({
+          id: 'custom-threebox-model',
+          type: 'custom',
+          renderingMode: '3d',
+          onAdd: function () {
+            const scale = 10;
+            const heightMultiple = mountainHeight < 100 ? 4 : 8;
+            const options = {
+              obj: '/assets/israel.gltf',
+              type: 'gltf',
+              scale: { x: scale, y: scale * heightMultiple, z: 20 },
+              units: 'meters',
+              rotation: { x: 90, y: -90, z: 0 }
+            };
+  
+            tb.loadObj(options, (model) => {
             model.setCoords([35.2310, 31.7794]);
-            model.setRotation({ x: 0, y: 0, z: 241 });
-            tb.add(model);
-          });
-        },
-        render: function () {
-          tb.update();
-        }
-      });
-      addRouteLayer(map)
-    });
+              model.setRotation({ x: 0, y: 0, z: 241 });
+              tb.add(model);
+            });
 
-    setMap(map);
+            const options2 = {
+              obj: '/assets/golgotha.gltf',
+              type: 'gltf',
+              scale: { x: scale, y: scale, z: 15 },
+              units: 'meters',
+              rotation: { x: 90, y: -90, z: 0 }
+            };
+  
+            tb.loadObj(options2, (model) => {
+              model.setCoords([35.2298, 31.7781]);
+              model.setRotation({ x: 0, y: 0, z: 241 });
+              tb.add(model);
+            });
+          },
+          render: function () {
+            tb.update();
+          }
+        });
+        addRouteLayer(map)
+      });
+    }
   };
 
   const addRouteLayer = async (map) => {
