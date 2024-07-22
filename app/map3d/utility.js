@@ -108,20 +108,9 @@ export const traceRouteRed = (map, routeData, startCoord, endCoord) => {
         'line-width': 4
       }
     });
-
-    // Ajout de marqueurs pour les points de départ et d'arrivée de la route additionnelle
-    new mapboxgl.Marker({ color: 'blue' })
-      .setLngLat(startCoord)
-      .setPopup(new mapboxgl.Popup().setText('Point de départ additionnel'))
-      .addTo(map);
-
-    new mapboxgl.Marker({ color: 'purple' })
-      .setLngLat(endCoord)
-      .setPopup(new mapboxgl.Popup().setText('Point d\'arrivée additionnel'))
-      .addTo(map);
 }
 
 // Helper function to compare coordinates
-export const areCoordsEqual = (coord1, coord2, threshold = 4) => {
+export const areCoordsEqual = (coord1, coord2, threshold = 5) => {
     return calculateDistance(coord1, coord2) <= threshold;
 };

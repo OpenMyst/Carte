@@ -22,8 +22,8 @@ const MapComponent = () => {
   const [mountainHeight, setMountainHeight] = useState(50);
   const [mapStyle, setMapStyle] = useState(sprintStyle);
   const [evangileEvents, setEvangileEvents] = useState([]);
-  const [startTravel, setStartTravel] = useState([]);
-  const [endTravel, setEndTravel] = useState([]);
+  const [startTravel, setStartTravel] = useState([35.2297, 31.7738]);
+  const [endTravel, setEndTravel] = useState([35.207639, 31.704306]);
 
   useEffect(() => {
     getAllEvent();
@@ -63,7 +63,6 @@ const MapComponent = () => {
       querySnapshot.forEach(doc => {
         eventsArray.push({ ...doc.data(), id: doc.id })
       })
-      console.log(eventsArray)
     })
   }
 
@@ -74,104 +73,102 @@ const MapComponent = () => {
     script.async = true;
     script.onload = () => {
       if (mapContainer.current && !map) {
-        const map = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: mapStyle,
-          center: [lng, lat],
-          zoom: zoom,
-          pitch: 62,
-          bearing: -20,
-        });
-    
-        map.on('move', () => {
-          setLng(map.getCenter().lng.toFixed(4));
-          setLat(map.getCenter().lat.toFixed(4));
-          setZoom(map.getZoom().toFixed(2));
-        });
-    
-        map.addControl(new mapboxgl.NavigationControl());
-        const tb = (window.tb = new Threebox(
-          map,
-          map.getCanvas().getContext('webgl'),
-          {
-            defaultLights: true
-          }
-        ));
-        initializeMap(map, tb);
-        setMap(map)
+        initializeMap();
       }
     };
     document.head.appendChild(script);
   };
 
-  const initializeMap = (map, tb) => {
-    if(map) {
-      map.on('style.load', () => {
-        map.addSource('mapbox-dem', {
-          type: 'raster-dem',
-          url: 'mapbox://mapbox.terrain-rgb'
-        });
-        handleCheckboxChange('building-extrusion', 'visibility', false);
-  
-        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-  
-        loadEvangileMarker(map);
-        map.addLayer({
-          id: 'custom-threebox-model',
-          type: 'custom',
-          renderingMode: '3d',
-          onAdd: function () {
-            const scale = 10;
-            const heightMultiple = mountainHeight < 100 ? 4 : 8;
-            const options = {
-              obj: '/assets/israel.gltf',
-              type: 'gltf',
-              scale: { x: scale, y: scale * heightMultiple, z: 20 },
-              units: 'meters',
-              rotation: { x: 90, y: -90, z: 0 }
-            };
-  
-            tb.loadObj(options, (model) => {
-            model.setCoords([35.2310, 31.7794]);
-              model.setRotation({ x: 0, y: 0, z: 241 });
-              tb.add(model);
-            });
+  const initializeMap = () => {
+    const map = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: mapStyle,
+      center: [lng, lat],
+      zoom: zoom,
+      pitch: 62,
+      bearing: -20,
+    });
 
-            const options2 = {
-              obj: '/assets/golgotha.gltf',
-              type: 'gltf',
-              scale: { x: scale, y: scale, z: 15 },
-              units: 'meters',
-              rotation: { x: 90, y: -90, z: 0 }
-            };
-  
-            tb.loadObj(options2, (model) => {
-              model.setCoords([35.2298, 31.7781]);
-              model.setRotation({ x: 0, y: 0, z: 241 });
-              tb.add(model);
-            });
+    map.on('move', () => {
+      setLng(map.getCenter().lng.toFixed(4));
+      setLat(map.getCenter().lat.toFixed(4));
+      setZoom(map.getZoom().toFixed(2));
+    });
 
-            const options3 = {
-              obj: '/assets/Palais_de_Lazare.gltf',
-              type: 'gltf',
-              scale: { x: scale, y: scale, z: 15 },
-              units: 'meters',
-              rotation: { x: 90, y: -90, z: 0 }
-            };
-  
-            tb.loadObj(options3, (model) => {
-              model.setCoords([35.2615, 31.7714]);
-              model.setRotation({ x: 0, y: 0, z: 241 });
-              tb.add(model);
-            });
-          },
-          render: function () {
-            tb.update();
-          }
-        });
-        addRouteLayer(map)
+    map.addControl(new mapboxgl.NavigationControl());
+    const tb = (window.tb = new Threebox(
+      map,
+      map.getCanvas().getContext('webgl'),
+      {
+        defaultLights: true
+      }
+    ));
+    map.on('style.load', () => {
+      map.addSource('mapbox-dem', {
+        type: 'raster-dem',
+        url: 'mapbox://mapbox.terrain-rgb'
       });
-    }
+      handleCheckboxChange('building-extrusion', 'visibility', false);
+
+      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+
+      loadEvangileMarker(map);
+      map.addLayer({
+        id: 'custom-threebox-model',
+        type: 'custom',
+        renderingMode: '3d',
+        onAdd: function () {
+          const scale = 10;
+          const heightMultiple = mountainHeight < 100 ? 4 : 8;
+          const options = {
+            obj: '/assets/israel.gltf',
+            type: 'gltf',
+            scale: { x: scale, y: scale * heightMultiple, z: 20 },
+            units: 'meters',
+            rotation: { x: 90, y: -90, z: 0 }
+          };
+
+          tb.loadObj(options, (model) => {
+            model.setCoords([35.2310, 31.7794]);
+            model.setRotation({ x: 0, y: 0, z: 241 });
+            tb.add(model);
+          });
+
+          const options2 = {
+            obj: '/assets/golgotha.gltf',
+            type: 'gltf',
+            scale: { x: scale, y: scale, z: 15 },
+            units: 'meters',
+            rotation: { x: 90, y: -90, z: 0 }
+          };
+
+          tb.loadObj(options2, (model) => {
+            model.setCoords([35.2298, 31.7781]);
+            model.setRotation({ x: 0, y: 0, z: 241 });
+            tb.add(model);
+          });
+
+          const options3 = {
+            obj: '/assets/Palais_de_Lazare.gltf',
+            type: 'gltf',
+            scale: { x: scale, y: scale, z: 15 },
+            units: 'meters',
+            rotation: { x: 90, y: -90, z: 0 }
+          };
+
+          tb.loadObj(options3, (model) => {
+            model.setCoords([35.2615, 31.7714]);
+            model.setRotation({ x: 0, y: 0, z: 241 });
+            tb.add(model);
+          });
+        },
+        render: function () {
+          tb.update();
+        }
+      });
+      addRouteLayer(map)
+    });
+    setMap(map)
   };
 
   const addRouteLayer = async (map) => {
@@ -194,17 +191,18 @@ const MapComponent = () => {
         },
         'paint': {
           'line-color': '#888',
-          'line-width': mountainHeight !== 100 ? 2 : 8
+          'line-width': 8
         }
       });
 
-      traceRouteRed(map, routeData, )
+      traceRouteRed(map, routeData, startTravel, endTravel)
     } catch (error) {
       console.error('Error loading route data:', error);
     }
   };
 
   const loadEvangileMarker = (mapEvent) => {
+   
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
             <div class="flex flex-row h-[300px] w-[220px]  static">
