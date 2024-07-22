@@ -88,14 +88,15 @@ const MapComponent = () => {
       pitch: 62,
       bearing: -20,
     });
-
+  
     map.on('move', () => {
       setLng(map.getCenter().lng.toFixed(4));
       setLat(map.getCenter().lat.toFixed(4));
       setZoom(map.getZoom().toFixed(2));
     });
-
+  
     map.addControl(new mapboxgl.NavigationControl());
+  
     const tb = (window.tb = new Threebox(
       map,
       map.getCanvas().getContext('webgl'),
@@ -103,51 +104,47 @@ const MapComponent = () => {
         defaultLights: true
       }
     ));
+  
     map.on('style.load', () => {
-      map.addSource('mapbox-dem', {
-        type: 'raster-dem',
-        url: 'mapbox://mapbox.terrain-rgb'
-      });
       handleCheckboxChange('building-extrusion', 'visibility', false);
-
-      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-
+  
+  
       loadEvangileMarker(map);
+  
       map.addLayer({
         id: 'custom-threebox-model',
         type: 'custom',
         renderingMode: '3d',
         onAdd: function () {
           const scale = 10;
-          const heightMultiple = mountainHeight < 100 ? 4 : 8;
-          const options = {
+          const heightMultiple = mountainHeight < 100 ? 1:2;
+  
+          const loadAndPlaceModel = (options, coords) => {
+            tb.loadObj(options, (model) => {
+              model.setCoords(coords);
+              model.setRotation({ x: 0, y: 0, z: 241 });
+              tb.add(model);
+            });
+          };
+  
+          const options1 = {
             obj: '/assets/israel.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale * heightMultiple, z: 20 },
+            scale: { x: scale, y: scale * heightMultiple, z: 15 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
-
-          tb.loadObj(options, (model) => {
-            model.setCoords([35.2310, 31.7794]);
-            model.setRotation({ x: 0, y: 0, z: 241 });
-            tb.add(model);
-          });
-
+          loadAndPlaceModel(options1, [35.2310, 31.7794]);
+  
           const options2 = {
             obj: '/assets/golgotha.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale, z: 15 },
+            scale: { x: scale, y: scale / 2, z: 15 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
-
-          tb.loadObj(options2, (model) => {
-            model.setCoords([35.2298, 31.7781]);
-            model.setRotation({ x: 0, y: 0, z: 241 });
-            tb.add(model);
-          });
-
+          loadAndPlaceModel(options2, [35.2298, 31.7781]);
+  
           const options3 = {
             obj: '/assets/Palais_de_Lazare.gltf',
             type: 'gltf',
@@ -155,21 +152,19 @@ const MapComponent = () => {
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
-
-          tb.loadObj(options3, (model) => {
-            model.setCoords([35.2615, 31.7714]);
-            model.setRotation({ x: 0, y: 0, z: 241 });
-            tb.add(model);
-          });
+          loadAndPlaceModel(options3, [35.2615, 31.7714]);
         },
         render: function () {
           tb.update();
         }
       });
-      addRouteLayer(map)
+  
+      addRouteLayer(map);
     });
-    setMap(map)
+  
+    setMap(map);
   };
+  
 
   const addRouteLayer = async (map) => {
     try {
