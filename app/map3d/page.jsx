@@ -150,6 +150,20 @@ const MapComponent = () => {
               model.setRotation({ x: 0, y: 0, z: 241 });
               tb.add(model);
             });
+
+            const options3 = {
+              obj: '/assets/Palais_de_Lazare.gltf',
+              type: 'gltf',
+              scale: { x: scale, y: scale, z: 15 },
+              units: 'meters',
+              rotation: { x: 90, y: -90, z: 0 }
+            };
+  
+            tb.loadObj(options3, (model) => {
+              model.setCoords([35.2615, 31.7714]);
+              model.setRotation({ x: 0, y: 0, z: 241 });
+              tb.add(model);
+            });
           },
           render: function () {
             tb.update();
