@@ -191,7 +191,7 @@ const MapComponent = () => {
         },
         'paint': {
           'line-color': '#888',
-          'line-width': 8
+          'line-width': 4
         }
       });
 
