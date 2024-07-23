@@ -61,7 +61,7 @@ export default function Home() {
       handleCheckboxChange('road-street-navigation', 'visibility', showRoad);
       handleCheckboxChange('road-minor-navigation', 'visibility', showRoad);
 
-      map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight });
+      map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       addRouteLayer(map.current, startTravel, endTravel)
       loadEvangileMarker();
     });
