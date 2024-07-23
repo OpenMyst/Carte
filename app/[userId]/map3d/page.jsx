@@ -194,6 +194,7 @@ const Map3DComponent = ({ params }) => {
     }
   };
 
+  // Load the location to zoom when user play one event
   const userPlayEvent = async () => {
     const q = query(collection(database, 'location'), where('idUser', '==', userId));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
