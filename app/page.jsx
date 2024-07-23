@@ -4,25 +4,27 @@ import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
-import Link from "next/link";
+import { addSnowLayer, addRainLayer, } from "@/lib/climat";
+import { addRouteLayer } from "@/lib/utility";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
 export default function Home() {
-  const mapContainer = useRef(null);
-  const map = useRef(null);
-  const [lng, setLng] = useState(35.21633);
-  const [lat, setLat] = useState(31.76904);
-  const [zoom, setZoom] = useState(9);
-  const [mapStyle, setMapStyle] = useState(sprintStyle);
-  const [showBuilding, setShowBuilding] = useState(true);
-  const [showMap3D, setShowMap3D] = useState(true);
-  const [showRoad, setShowRoad] = useState(true);
-  const [season, setSeason] = useState('spring');
-  const [mountainHeight, setMountainHeight] = useState(100);
+  const mapContainer = useRef(null); // Reference to the map container
+  const map = useRef(null); // Reference to the map object
+  const [lng, setLng] = useState(35.21633); // Longitude state
+  const [lat, setLat] = useState(31.76904); // Latitude state
+  const [zoom, setZoom] = useState(9); // Zoom level state
+  const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
+  const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
+  const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
+  const [season, setSeason] = useState('spring'); // Season state
+  const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
 
-  const [evangileEvents, setEvangileEvents] = useState([]);
-  const [open, setOpen] = useState(true);
+  const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
+  const [open, setOpen] = useState(true); // Toggle for overlay visibility
+  const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
+  const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
 
   useEffect(() => {
     getAllEvent();
@@ -55,8 +57,8 @@ export default function Home() {
 
       handleCheckboxChange('building-extrusion', 'visibility', false);
 
-      // map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight });
-      addRouteLayer(map.current)
+      map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight });
+      addRouteLayer(map.current, startTravel, endTravel)
       loadEvangileMarker();
     });
     console.log(map)
@@ -84,6 +86,20 @@ export default function Home() {
     }
   }, [season, mapStyle, evangileEvents]);
 
+  // Fetch all events from Firebase
+  const getAllEvent = () => {
+    const q = query(collection(database, 'events'))
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let eventsArray = []
+
+      querySnapshot.forEach(doc => {
+        eventsArray.push({ ...doc.data(), id: doc.id })
+      })
+      setEvangileEvents(eventsArray);
+    })
+  }
+
+   // Load markers for evangile events
   const loadEvangileMarker = () => {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
@@ -159,182 +175,14 @@ export default function Home() {
     });
   };
 
-  const addRouteLayer = async (map) => {
-    try {
-      const response = await fetch('/assets/route_palestine.geojson'); // Assurez-vous que le chemin est correct
-      const routeData = await response.json();
-
-      map.addSource('route', {
-        'type': 'geojson',
-        'data': routeData
-      });
-
-      map.addLayer({
-        'id': 'route',
-        'type': 'line',
-        'source': 'route',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': '#888',
-          'line-width': 2
-        }
-      });
-    } catch (error) {
-      console.error('Error loading route data:', error);
-    }
-  };
-
-  const addCloudLayer = (map) => {
-    for (let i = 0; i < 100; i++) {
-      const el = document.createElement("div");
-      el.className = "cloud";
-      el.style.width = "100px";
-      el.style.height = "60px";
-      el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-      el.style.borderRadius = "50%";
-      el.style.position = "absolute";
-      el.style.top = `${Math.random() * (window.innerHeight / 2)}px`;
-      el.style.left = `${Math.random() * window.innerWidth}px`;
-      el.style.animation = `float ${Math.random() * 10 + 10}s linear infinite`;
-      map.getCanvasContainer().appendChild(el);
-    }
-  
-    const styleElement = document.createElement("style");
-    styleElement.innerHTML = `
-      @keyframes float {
-        0% {
-          transform: translateX(0);
-        }
-        100% {
-          transform: translateX(${window.innerWidth}px);
-        }
-      }
-    `;
-    document.head.appendChild(styleElement);
-  };
-  
-
-  const addSnowLayer = (map) => {
-    const snowCoordinates = [lng, lat];
-
-    for (let i = 0; i < 1000; i++) {
-      const el = document.createElement("div");
-      el.className = "snow-flake";
-      el.style.width = "5px";
-      el.style.height = "5px";
-      el.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-      el.style.borderRadius = "50%";
-      el.style.position = "absolute";
-      el.style.top = `${Math.random() * window.innerHeight}px`;
-      el.style.left = `${Math.random() * window.innerWidth}px`;
-      el.style.animation = `fall ${Math.random() * 2 + 3}s linear infinite`;
-
-      map.getCanvasContainer().appendChild(el);
-    }
-
-    const styleElement = document.createElement("style");
-    styleElement.innerHTML = `
-      @keyframes fall {
-        0% {
-          transform: translateY(0);
-          opacity: 1;
-        }
-        100% {
-          transform: translateY(${window.innerHeight}px);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(styleElement);
-  };
-
-  const addRainLayer = (map) => {
-    const rainCoordinates = [lng, lat];
-
-    for (let i = 0; i < 1000; i++) {
-      const el = document.createElement("div");
-      el.className = "rain-drop";
-      el.style.width = "2px";
-      el.style.height = "10px";
-      el.style.backgroundColor = "rgba(0, 150, 255, 0.7)";
-      el.style.position = "absolute";
-      el.style.top = `${Math.random() * window.innerHeight}px`;
-      el.style.left = `${Math.random() * window.innerWidth}px`;
-      el.style.animation = `fall ${Math.random() * 2 + 1}s linear infinite`;
-
-      map.getCanvasContainer().appendChild(el);
-    }
-
-    const styleElement = document.createElement("style");
-    styleElement.innerHTML = `
-      @keyframes fall {
-        0% {
-          transform: translateY(0);
-          opacity: 1;
-        }
-        100% {
-          transform: translateY(${window.innerHeight}px);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(styleElement);
-  };
-
-  const addWindLayer = (map) => {
-    for (let i = 0; i < 1000; i++) {
-      const el = document.createElement("div");
-      el.className = "wind-blow";
-      el.style.width = "10px";
-      el.style.height = "2px";
-      el.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
-      el.style.position = "absolute";
-      el.style.top = `${Math.random() * window.innerHeight}px`;
-      el.style.left = `${Math.random() * window.innerWidth}px`;
-      el.style.animation = `blow ${Math.random() * 3 + 2}s linear infinite`;
-  
-      map.getCanvasContainer().appendChild(el);
-    }
-  
-    const styleElement = document.createElement("style");
-    styleElement.innerHTML = `
-      @keyframes blow {
-        0% {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        100% {
-          transform: translateX(${window.innerWidth}px);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(styleElement);
-  };
-  
-
-
-  const getAllEvent = () => {
-    const q = query(collection(database, 'events'))
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let eventsArray = []
-
-      querySnapshot.forEach(doc => {
-        eventsArray.push({ ...doc.data(), id: doc.id })
-      })
-      setEvangileEvents(eventsArray);
-    })
-  }
-
+  // Handle checkbox change for building visibility
   const handleCheckboxChange = (layerId, property, value) => {
     if (map.current) {
       map.current.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
     }
   };
 
+  // Handle mountain height change
   const handleMountainHeightChange = (event) => {
     const height = event.target.value;
     setMountainHeight(height);

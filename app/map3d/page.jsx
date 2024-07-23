@@ -4,12 +4,14 @@ import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
-import { addSnowLayer, addRainLayer, } from "./climat";
-import { traceRouteRed } from "./utility";
+import { addSnowLayer, addRainLayer, } from "@/lib/climat";
+import { addRouteLayer } from "@/lib/utility";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
-
-const MapComponent = () => {
+/*
+* Map3DComponent: a react page that displays 3D maps with 3D objects on top
+*/
+const Map3DComponent = () => {
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const [lng, setLng] = useState(35.21633);
@@ -19,7 +21,7 @@ const MapComponent = () => {
   const [showBuilding, setShowBuilding] = useState(true);
   const [showTemple, setShowTemple] = useState(true);
   const [season, setSeason] = useState('spring');
-  const [mountainHeight, setMountainHeight] = useState(50);
+  const [mountainHeight, setMountainHeight] = useState(100);
   const [mapStyle, setMapStyle] = useState(sprintStyle);
   const [evangileEvents, setEvangileEvents] = useState([]);
   const [startTravel, setStartTravel] = useState([35.2297, 31.7738]);
@@ -27,7 +29,6 @@ const MapComponent = () => {
 
   useEffect(() => {
     getAllEvent();
-    getCurrentTime();
     loadThreeboxScript();
   }, [])
 
@@ -43,6 +44,7 @@ const MapComponent = () => {
     }
   }, [mountainHeight, showTemple]);
 
+  //Receive every Event by user 
   const getAllEvent = () => {
     const q = query(collection(database, 'events'))
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -55,17 +57,7 @@ const MapComponent = () => {
     })
   }
 
-  const getCurrentTime = () => {
-    const q = query(collection(database, 'current_time'))
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let eventsArray = []
-
-      querySnapshot.forEach(doc => {
-        eventsArray.push({ ...doc.data(), id: doc.id })
-      })
-    })
-  }
-
+  //Load the Threebox librairie
   const loadThreeboxScript = () => {
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/gh/jscastro76/threebox@v.2.2.2/dist/threebox.min.js';
@@ -79,6 +71,7 @@ const MapComponent = () => {
     document.head.appendChild(script);
   };
 
+  //initializa the map with every 3D object loading with Threebox.js 
   const initializeMap = () => {
     const map = new mapboxgl.Map({
       container: mapContainer.current,
@@ -106,8 +99,11 @@ const MapComponent = () => {
     ));
   
     map.on('style.load', () => {
+      map.addSource('mapbox-dem', {
+        type: 'raster-dem',
+        url: 'mapbox://mapbox.terrain-rgb'
+      });
       handleCheckboxChange('building-extrusion', 'visibility', false);
-  
   
       loadEvangileMarker(map);
   
@@ -117,7 +113,7 @@ const MapComponent = () => {
         renderingMode: '3d',
         onAdd: function () {
           const scale = 10;
-          const heightMultiple = mountainHeight < 100 ? 1:2;
+          const heightMultiple = mountainHeight < 100 ? 1:4;
   
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
@@ -128,9 +124,9 @@ const MapComponent = () => {
           };
   
           const options1 = {
-            obj: '/assets/israel.gltf',
+            obj: '/assets/jerussalem.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale * heightMultiple, z: 15 },
+            scale: { x: scale * 2, y: scale * heightMultiple, z: 15 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
@@ -148,7 +144,7 @@ const MapComponent = () => {
           const options3 = {
             obj: '/assets/Palais_de_Lazare.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale, z: 15 },
+            scale: { x: scale * 1.5, y: scale / 2 * heightMultiple, z: 15 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
@@ -159,43 +155,13 @@ const MapComponent = () => {
         }
       });
   
-      addRouteLayer(map);
+      addRouteLayer(map, startTravel, endTravel);
     });
   
     setMap(map);
   };
-  
 
-  const addRouteLayer = async (map) => {
-    try {
-      const response = await fetch('/assets/route_palestine.geojson'); // Assurez-vous que le chemin est correct
-      const routeData = await response.json();
-
-      map.addSource('route', {
-        'type': 'geojson',
-        'data': routeData
-      });
-
-      map.addLayer({
-        'id': 'route',
-        'type': 'line',
-        'source': 'route',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': '#888',
-          'line-width': 4
-        }
-      });
-
-      traceRouteRed(map, routeData, startTravel, endTravel)
-    } catch (error) {
-      console.error('Error loading route data:', error);
-    }
-  };
-
+  //Transforme the event loading and represent this last into the marker in the map
   const loadEvangileMarker = (mapEvent) => {
    
     evangileEvents.forEach((location) => {
@@ -231,10 +197,10 @@ const MapComponent = () => {
 
         const anneeEvent = parseInt(location.event_date)
         if (anneeEvent < 0) {
-          setMountainHeight(20)
+          setMountainHeight(100)
           setShowBuilding(false)
           setShowTemple(true)
-          updateTerrain(map, 20, false)
+          updateTerrain(map, 100, false)
         } else {
           setMountainHeight(0)
           setShowBuilding(false)
@@ -244,7 +210,7 @@ const MapComponent = () => {
 
         const day = location.detail_jour;
         if (day === "Nuit") {
-          mapEvent.setStyle(sprintStyleNight);
+          mapEvent.setStyle(winterDark);
           setShowTemple(true);
         } else if (day === "Matin") {
           mapEvent.setStyle(summerLight);
@@ -263,6 +229,7 @@ const MapComponent = () => {
     });
   };
 
+  //update the terrain in the map when the height of mountain has changed
   const updateTerrain = (map, height, show) => {
     map.on('style.load', () => {
       map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
@@ -270,6 +237,7 @@ const MapComponent = () => {
     });
   };
 
+  // Handle checkbox change for building visibility
   const handleCheckboxChange = (layerId, property, value) => {
     if (map) {
       map.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
@@ -292,7 +260,7 @@ const MapComponent = () => {
             />
           </fieldset>
           <fieldset>
-            <label>Show 3D map</label>
+            <label>Show actualy building</label>
             <input
               type="checkbox"
               checked={showBuilding}
@@ -331,4 +299,4 @@ const MapComponent = () => {
   );
 };
 
-export default MapComponent;
+export default Map3DComponent;
