@@ -38,7 +38,7 @@ const Map3DComponent = () => {
     if (map) {
       loadEvangileMarker(map);
     }
-  }, [evangileEvents, showTemple, map]);
+  }, [evangileEvents, map]);
 
   useEffect(() => {
     if (map) {
@@ -177,7 +177,6 @@ const Map3DComponent = () => {
 
   const updateMapSettings = () => {
     if (map) {
-      initializeMap()
       map.on('style.load', () => {
         map.addSource('mapbox-dem', {
           type: 'raster-dem',
@@ -244,6 +243,7 @@ const Map3DComponent = () => {
         const day = location.detail_jour;
         if (day === "Nuit") {
           mapEvent.setStyle(winterDark);
+          setShowTemple(true);
         } else if (day === "Matin") {
           mapEvent.setStyle(summerLight);
         } else {
