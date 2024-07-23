@@ -6,6 +6,8 @@ import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/utility";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -17,7 +19,7 @@ export default function Home() {
   const [zoom, setZoom] = useState(9); // Zoom level state
   const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
   const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
-  const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
+  const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
   const [season, setSeason] = useState('spring'); // Season state
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
@@ -55,15 +57,21 @@ export default function Home() {
         url: 'mapbox://mapbox.terrain-rgb'
       });
 
-      handleCheckboxChange('building-extrusion', 'visibility', false);
-      handleCheckboxChange('road-primary-navigation', 'visibility', showRoad);
-      handleCheckboxChange('road-secondary-tertiary-navigation', 'visibility', showRoad);
-      handleCheckboxChange('road-street-navigation', 'visibility', showRoad);
-      handleCheckboxChange('road-minor-navigation', 'visibility', showRoad);
+      handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+      handleCheckboxChange('road-primary', 'visibility', showRoad);
+      handleCheckboxChange('road-secondary-tertiary', 'visibility', showRoad);
+      handleCheckboxChange('road-street', 'visibility', showRoad);
+      handleCheckboxChange('road-minor', 'visibility', showRoad);
+      handleCheckboxChange('road-major-link', 'visibility', showRoad);
+      handleCheckboxChange('road-motorway-trunk', 'visibility', showRoad);
+      handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
+      handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
+      handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
+      handleCheckboxChange('bridge-majore-link-2', 'visibility', showRoad);
 
       map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       addRouteLayer(map.current, startTravel, endTravel)
-      loadEvangileMarker();
+      loadEvangileMarker(map.current);
     });
     console.log(map)
 
@@ -86,7 +94,7 @@ export default function Home() {
       setMapStyle(styles[season]);
       map.current.setStyle(mapStyle);
 
-      loadEvangileMarker();      
+      loadEvangileMarker(map.current);
     }
   }, [season, mapStyle, evangileEvents]);
 
@@ -104,76 +112,67 @@ export default function Home() {
   }
 
   // Load markers for evangile events
-  const loadEvangileMarker = () => {
+  const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
-        <div class="flex flex-row h-[300px] w-[220px]  static">
-          <div class="w-full h-[5vw] bg-red relative">
-            <img src="${location.image}" alt="${location.label}" class="w-full sm:h-[120px] md:h-[80px]"/>
+          <div class="flex flex-row h-[300px] w-[220px]  static">
+            <div class="w-full h-[5vw] bg-red relative">
+              <img src="${location.image}" alt="${location.label}" class="w-full sm:h-[120px] md:h-[80px]"/>
+            </div>
+            <div class="mt-[120px] fixed md:mt-[80px]">
+              <h3 class="text-base font-bold text-center">${location.label}</h3>
+              <p class="h-[160px] overflow-y-scroll">${location.description}</p>
+            </div>
           </div>
-          <div class="mt-[120px] fixed md:mt-[80px]">
-            <h3 class="text-base font-bold text-center">${location.label}</h3>
-            <p class="h-[160px] overflow-y-scroll">${location.description}</p>
-          </div>
-        </div>
-      `);
+        `);
 
       const marker = new mapboxgl.Marker()
         .setLngLat([location.longitude, location.latitude])
         .setPopup(popup)  // Associe le popup au marqueur
-        .addTo(map.current);
-      
-      const anneeEvent = parseInt(location.event_date)
-      if ( anneeEvent > 0) {
-        console.log(location.event_date)
-        setMountainHeight(100)
-        setShowBuilding(false)
-        map.current.on('style.load', () => {
-          map.current.addSource('mapbox-dem', {
-            type: 'raster-dem',
-            url: 'mapbox://mapbox.terrain-rgb'
-          });
-          const terre = map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-          console.log(terre)
-          handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
-        });
-        
-        // console.log(mountainHeight)
-      } else {
-        setMountainHeight(0)
-        setShowBuilding(true)
-        map.current.on('style.load', () => {
-          map.current.addSource('mapbox-dem', {
-            type: 'raster-dem',
-            url: 'mapbox://mapbox.terrain-rgb'
-          });
-          const terre = map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-          console.log(terre)
-          handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
-        });
-      }
+        .addTo(mapEvent);
 
-      if (location.isPlay) {
-        map.current.flyTo({
+      marker.getElement().addEventListener('click', () => {
+        mapEvent.flyTo({
           center: [location.longitude, location.latitude],
           zoom: 20
         });
+      })
+
+      if (location.isPlay) {
+        mapEvent.flyTo({
+          center: [location.longitude, location.latitude],
+          zoom: 15
+        });
+
+        const anneeEvent = parseInt(location.event_date)
+        if (anneeEvent < 0) {
+          setMountainHeight(50)
+          setShowBuilding(false)
+          mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 50 / 100 });
+          handleCheckboxChange('building-extrusion', 'visibility', true);
+        } else {
+          setMountainHeight(0)
+          setShowBuilding(false)
+          mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 10 / 100 });
+          handleCheckboxChange('building-extrusion', 'visibility', show);
+        }
 
         const day = location.detail_jour;
         if (day === "Nuit") {
-          setMapStyle(sprintStyleNight);
-        } else if (day === "Matin" ) {
-          setMapStyle(summerLight);
+          mapEvent.setStyle(winterDark);
+        } else if (day === "Matin") {
+          mapEvent.setStyle(summerLight);
         } else {
-          setMapStyle(winterDark);
-          addSnowLayer(map.current)
+          mapEvent.setStyle(winterDark);
+          addSnowLayer(mapEvent)
         }
 
         const meteo = location.meteo;
-        if(meteo === "Pluvieux") {
-          addRainLayer(map.current)
-        } else if(meteo === "Neigeux") {
-          addSnowLayer(map.current)
+        console.log(meteo)
+        if (meteo === "Pluvieux") {
+          addRainLayer(mapEvent)
+        } else if (meteo === "Neigeux") {
+          addSnowLayer(mapEvent)
         }
       }
     });
@@ -217,19 +216,37 @@ export default function Home() {
             />
           </fieldset>
           <fieldset>
-            <label>Montrer le batiment</label>
-            <input
-              type="checkbox"
+            <Label htmlFor="show-building">Show Building</Label>
+            <Switch
+              id="show-building"
               checked={showBuilding}
-              onChange={(e) => {
-                setShowBuilding(e.target.checked);
-                handleCheckboxChange('building-extrusion', 'visibility', e.target.checked);
+              onCheckedChange={() => {
+                setShowBuilding(!showBuilding);
+                handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
+              }} />
+          </fieldset>
+          <fieldset>
+            <Label htmlFor="showRoad">Show Road</Label>
+            <Switch
+              id="showRoad"
+              checked={showRoad}
+              onCheckedChange={() => {
+                setShowRoad(!showRoad);
+                handleCheckboxChange('road-primary', 'visibility', !showRoad);
+                handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
+                handleCheckboxChange('road-street', 'visibility', !showRoad);
+                handleCheckboxChange('road-minor', 'visibility', !showRoad);
+                handleCheckboxChange('road-major-link', 'visibility', !showRoad);
+                handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
+                handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
+                handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
+                handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
+                handleCheckboxChange('bridge-majore-link-2', 'visibility', !showRoad);
               }}
             />
           </fieldset>
-
           <fieldset>
-            <label>Variation du Temps: {mountainHeight >= 100 ? -2000 : 2000 }</label>
+            <label>Variation du Temps: {mountainHeight >= 100 ? -2000 : 2000}</label>
             <input
               type="range"
               min="0"
@@ -239,22 +256,12 @@ export default function Home() {
             />
           </fieldset>
           <fieldset>
-            <label>Longitude</label>
-            <input
-              type="number"
-              value={lng}
-              onChange={(e) => setLng(parseFloat(e.target.value))}
-              id="longitude"
-            />
+            <Label>Longitude</Label>
+            <input type="number" value={lng} step="any" className="lat-lng" readOnly />
           </fieldset>
           <fieldset>
-            <label>Latitude</label>
-            <input
-              type="number"
-              value={lat}
-              onChange={(e) => setLat(parseFloat(e.target.value))}
-              id="latitude"
-            />
+            <Label>Latitude</Label>
+            <input type="number" value={lat} step="any" className="lat-lng" readOnly />
           </fieldset>
         </div>
       </div>
