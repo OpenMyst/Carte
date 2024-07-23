@@ -17,10 +17,10 @@ export default function Home() {
   const [zoom, setZoom] = useState(9); // Zoom level state
   const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
   const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
+  const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
   const [season, setSeason] = useState('spring'); // Season state
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
-
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
@@ -56,6 +56,10 @@ export default function Home() {
       });
 
       handleCheckboxChange('building-extrusion', 'visibility', false);
+      handleCheckboxChange('road-primary-navigation', 'visibility', showRoad);
+      handleCheckboxChange('road-secondary-tertiary-navigation', 'visibility', showRoad);
+      handleCheckboxChange('road-street-navigation', 'visibility', showRoad);
+      handleCheckboxChange('road-minor-navigation', 'visibility', showRoad);
 
       map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight });
       addRouteLayer(map.current, startTravel, endTravel)
@@ -99,7 +103,7 @@ export default function Home() {
     })
   }
 
-   // Load markers for evangile events
+  // Load markers for evangile events
   const loadEvangileMarker = () => {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`

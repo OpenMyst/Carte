@@ -14,18 +14,18 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 const Map3DComponent = () => {
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
-  const [lng, setLng] = useState(35.21633);
-  const [lat, setLat] = useState(31.76904);
-  const [zoom, setZoom] = useState(9);
-  const [showRoad, setShowRoad] = useState(true);
-  const [showBuilding, setShowBuilding] = useState(true);
-  const [showTemple, setShowTemple] = useState(true);
-  const [season, setSeason] = useState('spring');
-  const [mountainHeight, setMountainHeight] = useState(100);
-  const [mapStyle, setMapStyle] = useState(sprintStyle);
-  const [evangileEvents, setEvangileEvents] = useState([]);
-  const [startTravel, setStartTravel] = useState([35.2297, 31.7738]);
-  const [endTravel, setEndTravel] = useState([35.207639, 31.704306]);
+  const [lng, setLng] = useState(35.21633); // Longitude state
+  const [lat, setLat] = useState(31.76904); // Latitude state
+  const [zoom, setZoom] = useState(9); // Zoom level state
+  const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
+  const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
+  const [showTemple, setShowTemple] = useState(true); // Toggle for building visibility
+  const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
+  const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
+  const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
+  const [open, setOpen] = useState(true); // Toggle for overlay visibility
+  const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
+  const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
 
   useEffect(() => {
     getAllEvent();
@@ -44,7 +44,7 @@ const Map3DComponent = () => {
     }
   }, [mountainHeight, showTemple]);
 
-  //Receive every Event by user 
+  // Fetch all events from Firebase
   const getAllEvent = () => {
     const q = query(collection(database, 'events'))
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -71,7 +71,7 @@ const Map3DComponent = () => {
     document.head.appendChild(script);
   };
 
-  //initializa the map with every 3D object loading with Threebox.js 
+  //Initialize the map with every 3D object loading with Threebox.js 
   const initializeMap = () => {
     const map = new mapboxgl.Map({
       container: mapContainer.current,
@@ -81,15 +81,15 @@ const Map3DComponent = () => {
       pitch: 62,
       bearing: -20,
     });
-  
+
     map.on('move', () => {
       setLng(map.getCenter().lng.toFixed(4));
       setLat(map.getCenter().lat.toFixed(4));
       setZoom(map.getZoom().toFixed(2));
     });
-  
+
     map.addControl(new mapboxgl.NavigationControl());
-  
+
     const tb = (window.tb = new Threebox(
       map,
       map.getCanvas().getContext('webgl'),
@@ -97,24 +97,29 @@ const Map3DComponent = () => {
         defaultLights: true
       }
     ));
-  
+
     map.on('style.load', () => {
       map.addSource('mapbox-dem', {
         type: 'raster-dem',
         url: 'mapbox://mapbox.terrain-rgb'
       });
       handleCheckboxChange('building-extrusion', 'visibility', false);
-  
+      handleCheckboxChange('building', 'visibility', false);
+      handleCheckboxChange('road-primary-navigation', 'visibility', false);
+      handleCheckboxChange('road-secondary-tertiary-navigation', 'visibility', false);
+      handleCheckboxChange('road-street-navigation', 'visibility', false);
+      handleCheckboxChange('road-minor-navigation', 'visibility', false);
+
       loadEvangileMarker(map);
-  
+
       map.addLayer({
         id: 'custom-threebox-model',
         type: 'custom',
         renderingMode: '3d',
         onAdd: function () {
           const scale = 10;
-          const heightMultiple = mountainHeight < 100 ? 1:4;
-  
+          const heightMultiple = mountainHeight < 100 ? 1 : 4;
+
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
               model.setCoords(coords);
@@ -122,7 +127,7 @@ const Map3DComponent = () => {
               tb.add(model);
             });
           };
-  
+
           const options1 = {
             obj: '/assets/jerussalem.gltf',
             type: 'gltf',
@@ -131,7 +136,7 @@ const Map3DComponent = () => {
             rotation: { x: 90, y: -90, z: 0 }
           };
           loadAndPlaceModel(options1, [35.2310, 31.7794]);
-  
+
           const options2 = {
             obj: '/assets/golgotha.gltf',
             type: 'gltf',
@@ -140,7 +145,7 @@ const Map3DComponent = () => {
             rotation: { x: 90, y: -90, z: 0 }
           };
           loadAndPlaceModel(options2, [35.2298, 31.7781]);
-  
+
           const options3 = {
             obj: '/assets/Palais_de_Lazare.gltf',
             type: 'gltf',
@@ -154,16 +159,16 @@ const Map3DComponent = () => {
           tb.update();
         }
       });
-  
+
       addRouteLayer(map, startTravel, endTravel);
     });
-  
+
     setMap(map);
   };
 
-  //Transforme the event loading and represent this last into the marker in the map
+  // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
-   
+
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
             <div class="flex flex-row h-[300px] w-[220px]  static">
@@ -239,6 +244,7 @@ const Map3DComponent = () => {
 
   // Handle checkbox change for building visibility
   const handleCheckboxChange = (layerId, property, value) => {
+    console.log(layerId)
     if (map) {
       map.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
     }
@@ -248,7 +254,12 @@ const Map3DComponent = () => {
     <div>
       <div ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
       <div className="map-overlay top w-[20vw]">
-        <div className="map-overlay-inner">
+        <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+          </svg>
+        </button>
+        <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <fieldset>
             <label>Show temple</label>
             <input
@@ -260,13 +271,14 @@ const Map3DComponent = () => {
             />
           </fieldset>
           <fieldset>
-            <label>Show actualy building</label>
+            <label>Show actual building</label>
             <input
               type="checkbox"
               checked={showBuilding}
               onChange={(e) => {
                 setShowBuilding(e.target.checked);
                 handleCheckboxChange('building-extrusion', 'visibility', e.target.checked);
+                handleCheckboxChange('building', 'visibility', e.target.checked);
               }}
             />
           </fieldset>

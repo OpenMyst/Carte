@@ -5,29 +5,32 @@ import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import Link from "next/link";
+import { addRouteLayer } from "@/lib/utility";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
 export default function Map2DComponent() {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(35.21633);
-  const [lat, setLat] = useState(31.76904);
-  const [zoom, setZoom] = useState(9);
-  const [mapStyle, setMapStyle] = useState(sprintStyle);
-  const [showBuilding, setShowBuilding] = useState(false);
-  const [showMap3D, setShowMap3D] = useState(true);
-  const [showRoad, setShowRoad] = useState(true);
+  const [lng, setLng] = useState(35.21633); // Longitude state
+  const [lat, setLat] = useState(31.76904); // Latitude state
+  const [zoom, setZoom] = useState(9); // Zoom level state
+  const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
+  const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
+  const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
+  const [showMap3D, setShowMap3D] = useState(true); //Toggle to show map into 3D
   const [season, setSeason] = useState('spring');
-  const [mountainHeight, setMountainHeight] = useState(100);
-
-  const [evangileEvents, setEvangileEvents] = useState([]);
-  const [open, setOpen] = useState(true);
+  const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
+  const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
+  const [open, setOpen] = useState(true); // Toggle for overlay visibility
+  const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
+  const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
 
   useEffect(() => {
     getAllEvent();
   }, [])
 
+  //Initialize the map with mapbox
   useEffect(() => {
     if (map.current) return;
     map.current = new mapboxgl.Map({
@@ -57,12 +60,13 @@ export default function Map2DComponent() {
       // map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight });
 
       loadEvangileMarker();
-      addRouteLayer(map.current);
+      addRouteLayer(map.current, startTravel, endTravel);
     });
     console.log(map)
 
   }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
 
+  //when the climat change
   useEffect(() => {
     if (map.current) {
       const styles = {
@@ -78,6 +82,20 @@ export default function Map2DComponent() {
     }
   }, [season, mapStyle, evangileEvents]);
 
+  // Fetch all events from Firebase
+  const getAllEvent = () => {
+    const q = query(collection(database, 'events'))
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let eventsArray = []
+
+      querySnapshot.forEach(doc => {
+        eventsArray.push({ ...doc.data(), id: doc.id })
+      })
+      setEvangileEvents(eventsArray);
+    })
+  }
+
+  // Load markers for evangile events
   const loadEvangileMarker = () => {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
@@ -149,53 +167,14 @@ export default function Map2DComponent() {
     });
   };
 
-  const addRouteLayer = async (map) => {
-    try {
-      const response = await fetch('/assets/route_palestine.geojson'); // Assurez-vous que le chemin est correct
-      const routeData = await response.json();
-
-      map.addSource('route', {
-        'type': 'geojson',
-        'data': routeData
-      });
-
-      map.addLayer({
-        'id': 'route',
-        'type': 'line',
-        'source': 'route',
-        'layout': {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        'paint': {
-          'line-color': '#888',
-          'line-width': 2
-        }
-      });
-    } catch (error) {
-      console.error('Error loading route data:', error);
-    }
-  };
-
-
-  const getAllEvent = () => {
-    const q = query(collection(database, 'events'))
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let eventsArray = []
-
-      querySnapshot.forEach(doc => {
-        eventsArray.push({ ...doc.data(), id: doc.id })
-      })
-      setEvangileEvents(eventsArray);
-    })
-  }
-
+  // Handle checkbox change for building visibility
   const handleCheckboxChange = (layerId, property, value) => {
     if (map.current) {
       map.current.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
     }
   };
 
+  // Handle mountain height change
   const handleMountainHeightChange = (event) => {
     const height = event.target.value;
     setMountainHeight(height);
@@ -216,11 +195,11 @@ export default function Map2DComponent() {
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <fieldset>
             <Link href="/map">
-              <label>Afficher les Batiments</label>
+              <label>Show map in 2D</label>
             </Link>
           </fieldset>
           <fieldset>
-            <label>Montrer le batiment</label>
+            <label>Show Building</label>
             <input
               type="checkbox"
               checked={showBuilding}
@@ -232,7 +211,7 @@ export default function Map2DComponent() {
           </fieldset>
 
           <fieldset>
-            <label>Variation du Temps: {mountainHeight >= 100 ? -2000 : 2000 }</label>
+            <label>Time: {mountainHeight >= 100 ? -2000 : 2000 }</label>
             <input
               type="range"
               min="0"
