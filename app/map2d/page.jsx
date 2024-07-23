@@ -6,6 +6,8 @@ import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import Link from "next/link";
 import { addRouteLayer } from "@/lib/utility";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -33,6 +35,36 @@ export default function Map2DComponent() {
   //Initialize the map with mapbox
   useEffect(() => {
     if (map.current) return;
+    initializeMap()
+    console.log(showBuilding)
+  }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
+
+  //when the climat change
+  useEffect(() => {
+    if (map.current) {
+      const styles = {
+        spring: sprintStyle,
+        summer: summerLight,
+        autumn: automnStyle,
+        winter: winterDark,
+      };
+      setMapStyle(styles[season]);
+      map.current.setStyle(mapStyle);
+
+      loadEvangileMarker();
+      addRouteLayer(map.current, startTravel, endTravel);
+      map.current.on('style.load', () => {
+        handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+        handleCheckboxChange('building', 'visibility', showBuilding);
+        handleCheckboxChange('road-primary-navigation', 'visibility', showRoad);
+        handleCheckboxChange('road-secondary-tertiary-navigation', 'visibility', showRoad);
+        handleCheckboxChange('road-street-navigation', 'visibility', showRoad);
+        handleCheckboxChange('road-minor-navigation', 'visibility', showRoad);
+      })
+    }
+  }, [season, mapStyle, evangileEvents]);
+
+  const initializeMap = () => {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: mapStyle,
@@ -55,32 +87,25 @@ export default function Map2DComponent() {
         type: 'raster-dem',
         url: 'mapbox://mapbox.terrain-rgb'
       });
-      
-      handleCheckboxChange('building-extrusion', 'visibility', false);
-      // map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight });
+
+      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
+      map.setLayoutProperty('building', 'visibility', showBuilding ? "vissible" : "none");
+      map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-minor', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-major-link', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-motorway-trunk', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('bridge-majore-link-2', 'visibility', showRoad ? "visible":"none");
 
       loadEvangileMarker();
       addRouteLayer(map.current, startTravel, endTravel);
     });
-    console.log(map)
-
-  }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
-
-  //when the climat change
-  useEffect(() => {
-    if (map.current) {
-      const styles = {
-        spring: sprintStyle,
-        summer: summerLight,
-        autumn: automnStyle,
-        winter: winterDark,
-      };
-      setMapStyle(styles[season]);
-      map.current.setStyle(mapStyle);
-
-      loadEvangileMarker();      
-    }
-  }, [season, mapStyle, evangileEvents]);
+  }
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
@@ -114,9 +139,9 @@ export default function Map2DComponent() {
         .setLngLat([location.longitude, location.latitude])
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(map.current);
-      
+
       const anneeEvent = parseInt(location.event_date)
-      if ( anneeEvent > 0) {
+      if (anneeEvent > 0) {
         console.log(location.event_date)
         setMountainHeight(100)
         setShowBuilding(false)
@@ -128,14 +153,12 @@ export default function Map2DComponent() {
           const terre = map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
           console.log(terre)
           handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+          handleCheckboxChange('building', 'visibility', showBuilding);
+
         });
-       
-        
-        
-        console.log(mountainHeight)
       } else {
         setMountainHeight(0)
-        setShowBuilding(true)
+        setShowBuilding(false)
         map.current.on('style.load', () => {
           map.current.addSource('mapbox-dem', {
             type: 'raster-dem',
@@ -144,9 +167,8 @@ export default function Map2DComponent() {
           const terre = map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
           console.log(terre)
           handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+          handleCheckboxChange('building', 'visibility', showBuilding);
         });
-        
-        console.log(mountainHeight)
       }
 
       if (location.isPlay) {
@@ -195,23 +217,42 @@ export default function Map2DComponent() {
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <fieldset>
             <Link href="/map">
-              <label>Show map in 2D</label>
+              <Label>Show map in 2D</Label>
             </Link>
           </fieldset>
           <fieldset>
-            <label>Show Building</label>
-            <input
-              type="checkbox"
+            <Label htmlFor="show-building">Show Building</Label>
+            <Switch
+              id="show-building"
               checked={showBuilding}
-              onChange={(e) => {
-                setShowBuilding(e.target.checked);
-                handleCheckboxChange('building-extrusion', 'visibility', e.target.checked);
+              onCheckedChange={() => {
+                setShowBuilding(!showBuilding);
+                handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
+                handleCheckboxChange('building', 'visibility', !showBuilding);
+              }} />
+          </fieldset>
+          <fieldset>
+            <Label htmlFor="showRoad">Show Road</Label>
+            <Switch
+              id="showRoad"
+              checked={showRoad}
+              onCheckedChange={() => {
+                setShowRoad(!showRoad);
+                handleCheckboxChange('road-primary', 'visibility', !showRoad);
+                handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
+                handleCheckboxChange('road-street', 'visibility', !showRoad);
+                handleCheckboxChange('road-minor', 'visibility', !showRoad);
+                handleCheckboxChange('road-major-link', 'visibility', !showRoad);
+                handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
+                handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
+                handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
+                handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
+                handleCheckboxChange('bridge-majore-link-2', 'visibility', !showRoad);
               }}
             />
           </fieldset>
-
           <fieldset>
-            <label>Time: {mountainHeight >= 100 ? -2000 : 2000 }</label>
+            <Label>Time: {mountainHeight >= 100 ? -2000 : 2000}</Label>
             <input
               type="range"
               min="0"
@@ -221,7 +262,7 @@ export default function Map2DComponent() {
             />
           </fieldset>
           <fieldset>
-            <label>Longitude</label>
+            <Label>Longitude</Label>
             <input
               type="number"
               value={lng}
@@ -230,7 +271,7 @@ export default function Map2DComponent() {
             />
           </fieldset>
           <fieldset>
-            <label>Latitude</label>
+            <Label>Latitude</Label>
             <input
               type="number"
               value={lat}

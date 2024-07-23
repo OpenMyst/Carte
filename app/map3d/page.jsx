@@ -6,6 +6,8 @@ import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/utility";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 /*
@@ -21,7 +23,7 @@ const Map3DComponent = () => {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showTemple, setShowTemple] = useState(true); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
-  const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(15); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
@@ -36,13 +38,13 @@ const Map3DComponent = () => {
     if (map) {
       loadEvangileMarker(map);
     }
-  }, [evangileEvents, map, mountainHeight]);
+  }, [evangileEvents, map]);
 
   useEffect(() => {
     if (map) {
-      initializeMap();
+      updateMapSettings();
     }
-  }, [mountainHeight, showTemple]);
+  }, [mountainHeight, showTemple, showBuilding]);
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
@@ -99,16 +101,23 @@ const Map3DComponent = () => {
     ));
 
     map.on('style.load', () => {
-      map.addSource('mapbox-dem', {
-        type: 'raster-dem',
-        url: 'mapbox://mapbox.terrain-rgb'
-      });
-      handleCheckboxChange('building-extrusion', 'visibility', false);
-      handleCheckboxChange('building', 'visibility', false);
-      handleCheckboxChange('road-primary-navigation', 'visibility', false);
-      handleCheckboxChange('road-secondary-tertiary-navigation', 'visibility', false);
-      handleCheckboxChange('road-street-navigation', 'visibility', false);
-      handleCheckboxChange('road-minor-navigation', 'visibility', false);
+      // map.addSource('mapbox-dem', {
+      //   type: 'raster-dem',
+      //   url: 'mapbox://mapbox.terrain-rgb'
+      // });
+      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
+      map.setLayoutProperty('building', 'visibility', showBuilding ? "vissible" : "none");
+      map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-minor', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-major-link', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-motorway-trunk', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('bridge-majore-link-2', 'visibility', showRoad ? "visible":"none");
 
       loadEvangileMarker(map);
 
@@ -118,7 +127,7 @@ const Map3DComponent = () => {
         renderingMode: '3d',
         onAdd: function () {
           const scale = 10;
-          const heightMultiple = mountainHeight < 100 ? 1 : 4;
+          const heightMultiple = mountainHeight < 50 ? 1 : showTemple ? 1 : 5;
 
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
@@ -129,9 +138,9 @@ const Map3DComponent = () => {
           };
 
           const options1 = {
-            obj: '/assets/jerussalem.gltf',
+            obj: showTemple ? '/assets/israel_temple.gltf' : '/assets/jerusalem.gltf',
             type: 'gltf',
-            scale: { x: scale * 2, y: scale * heightMultiple, z: 15 },
+            scale: { x: scale, y: scale * heightMultiple, z: 15 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
@@ -149,7 +158,7 @@ const Map3DComponent = () => {
           const options3 = {
             obj: '/assets/Palais_de_Lazare.gltf',
             type: 'gltf',
-            scale: { x: scale * 1.5, y: scale / 2 * heightMultiple, z: 15 },
+            scale: { x: scale * 1.5, y: scale * heightMultiple, z: 15 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
@@ -164,6 +173,24 @@ const Map3DComponent = () => {
     });
 
     setMap(map);
+  };
+
+  const updateMapSettings = () => {
+    if (map) {
+      map.on('style.load', () => {
+        // map.addSource('mapbox-dem', {
+        //   type: 'raster-dem',
+        //   url: 'mapbox://mapbox.terrain-rgb'
+        // });
+        handleCheckboxChange(map, 'building-extrusion', 'visibility', showBuilding);
+        handleCheckboxChange(map, 'building', 'visibility', showBuilding);
+        handleCheckboxChange(map, 'road-primary-navigation', 'visibility', showRoad);
+        handleCheckboxChange(map, 'road-secondary-tertiary-navigation', 'visibility', showRoad);
+        handleCheckboxChange(map, 'road-street-navigation', 'visibility', showRoad);
+        handleCheckboxChange(map, 'road-minor-navigation', 'visibility', showRoad);
+        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      })
+    }
   };
 
   // Load markers for evangile events
@@ -202,10 +229,10 @@ const Map3DComponent = () => {
 
         const anneeEvent = parseInt(location.event_date)
         if (anneeEvent < 0) {
-          setMountainHeight(100)
+          setMountainHeight(50)
           setShowBuilding(false)
           setShowTemple(true)
-          updateTerrain(map, 100, false)
+          updateTerrain(map, 50, false)
         } else {
           setMountainHeight(0)
           setShowBuilding(false)
@@ -244,7 +271,6 @@ const Map3DComponent = () => {
 
   // Handle checkbox change for building visibility
   const handleCheckboxChange = (layerId, property, value) => {
-    console.log(layerId)
     if (map) {
       map.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
     }
@@ -261,48 +287,52 @@ const Map3DComponent = () => {
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <fieldset>
-            <label>Show temple</label>
-            <input
-              type="checkbox"
+            <Label htmlFor="show-temple">Show temple</Label>
+            <Switch
+              id="show-temple"
               checked={showTemple}
-              onChange={(e) => {
-                setShowTemple(e.target.checked);
-              }}
-            />
+              onCheckedChange={() => {
+                setShowTemple(!showTemple);
+              }} />
           </fieldset>
           <fieldset>
-            <label>Show actual building</label>
-            <input
-              type="checkbox"
+            <Label htmlFor="show-building">Show Building</Label>
+            <Switch
+              id="show-building"
               checked={showBuilding}
-              onChange={(e) => {
-                setShowBuilding(e.target.checked);
-                handleCheckboxChange('building-extrusion', 'visibility', e.target.checked);
-                handleCheckboxChange('building', 'visibility', e.target.checked);
-              }}
-            />
+              onCheckedChange={() => {
+                setShowBuilding(!showBuilding);
+                console.log(showBuilding)
+                // handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
+                handleCheckboxChange('building', 'visibility', !showBuilding);
+              }} />
           </fieldset>
           <fieldset>
-            <label>Show Road</label>
-            <input
-              type="checkbox"
+            <Label htmlFor="showRoad">Show Road</Label>
+            <Switch
               id="showRoad"
               checked={showRoad}
-              onChange={() => {
+              onCheckedChange={() => {
                 setShowRoad(!showRoad);
-                handleCheckboxChange('road-primary-navigation', 'visibility', showRoad);
-                handleCheckboxChange('road-secondary-tertiary-navigation', 'visibility', showRoad);
-                handleCheckboxChange('road-street-navigation', 'visibility', showRoad);
-                handleCheckboxChange('road-minor-navigation', 'visibility', showRoad);
+                handleCheckboxChange('road-primary', 'visibility', !showRoad);
+                handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
+                handleCheckboxChange('road-street', 'visibility', !showRoad);
+                handleCheckboxChange('road-minor', 'visibility', !showRoad);
+                handleCheckboxChange('road-major-link', 'visibility', !showRoad);
+                handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
+                handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
+                handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
+                handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
+                handleCheckboxChange('bridge-majore-link-2', 'visibility', !showRoad);
               }}
             />
           </fieldset>
           <fieldset>
-            <label>Longitude</label>
+            <Label>Longitude</Label>
             <input type="number" value={lng} step="any" className="lat-lng" readOnly />
           </fieldset>
           <fieldset>
-            <label>Latitude</label>
+            <Label>Latitude</Label>
             <input type="number" value={lat} step="any" className="lat-lng" readOnly />
           </fieldset>
         </div>
