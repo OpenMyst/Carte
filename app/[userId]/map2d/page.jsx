@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-export default function Map2DComponent() {
+export default function Map2DComponent({ params }) {
+  const userId = params.userId;
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [lng, setLng] = useState(35.21633); // Longitude state
@@ -91,16 +92,16 @@ export default function Map2DComponent() {
       map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
       map.setLayoutProperty('building', 'visibility', showBuilding ? "vissible" : "none");
-      map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-minor', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-major-link', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-motorway-trunk', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('bridge-majore-link-2', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-minor', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-major-link', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-motorway-trunk', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('bridge-majore-link-2', 'visibility', showRoad ? "visible" : "none");
 
       loadEvangileMarker();
       addRouteLayer(map.current, startTravel, endTravel);
@@ -120,6 +121,22 @@ export default function Map2DComponent() {
     })
   }
 
+  const userPlayEvent = async () => {
+    const q = query(collection(database, 'location'), where('idUser', '==', userId));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      querySnapshot.forEach(doc => {
+        const data = { ...locationDoc.data(), id: locationDoc.id };
+        if (data.isPlay) {
+          const location = evangileEvents.filter(loc => loc.id === data.idEvents)
+          mapEvent.flyTo({
+            center: [location.longitude, location.latitude],
+            zoom: 20
+          });
+        }
+      })
+      setEvangileEvents(eventsArray);
+    })
+  }
   // Load markers for evangile events
   const loadEvangileMarker = () => {
     evangileEvents.forEach((location) => {
@@ -142,7 +159,6 @@ export default function Map2DComponent() {
 
       const anneeEvent = parseInt(location.event_date)
       if (anneeEvent > 0) {
-        console.log(location.event_date)
         setMountainHeight(100)
         setShowBuilding(false)
         map.current.on('style.load', () => {
@@ -151,7 +167,6 @@ export default function Map2DComponent() {
             url: 'mapbox://mapbox.terrain-rgb'
           });
           const terre = map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-          console.log(terre)
           handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
           handleCheckboxChange('building', 'visibility', showBuilding);
 
@@ -165,26 +180,20 @@ export default function Map2DComponent() {
             url: 'mapbox://mapbox.terrain-rgb'
           });
           const terre = map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-          console.log(terre)
           handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
           handleCheckboxChange('building', 'visibility', showBuilding);
         });
       }
 
-      if (location.isPlay) {
-        map.current.flyTo({
-          center: [location.longitude, location.latitude],
-          zoom: 20
-        });
+      userPlayEvent()
 
-        const day = location.detail_jour;
-        if (day === "Nuit") {
-          setMapStyle(winterDark);
-        } else if (day === "Matin") {
-          setMapStyle(summerLight);
-        } else {
-          setMapStyle(winterDark);
-        }
+      const day = location.detail_jour;
+      if (day === "Nuit") {
+        setMapStyle(winterDark);
+      } else if (day === "Matin") {
+        setMapStyle(summerLight);
+      } else {
+        setMapStyle(winterDark);
       }
     });
   };

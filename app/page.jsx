@@ -130,7 +130,9 @@ export default function Home() {
         .setLngLat([location.longitude, location.latitude])
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
-
+      
+      userPlayEvent(location.id);
+      
       marker.getElement().addEventListener('click', () => {
         mapEvent.flyTo({
           center: [location.longitude, location.latitude],
@@ -138,45 +140,56 @@ export default function Home() {
         });
       })
 
-      if (location.isPlay) {
+      const anneeEvent = parseInt(location.event_date)
+      if (anneeEvent < 0) {
+        setMountainHeight(50)
+        setShowBuilding(false)
+        mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 50 / 100 });
+        handleCheckboxChange('building-extrusion', 'visibility', true);
+      } else {
+        setMountainHeight(0)
+        setShowBuilding(false)
+        mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 10 / 100 });
+        handleCheckboxChange('building-extrusion', 'visibility', show);
+      }
+
+      const day = location.detail_jour;
+      if (day === "Nuit") {
+        mapEvent.setStyle(winterDark);
+      } else if (day === "Matin") {
+        mapEvent.setStyle(summerLight);
+      } else {
+        mapEvent.setStyle(winterDark);
+        addSnowLayer(mapEvent)
+      }
+
+      const meteo = location.meteo;
+      console.log(meteo)
+      if (meteo === "Pluvieux") {
+        addRainLayer(mapEvent)
+      } else if (meteo === "Neigeux") {
+        addSnowLayer(mapEvent)
+      }
+    });
+  };
+
+  const userPlayEvent = async (eventId) => {
+    const q = query(collection(database, 'location'), where('idUser', '==', uid),  where('idEvents', '==', eventId));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const locationDoc = querySnapshot.docs[0];
+      const data = { ...locationDoc.data(), id: locationDoc.id };
+      if (data.isPlay) {
         mapEvent.flyTo({
           center: [location.longitude, location.latitude],
           zoom: 20
         });
-
-        const anneeEvent = parseInt(location.event_date)
-        if (anneeEvent < 0) {
-          setMountainHeight(50)
-          setShowBuilding(false)
-          mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 50 / 100 });
-          handleCheckboxChange('building-extrusion', 'visibility', true);
-        } else {
-          setMountainHeight(0)
-          setShowBuilding(false)
-          mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 10 / 100 });
-          handleCheckboxChange('building-extrusion', 'visibility', show);
-        }
-
-        const day = location.detail_jour;
-        if (day === "Nuit") {
-          mapEvent.setStyle(winterDark);
-        } else if (day === "Matin") {
-          mapEvent.setStyle(summerLight);
-        } else {
-          mapEvent.setStyle(winterDark);
-          addSnowLayer(mapEvent)
-        }
-
-        const meteo = location.meteo;
-        console.log(meteo)
-        if (meteo === "Pluvieux") {
-          addRainLayer(mapEvent)
-        } else if (meteo === "Neigeux") {
-          addSnowLayer(mapEvent)
-        }
       }
-    });
-  };
+    } else {
+      console.log('No location document found for the user.');
+    }
+    
+  }
 
   // Handle checkbox change for building visibility
   const handleCheckboxChange = (layerId, property, value) => {

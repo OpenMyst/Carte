@@ -13,7 +13,8 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 /*
 * Map3DComponent: a react page that displays 3D maps with 3D objects on top
 */
-const Map3DComponent = () => {
+const Map3DComponent = ({ params }) => {
+  const userId = params.userId;
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const [lng, setLng] = useState(35.21633); // Longitude state
@@ -106,18 +107,18 @@ const Map3DComponent = () => {
         url: 'mapbox://mapbox.terrain-rgb'
       });
       map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-      map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible": "none");
+      map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
       // map.setLayoutProperty('building', 'visibility', showBuilding ? "vissible": "none");
-      map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-minor', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-major-link', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('road-motorway-trunk', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
-      map.setLayoutProperty('bridge-majore-link-2', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-minor', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-major-link', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('road-motorway-trunk', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('bridge-majore-link-2', 'visibility', showRoad ? "visible" : "none");
 
       loadEvangileMarker(map);
 
@@ -193,9 +194,26 @@ const Map3DComponent = () => {
     }
   };
 
+  const userPlayEvent = async () => {
+    const q = query(collection(database, 'location'), where('idUser', '==', userId));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      querySnapshot.forEach(doc => {
+        const data = { ...locationDoc.data(), id: locationDoc.id };
+        if (data.isPlay) {
+          const location = evangileEvents.filter(loc => loc.id === data.idEvents)
+          mapEvent.flyTo({
+            center: [location.longitude, location.latitude],
+            zoom: 20
+          });
+        }
+      })
+      setEvangileEvents(eventsArray);
+    })
+  }
+
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
-
+    userPlayEvent()
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
             <div class="flex flex-row h-[300px] w-[220px]  static">
@@ -221,43 +239,36 @@ const Map3DComponent = () => {
         });
       })
 
-      if (location.isPlay) {
-        mapEvent.flyTo({
-          center: [location.longitude, location.latitude],
-          zoom: 20
-        });
+      const anneeEvent = parseInt(location.event_date)
+      if (anneeEvent < 0) {
+        setMountainHeight(50)
+        setShowBuilding(false)
+        setShowTemple(true)
+        updateTerrain(map, 50, false)
+      } else {
+        setMountainHeight(0)
+        setShowBuilding(false)
+        setShowTemple(false)
+        updateTerrain(map, 10, true)
+      }
 
-        const anneeEvent = parseInt(location.event_date)
-        if (anneeEvent < 0) {
-          setMountainHeight(50)
-          setShowBuilding(false)
-          setShowTemple(true)
-          updateTerrain(map, 50, false)
-        } else {
-          setMountainHeight(0)
-          setShowBuilding(false)
-          setShowTemple(false)
-          updateTerrain(map, 10, true)
-        }
+      const day = location.detail_jour;
+      if (day === "Nuit") {
+        mapEvent.setStyle(winterDark);
+        setShowTemple(true);
+      } else if (day === "Matin") {
+        mapEvent.setStyle(summerLight);
+      } else {
+        mapEvent.setStyle(winterDark);
+        addSnowLayer(mapEvent)
+      }
 
-        const day = location.detail_jour;
-        if (day === "Nuit") {
-          mapEvent.setStyle(winterDark);
-          setShowTemple(true);
-        } else if (day === "Matin") {
-          mapEvent.setStyle(summerLight);
-        } else {
-          mapEvent.setStyle(winterDark);
-          addSnowLayer(mapEvent)
-        }
-
-        const meteo = location.meteo;
-        console.log(meteo)
-        if (meteo === "Pluvieux") {
-          addRainLayer(mapEvent)
-        } else if (meteo === "Neigeux") {
-          addSnowLayer(mapEvent)
-        }
+      const meteo = location.meteo;
+      console.log(meteo)
+      if (meteo === "Pluvieux") {
+        addRainLayer(mapEvent)
+      } else if (meteo === "Neigeux") {
+        addSnowLayer(mapEvent)
       }
     });
   };
