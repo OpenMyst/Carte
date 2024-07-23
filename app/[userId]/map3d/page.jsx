@@ -184,11 +184,16 @@ const Map3DComponent = ({ params }) => {
           url: 'mapbox://mapbox.terrain-rgb'
         });
         handleCheckboxChange(map, 'building-extrusion', 'visibility', showBuilding);
-        handleCheckboxChange(map, 'building', 'visibility', showBuilding);
-        handleCheckboxChange(map, 'road-primary-navigation', 'visibility', showRoad);
-        handleCheckboxChange(map, 'road-secondary-tertiary-navigation', 'visibility', showRoad);
-        handleCheckboxChange(map, 'road-street-navigation', 'visibility', showRoad);
-        handleCheckboxChange(map, 'road-minor-navigation', 'visibility', showRoad);
+        handleCheckboxChange('road-primary', 'visibility', showRoad);
+        handleCheckboxChange('road-secondary-tertiary', 'visibility', showRoad);
+        handleCheckboxChange('road-street', 'visibility', showRoad);
+        handleCheckboxChange('road-minor', 'visibility', showRoad);
+        handleCheckboxChange('road-major-link', 'visibility', showRoad);
+        handleCheckboxChange('road-motorway-trunk', 'visibility', showRoad);
+        handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
+        handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
+        handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
+        handleCheckboxChange('bridge-majore-link-2', 'visibility', showRoad);
         map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       })
     }
