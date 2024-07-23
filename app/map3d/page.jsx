@@ -42,9 +42,9 @@ const Map3DComponent = () => {
 
   useEffect(() => {
     if (map) {
-      initializeMap();
+      updateMapSettings();
     }
-  }, [mountainHeight, showTemple]);
+  }, [mountainHeight, showTemple, showBuilding]);
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
@@ -106,17 +106,18 @@ const Map3DComponent = () => {
         url: 'mapbox://mapbox.terrain-rgb'
       });
       map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-      map.setLayoutProperty('building-extrusion', 'visibility', "none");
-      map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('road-minor', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('road-major-link', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('road-motorway-trunk', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('bridge-majore-link-2', 'visibility', showRoad ? "visible" : "none");
+      map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible": "none");
+      // map.setLayoutProperty('building', 'visibility', showBuilding ? "vissible": "none");
+      map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-minor', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-major-link', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('road-motorway-trunk', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible":"none");
+      map.setLayoutProperty('bridge-majore-link-2', 'visibility', showRoad ? "visible":"none");
 
       loadEvangileMarker(map);
 
@@ -172,6 +173,24 @@ const Map3DComponent = () => {
     });
 
     setMap(map);
+  };
+
+  const updateMapSettings = () => {
+    if (map) {
+      map.on('style.load', () => {
+        map.addSource('mapbox-dem', {
+          type: 'raster-dem',
+          url: 'mapbox://mapbox.terrain-rgb'
+        });
+        handleCheckboxChange(map, 'building-extrusion', 'visibility', showBuilding);
+        handleCheckboxChange(map, 'building', 'visibility', showBuilding);
+        handleCheckboxChange(map, 'road-primary-navigation', 'visibility', showRoad);
+        handleCheckboxChange(map, 'road-secondary-tertiary-navigation', 'visibility', showRoad);
+        handleCheckboxChange(map, 'road-street-navigation', 'visibility', showRoad);
+        handleCheckboxChange(map, 'road-minor-navigation', 'visibility', showRoad);
+        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      })
+    }
   };
 
   // Load markers for evangile events
@@ -233,6 +252,7 @@ const Map3DComponent = () => {
         }
 
         const meteo = location.meteo;
+        console.log(meteo)
         if (meteo === "Pluvieux") {
           addRainLayer(mapEvent)
         } else if (meteo === "Neigeux") {
@@ -283,7 +303,6 @@ const Map3DComponent = () => {
               checked={showBuilding}
               onCheckedChange={() => {
                 setShowBuilding(!showBuilding);
-                console.log(showBuilding)
                 handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
               }} />
           </fieldset>
