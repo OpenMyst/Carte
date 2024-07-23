@@ -141,7 +141,7 @@ export default function Home() {
       if (location.isPlay) {
         mapEvent.flyTo({
           center: [location.longitude, location.latitude],
-          zoom: 15
+          zoom: 20
         });
 
         const anneeEvent = parseInt(location.event_date)
