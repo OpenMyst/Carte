@@ -23,7 +23,7 @@ const Map3DComponent = () => {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showTemple, setShowTemple] = useState(true); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
-  const [mountainHeight, setMountainHeight] = useState(15); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
@@ -38,13 +38,13 @@ const Map3DComponent = () => {
     if (map) {
       loadEvangileMarker(map);
     }
-  }, [evangileEvents, map]);
+  }, [evangileEvents, showTemple, map]);
 
   useEffect(() => {
     if (map) {
       updateMapSettings();
     }
-  }, [mountainHeight, showTemple, showBuilding]);
+  }, [mountainHeight, showBuilding]);
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
@@ -127,7 +127,7 @@ const Map3DComponent = () => {
         renderingMode: '3d',
         onAdd: function () {
           const scale = 10;
-          const heightMultiple = mountainHeight < 50 ? 1 : showTemple ? 1 : 5;
+          const heightMultiple = mountainHeight < 50 ? 1 : 2;
 
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
@@ -177,6 +177,7 @@ const Map3DComponent = () => {
 
   const updateMapSettings = () => {
     if (map) {
+      initializeMap()
       map.on('style.load', () => {
         map.addSource('mapbox-dem', {
           type: 'raster-dem',
@@ -243,7 +244,6 @@ const Map3DComponent = () => {
         const day = location.detail_jour;
         if (day === "Nuit") {
           mapEvent.setStyle(winterDark);
-          setShowTemple(true);
         } else if (day === "Matin") {
           mapEvent.setStyle(summerLight);
         } else {
@@ -287,15 +287,6 @@ const Map3DComponent = () => {
           </svg>
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
-          <fieldset>
-            <Label htmlFor="show-temple">Show temple</Label>
-            <Switch
-              id="show-temple"
-              checked={showTemple}
-              onCheckedChange={() => {
-                setShowTemple(!showTemple);
-              }} />
-          </fieldset>
           <fieldset>
             <Label htmlFor="show-building">Show Building</Label>
             <Switch
