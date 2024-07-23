@@ -134,7 +134,6 @@ export default function Map2DComponent({ params }) {
           });
         }
       })
-      setEvangileEvents(eventsArray);
     })
   }
   // Load markers for evangile events

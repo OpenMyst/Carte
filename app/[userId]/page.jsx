@@ -187,7 +187,6 @@ export default function MapByUserId({ params }) {
                     });
                 }
             })
-            setEvangileEvents(eventsArray);
         })
     }
 

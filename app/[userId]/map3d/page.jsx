@@ -207,13 +207,11 @@ const Map3DComponent = ({ params }) => {
           });
         }
       })
-      setEvangileEvents(eventsArray);
     })
   }
 
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
-    userPlayEvent()
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
             <div class="flex flex-row h-[300px] w-[220px]  static">
@@ -262,9 +260,8 @@ const Map3DComponent = ({ params }) => {
         mapEvent.setStyle(winterDark);
         addSnowLayer(mapEvent)
       }
-
+      userPlayEvent()
       const meteo = location.meteo;
-      console.log(meteo)
       if (meteo === "Pluvieux") {
         addRainLayer(mapEvent)
       } else if (meteo === "Neigeux") {
