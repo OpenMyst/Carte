@@ -131,8 +131,6 @@ export default function Home() {
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
       
-      userPlayEvent(location.id);
-      
       marker.getElement().addEventListener('click', () => {
         mapEvent.flyTo({
           center: [location.longitude, location.latitude],
@@ -172,24 +170,6 @@ export default function Home() {
       }
     });
   };
-
-  const userPlayEvent = async (eventId) => {
-    const q = query(collection(database, 'location'), where('idUser', '==', uid),  where('idEvents', '==', eventId));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const locationDoc = querySnapshot.docs[0];
-      const data = { ...locationDoc.data(), id: locationDoc.id };
-      if (data.isPlay) {
-        mapEvent.flyTo({
-          center: [location.longitude, location.latitude],
-          zoom: 20
-        });
-      }
-    } else {
-      console.log('No location document found for the user.');
-    }
-    
-  }
 
   // Handle checkbox change for building visibility
   const handleCheckboxChange = (layerId, property, value) => {
