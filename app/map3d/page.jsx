@@ -138,7 +138,7 @@ const Map3DComponent = () => {
           };
 
           const options1 = {
-            obj: showTemple ? '/assets/israel_temple.gltf' : '/assets/jerusalem.gltf',
+            obj: '/assets/israel_temple.gltf',
             type: 'gltf',
             scale: { x: scale, y: scale * heightMultiple, z: 15 },
             units: 'meters',
