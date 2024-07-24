@@ -2,12 +2,13 @@
 import { MAPBOX_TOKEN, sprintStyleNight, sprintStyle, winterDark, summerLight } from "@/tool/security";
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import { addSnowLayer, addRainLayer, } from "@/lib/climat";
-import { addRouteLayer } from "@/lib/utility";
+import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { userPlayEvent } from "@/tool/service";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 /*
@@ -38,6 +39,7 @@ const Map3DComponent = ({ params }) => {
   useEffect(() => {
     if (map) {
       loadEvangileMarker(map);
+      getUserPlayEvent(map);
     }
   }, [evangileEvents, map]);
 
@@ -49,15 +51,28 @@ const Map3DComponent = ({ params }) => {
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
-    const q = query(collection(database, 'events'))
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let eventsArray = []
+    try {
+      const q = query(collection(database, 'events'))
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        let eventsArray = []
 
-      querySnapshot.forEach(doc => {
-        eventsArray.push({ ...doc.data(), id: doc.id })
+        querySnapshot.forEach(doc => {
+          eventsArray.push({ ...doc.data(), id: doc.id })
+        })
+        setEvangileEvents(eventsArray);
       })
-      setEvangileEvents(eventsArray);
-    })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const getUserPlayEvent = async (mapEvent) => {
+    const location = await userPlayEvent(userId);
+    // console.log(location)
+    mapEvent.flyTo({
+      center: [location.longitude, location.latitude],
+      zoom: 20
+    });
   }
 
   //Load the Threebox librairie
@@ -118,7 +133,6 @@ const Map3DComponent = ({ params }) => {
       map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible" : "none");
       map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible" : "none");
       map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
-      map.setLayoutProperty('bridge-majore-link-2', 'visibility', showRoad ? "visible" : "none");
 
       loadEvangileMarker(map);
 
@@ -139,18 +153,18 @@ const Map3DComponent = ({ params }) => {
           };
 
           const options1 = {
-            obj: '/assets/israel_temple.gltf',
+            obj: '/assets/jeru.gltf',
             type: 'gltf',
             scale: { x: scale, y: scale * heightMultiple, z: 15 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
-          loadAndPlaceModel(options1, [35.2310, 31.7794]);
+          loadAndPlaceModel(options1, [35.2297, 31.7738]);
 
           const options2 = {
-            obj: '/assets/golgotha.gltf',
+            obj: '/assets/golgot.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale / 2, z: 15 },
+            scale: { x: scale, y: scale, z: 15 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
@@ -193,28 +207,10 @@ const Map3DComponent = ({ params }) => {
         handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
         handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
         handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
-        handleCheckboxChange('bridge-majore-link-2', 'visibility', showRoad);
         map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       })
     }
   };
-
-  // Load the location to zoom when user play one event
-  const userPlayEvent = async () => {
-    const q = query(collection(database, 'location'), where('idUser', '==', userId));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      querySnapshot.forEach(doc => {
-        const data = { ...locationDoc.data(), id: locationDoc.id };
-        if (data.isPlay) {
-          const location = evangileEvents.filter(loc => loc.id === data.idEvents)
-          mapEvent.flyTo({
-            center: [location.longitude, location.latitude],
-            zoom: 20
-          });
-        }
-      })
-    })
-  }
 
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
@@ -266,7 +262,7 @@ const Map3DComponent = ({ params }) => {
         mapEvent.setStyle(winterDark);
         addSnowLayer(mapEvent)
       }
-      userPlayEvent()
+
       const meteo = location.meteo;
       if (meteo === "Pluvieux") {
         addRainLayer(mapEvent)
@@ -327,7 +323,6 @@ const Map3DComponent = ({ params }) => {
                 handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
                 handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
                 handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-                handleCheckboxChange('bridge-majore-link-2', 'visibility', !showRoad);
               }}
             />
           </fieldset>

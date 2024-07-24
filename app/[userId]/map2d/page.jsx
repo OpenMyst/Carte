@@ -5,9 +5,10 @@ import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import Link from "next/link";
-import { addRouteLayer } from "@/lib/utility";
+import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { userPlayEvent } from "@/tool/service";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -53,6 +54,7 @@ export default function Map2DComponent({ params }) {
       map.current.setStyle(mapStyle);
 
       loadEvangileMarker();
+      getUserPlayEvent(map.current);
       addRouteLayer(map.current, startTravel, endTravel);
       map.current.on('style.load', () => {
         handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
@@ -108,6 +110,15 @@ export default function Map2DComponent({ params }) {
     });
   }
 
+  const getUserPlayEvent = async (mapEvent) => {
+    const location = await userPlayEvent(userId);
+    // console.log(location)
+    mapEvent.flyTo({
+      center: [location.longitude, location.latitude],
+      zoom: 20
+    });
+  }
+
   // Fetch all events from Firebase
   const getAllEvent = () => {
     const q = query(collection(database, 'events'))
@@ -121,22 +132,6 @@ export default function Map2DComponent({ params }) {
     })
   }
 
-  // Load the location to zoom when user play one event
-  const userPlayEvent = async () => {
-    const q = query(collection(database, 'location'), where('idUser', '==', userId));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      querySnapshot.forEach(doc => {
-        const data = { ...locationDoc.data(), id: locationDoc.id };
-        if (data.isPlay) {
-          const location = evangileEvents.filter(loc => loc.id === data.idEvents)
-          mapEvent.flyTo({
-            center: [location.longitude, location.latitude],
-            zoom: 20
-          });
-        }
-      })
-    })
-  }
   // Load markers for evangile events
   const loadEvangileMarker = () => {
     evangileEvents.forEach((location) => {
@@ -184,8 +179,6 @@ export default function Map2DComponent({ params }) {
           handleCheckboxChange('building', 'visibility', showBuilding);
         });
       }
-
-      userPlayEvent()
 
       const day = location.detail_jour;
       if (day === "Nuit") {

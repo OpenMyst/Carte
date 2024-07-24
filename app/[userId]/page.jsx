@@ -5,9 +5,10 @@ import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import { addSnowLayer, addRainLayer, } from "@/lib/climat";
-import { addRouteLayer } from "@/lib/utility";
+import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { userPlayEvent } from "@/tool/service";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -73,8 +74,8 @@ export default function MapByUserId({ params }) {
             map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             addRouteLayer(map.current, startTravel, endTravel)
             loadEvangileMarker(map.current);
+            getUserPlayEvent(map.current);
         });
-        console.log(map)
 
     }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
 
@@ -112,6 +113,15 @@ export default function MapByUserId({ params }) {
         })
     }
 
+    const getUserPlayEvent = async (mapEvent) => {
+        const location = await userPlayEvent(userId);
+        // console.log(location)
+        mapEvent.flyTo({
+            center: [location.longitude, location.latitude],
+            zoom: 20
+        });
+    }
+
     // Load markers for evangile events
     const loadEvangileMarker = (mapEvent) => {
         evangileEvents.forEach((location) => {
@@ -126,7 +136,7 @@ export default function MapByUserId({ params }) {
                     </div>
                 </div>
                 `);
-            
+
             userPlayEvent()
 
             const marker = new mapboxgl.Marker()
