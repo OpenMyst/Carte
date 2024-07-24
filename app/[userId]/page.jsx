@@ -29,6 +29,7 @@ export default function MapByUserId({ params }) {
     const [open, setOpen] = useState(true); // Toggle for overlay visibility
     const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
     const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
+    const [locationPlay, setLocationPlay] = useState({}); // data of the location of event
 
     useEffect(() => {
         getAllEvent();
@@ -76,7 +77,6 @@ export default function MapByUserId({ params }) {
             loadEvangileMarker(map.current);
         });
         getUserPlayEvent(map.current);
-
     }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
 
     useEffect(() => {
@@ -100,6 +100,12 @@ export default function MapByUserId({ params }) {
         }
     }, [season, mapStyle, evangileEvents]);
 
+    useEffect(() => {
+        if(map.current) {
+            getUserPlayEvent(map.current);
+        }
+    }, [locationPlay])
+
     // Fetch all events from Firebase
     const getAllEvent = () => {
         const q = query(collection(database, 'events'))
@@ -116,7 +122,8 @@ export default function MapByUserId({ params }) {
     //Received the location of the event who play by user and zoom in them
     const getUserPlayEvent = async (mapEvent) => {
         const location = await userPlayEvent(userId);
-        // console.log(location)
+        console.log(location)
+        setLocationPlay(location)
         mapEvent.flyTo({
             center: [location.longitude, location.latitude],
             zoom: 20
@@ -174,7 +181,6 @@ export default function MapByUserId({ params }) {
             }
 
             const meteo = location.meteo;
-            console.log(meteo)
             if (meteo === "Pluvieux") {
                 addRainLayer(mapEvent)
             } else if (meteo === "Neigeux") {

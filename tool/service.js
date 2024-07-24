@@ -16,7 +16,7 @@ export const userPlayEvent = async (userId) => {
       where('isPlay', '==', true)
     );
     const locationsSnapshot = await getDocs(locationsQuery);
-
+    
     // Extract idEvents from the retrieved locations
     const eventIds = [];
     locationsSnapshot.forEach((doc) => {

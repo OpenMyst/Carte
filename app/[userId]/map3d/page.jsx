@@ -30,6 +30,7 @@ const Map3DComponent = ({ params }) => {
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
+  const [locationPlay, setLocationPlay] = useState({}); // data of the location of event
 
   useEffect(() => {
     getAllEvent();
@@ -48,6 +49,12 @@ const Map3DComponent = ({ params }) => {
       updateMapSettings();
     }
   }, [mountainHeight, showBuilding]);
+
+  useEffect(() => {
+    if (map) {
+      getUserPlayEvent(map);
+    }
+  }, [locationPlay])
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
@@ -69,7 +76,7 @@ const Map3DComponent = ({ params }) => {
   //Received the location of the event who play by user and zoom in them
   const getUserPlayEvent = async (mapEvent) => {
     const location = await userPlayEvent(userId);
-    // console.log(location)
+    setLocationPlay(location)
     mapEvent.flyTo({
       center: [location.longitude, location.latitude],
       zoom: 15

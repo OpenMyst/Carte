@@ -29,6 +29,7 @@ export default function Map2DComponent({ params }) {
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
+  const [locationPlay, setLocationPlay] = useState({}); // data of the location of event
 
   useEffect(() => {
     getAllEvent();
@@ -66,6 +67,12 @@ export default function Map2DComponent({ params }) {
       })
     }
   }, [season, mapStyle, evangileEvents]);
+
+  useEffect(() => {
+    if (map.current) {
+      getUserPlayEvent(map.current);
+    }
+  }, [locationPlay])
 
   const initializeMap = () => {
     map.current = new mapboxgl.Map({
@@ -113,7 +120,7 @@ export default function Map2DComponent({ params }) {
   //Received the location of the event who play by user and zoom in them
   const getUserPlayEvent = async (mapEvent) => {
     const location = await userPlayEvent(userId);
-    // console.log(location)
+    setLocationPlay(location)
     mapEvent.flyTo({
       center: [location.longitude, location.latitude],
       zoom: 20
