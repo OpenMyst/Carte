@@ -154,7 +154,7 @@ const Map3DComponent = ({ params }) => {
           };
 
           const options1 = {
-            obj: '/assets/jeru.gltf',
+            obj: '/assets/jerusalem2.gltf',
             type: 'gltf',
             scale: { x: scale, y: scale * heightMultiple, z: 15 },
             units: 'meters',

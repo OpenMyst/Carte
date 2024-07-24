@@ -74,8 +74,8 @@ export default function MapByUserId({ params }) {
             map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             addRouteLayer(map.current, startTravel, endTravel)
             loadEvangileMarker(map.current);
-            getUserPlayEvent(map.current);
         });
+        getUserPlayEvent(map.current);
 
     }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
 
@@ -138,8 +138,6 @@ export default function MapByUserId({ params }) {
                 </div>
                 `);
 
-            userPlayEvent()
-
             const marker = new mapboxgl.Marker()
                 .setLngLat([location.longitude, location.latitude])
                 .setPopup(popup)  // Associe le popup au marqueur
@@ -184,23 +182,6 @@ export default function MapByUserId({ params }) {
             }
         });
     };
-
-    // Load the location to zoom when user play one event
-    const userPlayEvent = async () => {
-        const q = query(collection(database, 'location'), where('idUser', '==', userId));
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            querySnapshot.forEach(doc => {
-                const data = { ...locationDoc.data(), id: locationDoc.id };
-                if (data.isPlay) {
-                    const location = evangileEvents.filter(loc => loc.id === data.idEvents)
-                    mapEvent.flyTo({
-                        center: [location.longitude, location.latitude],
-                        zoom: 20
-                    });
-                }
-            })
-        })
-    }
 
     // Handle checkbox change for building visibility
     const handleCheckboxChange = (layerId, property, value) => {
