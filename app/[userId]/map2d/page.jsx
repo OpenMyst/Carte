@@ -110,6 +110,7 @@ export default function Map2DComponent({ params }) {
     });
   }
 
+  //Received the location of the event who play by user and zoom in them
   const getUserPlayEvent = async (mapEvent) => {
     const location = await userPlayEvent(userId);
     // console.log(location)

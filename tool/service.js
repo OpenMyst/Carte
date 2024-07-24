@@ -1,42 +1,51 @@
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 
+/**
+ * Retrieves the first event associated with a given user's play locations.
+ * 
+ * @param {string} userId - The ID of the user for whom to retrieve the play events.
+ * @returns {Promise<object[]>} - A promise that resolves to an array containing the first event found, or an empty array if no events are found.
+ */
 export const userPlayEvent = async (userId) => {
   try {
-    // Étape 1: Récupérer les locations pour un utilisateur donné où isPlay est true
+    // Step 1: Retrieve locations for the given user where isPlay is true
     const locationsQuery = query(
       collection(database, 'location'),
       where('idUser', '==', userId),
       where('isPlay', '==', true)
     );
     const locationsSnapshot = await getDocs(locationsQuery);
-    // Extraire les idEvents des locations récupérées
+
+    // Extract idEvents from the retrieved locations
     const eventIds = [];
     locationsSnapshot.forEach((doc) => {
       eventIds.push(doc.data().idEvents);
     });
 
-    // Si aucun événement n'est trouvé, retourner un tableau vide
+    // If no events are found, return an empty array
     if (eventIds.length === 0) {
       return [];
     }
 
-    // Étape 2: Récupérer les events correspondants dans la collection events
+    // Step 2: Retrieve the corresponding events from the 'events' collection
     const eventsQuery = query(
       collection(database, 'events'),
-      where('__name__', 'in', eventIds)  // __name__ correspond à l'ID du document dans Firestore
+      where('__name__', 'in', eventIds)  // '__name__' corresponds to the document ID in Firestore
     );
     const eventsSnapshot = await getDocs(eventsQuery);
 
-    // Extraire les coordonnées des events récupérés
+    // Extract data from the retrieved events
     const events = [];
     eventsSnapshot.forEach((doc) => {
       events.push(doc.data());
     });
 
-    return events[0]
+    // Return the first event found
+    return events[0];
   } catch (error) {
+    // Log the error and return an empty array in case of failure
     console.error('Error retrieving locations and events:', error);
     return [];
   }
-}
+};
