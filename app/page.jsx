@@ -142,13 +142,11 @@ export default function Home() {
       if (anneeEvent < 0) {
         setMountainHeight(50)
         setShowBuilding(false)
-        setShowTemple(true)
-        updateTerrain(map, 50, false)
+        updateTerrain(mapEvent, 50, false)
       } else {
         setMountainHeight(0)
         setShowBuilding(false)
-        setShowTemple(false)
-        updateTerrain(map, 10, false)
+        updateTerrain(mapEvent, 10, false)
       }
 
       const day = location.detail_jour;
