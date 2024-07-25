@@ -122,12 +122,21 @@ export default function MapByUserId({ params }) {
     //Received the location of the event who play by user and zoom in them
     const getUserPlayEvent = async (mapEvent) => {
         const location = await userPlayEvent(userId);
-        console.log(location)
         setLocationPlay(location)
-        mapEvent.flyTo({
-            center: [location.longitude, location.latitude],
-            zoom: 20
-        });
+        setStartTravel([location.longitude, location.latitude]);
+
+        // Find the next event in the list
+        const currentIndex = evangileEvents.findIndex(event => event.id === location.id);
+        if (currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
+            const nextEvent = evangileEvents[currentIndex + 1];
+            setEndTravel([nextEvent.longitude, nextEvent.latitude]);
+        }
+        if (location) {
+            mapEvent.flyTo({
+                center: [location.longitude, location.latitude],
+                zoom: 15
+            });
+        }
     }
 
     // Load markers for evangile events
