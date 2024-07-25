@@ -130,7 +130,7 @@ export default function Home() {
         .setLngLat([location.longitude, location.latitude])
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
-      
+
       marker.getElement().addEventListener('click', () => {
         mapEvent.flyTo({
           center: [location.longitude, location.latitude],
@@ -197,16 +197,14 @@ export default function Home() {
           </svg>
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
-
           <fieldset>
-            <label>Passer la carte en 3D</label>
-            <input
-              type="checkbox"
+            <Label htmlFor="show-building">Pass in 3D</Label>
+            <Switch
+              id="show-building"
               checked={showMap3D}
-              onChange={(e) => {
-                setShowMap3D(e.target.checked);
-              }}
-            />
+              onCheckedChange={() => {
+                setShowMap3D(!showMap3D);
+              }} />
           </fieldset>
           <fieldset>
             <Label htmlFor="show-building">Show Building</Label>
