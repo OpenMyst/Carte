@@ -1,4 +1,3 @@
-import "@/style/globals.css";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Head from 'next/head'
 import { Inter as FontSans } from "next/font/google"

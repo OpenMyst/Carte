@@ -19,7 +19,7 @@ export default function Home() {
   const [zoom, setZoom] = useState(9); // Zoom level state
   const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
-  const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
+  const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
   const [season, setSeason] = useState('spring'); // Season state
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
@@ -67,7 +67,6 @@ export default function Home() {
       handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
       handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
       handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
-      handleCheckboxChange('bridge-majore-link-2', 'visibility', showRoad);
 
       map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       addRouteLayer(map.current, startTravel, endTravel)
@@ -94,6 +93,7 @@ export default function Home() {
       setMapStyle(styles[season]);
       map.current.setStyle(mapStyle);
 
+      addRouteLayer(map.current, startTravel, endTravel)
       loadEvangileMarker(map.current);
     }
   }, [season, mapStyle, evangileEvents]);
@@ -234,7 +234,6 @@ export default function Home() {
                 handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
                 handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
                 handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-                handleCheckboxChange('bridge-majore-link-2', 'visibility', !showRoad);
               }}
             />
           </fieldset>
