@@ -29,7 +29,7 @@ export default function Map2DByUserId({ params }) {
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
-  const [locationPlay, setLocationPlay] = useState({}); // data of the location of event
+  const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
 
   useEffect(() => {
     getAllEvent();
@@ -57,8 +57,7 @@ export default function Map2DByUserId({ params }) {
     updateMapSettings();
     addRouteLayer(map.current, startTravel, endTravel)
     loadEvangileMarker(map.current);
-    getUserPlayEvent(map.current);
-  }, [map, mapStyle, evangileEvents, showMap3D, locationPlay]);
+  }, [map, mapStyle, evangileEvents, showMap3D]);
 
   useEffect(() => {
     if (map.current) {
@@ -78,8 +77,9 @@ export default function Map2DByUserId({ params }) {
       map.current.setStyle(mapStyle);
       addRouteLayer(map.current, startTravel, endTravel);
       loadEvangileMarker(map.current);
+      getUserPlayEvent(map.current);
     }
-  }, [season, mapStyle, evangileEvents]);
+  }, [season, mapStyle, evangileEvents, locationPlayId]);
 
   useEffect(() => {
     if (map.current) {
@@ -103,17 +103,18 @@ export default function Map2DByUserId({ params }) {
   //Received the location of the event who play by user and zoom in them
   const getUserPlayEvent = async (mapEvent) => {
     const location = await userPlayEvent(userId);
-    setLocationPlay(location)
-    setStartTravel([location.longitude, location.latitude]);
+    setLocationPlayId(location)
 
     // Find the next event in the list
-    const currentIndex = evangileEvents.findIndex(event => event.id === location.id);
+    const currentIndex = evangileEvents.findIndex(event => event.id === location);
+    const currentEvents = evangileEvents[currentIndex];
+    setStartTravel([currentEvents.longitude, currentEvents.latitude]);
     if (currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
       const nextEvent = evangileEvents[currentIndex + 1];
       setEndTravel([nextEvent.longitude, nextEvent.latitude]);
     }
-    if (location) {
-      const anneeEvent = parseInt(location.event_date)
+    if (currentEvents) {
+      const anneeEvent = parseInt(currentEvents.event_date)
       if (anneeEvent < 0) {
         setMountainHeight(50)
         setShowBuilding(false)
@@ -124,7 +125,7 @@ export default function Map2DByUserId({ params }) {
         updateTerrain(mapEvent, 10, false)
       }
 
-      const day = location.detail_jour;
+      const day = currentEvents.detail_jour;
       if (day === "Nuit") {
         mapEvent.setStyle(winterDark);
         setShowTemple(true);
@@ -135,14 +136,14 @@ export default function Map2DByUserId({ params }) {
         addSnowLayer(mapEvent)
       }
 
-      const meteo = location.meteo;
+      const meteo = currentEvents.meteo;
       if (meteo === "Pluvieux") {
         addRainLayer(mapEvent)
       } else if (meteo === "Neigeux") {
         addSnowLayer(mapEvent)
       }
       mapEvent.flyTo({
-        center: [location.longitude, location.latitude],
+        center: [currentEvents.longitude, currentEvents.latitude],
         zoom: 15
       });
     }

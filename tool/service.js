@@ -23,26 +23,26 @@ export const userPlayEvent = async (userId) => {
       eventIds.push(doc.data().idEvents);
     });
 
-    // If no events are found, return an empty array
-    if (eventIds.length === 0) {
-      return [];
-    }
+    // // If no events are found, return an empty array
+    // if (eventIds.length === 0) {
+    //   return [];
+    // }
 
-    // Step 2: Retrieve the corresponding events from the 'events' collection
-    const eventsQuery = query(
-      collection(database, 'events'),
-      where('__name__', 'in', eventIds)  // '__name__' corresponds to the document ID in Firestore
-    );
-    const eventsSnapshot = await getDocs(eventsQuery);
+    // // Step 2: Retrieve the corresponding events from the 'events' collection
+    // const eventsQuery = query(
+    //   collection(database, 'events'),
+    //   where('__name__', 'in', eventIds)  // '__name__' corresponds to the document ID in Firestore
+    // );
+    // const eventsSnapshot = await getDocs(eventsQuery);
 
-    // Extract data from the retrieved events
-    const events = [];
-    eventsSnapshot.forEach((doc) => {
-      events.push(doc.data());
-    });
+    // // Extract data from the retrieved events
+    // const events = [];
+    // eventsSnapshot.forEach((doc) => {
+    //   events.push(doc.data());
+    // });
 
     // Return the first event found
-    return events[0];
+    return eventIds[0];
   } catch (error) {
     // Log the error and return an empty array in case of failure
     console.error('Error retrieving locations and events:', error);
