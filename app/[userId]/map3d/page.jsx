@@ -42,7 +42,7 @@ const Map3DComponent = ({ params }) => {
       loadEvangileMarker(map);
       getUserPlayEvent(map);
     }
-  }, [evangileEvents, map]);
+  }, [evangileEvents, map, locationPlay]);
 
   useEffect(() => {
     if (map) {
@@ -50,13 +50,6 @@ const Map3DComponent = ({ params }) => {
       addRouteLayer(map, startTravel, endTravel)
     }
   }, [mountainHeight, showBuilding, showRoad]);
-
-  useEffect(() => {
-    if (map && locationPlay) {
-      getUserPlayEvent(map);
-      addRouteLayer(map, startTravel, endTravel);
-    }
-  }, [locationPlay, startTravel, endTravel])
 
   // Fetch all events from Firebase
   const getAllEvent = () => {

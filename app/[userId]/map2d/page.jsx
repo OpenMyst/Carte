@@ -58,7 +58,7 @@ export default function Map2DByUserId({ params }) {
     addRouteLayer(map.current, startTravel, endTravel)
     loadEvangileMarker(map.current);
     getUserPlayEvent(map.current);
-  }, [map, mapStyle, evangileEvents, showMap3D]);
+  }, [map, mapStyle, evangileEvents, showMap3D, locationPlay]);
 
   useEffect(() => {
     if (map.current) {
@@ -80,12 +80,6 @@ export default function Map2DByUserId({ params }) {
       loadEvangileMarker(map.current);
     }
   }, [season, mapStyle, evangileEvents]);
-
-  useEffect(() => {
-    if (map.current) {
-      getUserPlayEvent(map.current);
-    }
-  }, [locationPlay, startTravel, endTravel]);
 
   useEffect(() => {
     if (map.current) {
