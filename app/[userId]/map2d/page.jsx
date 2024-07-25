@@ -27,8 +27,8 @@ export default function Map2DByUserId({ params }) {
     const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
     const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
     const [open, setOpen] = useState(true); // Toggle for overlay visibility
-    const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
-    const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
+    const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
+    const [endTravel, setEndTravel] = useState([]); // End coordinates for route
     const [locationPlay, setLocationPlay] = useState({}); // data of the location of event
 
     useEffect(() => {
@@ -73,7 +73,7 @@ export default function Map2DByUserId({ params }) {
             handleCheckboxChange('bridge-majore-link-2', 'visibility', showRoad);
 
             map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-            // addRouteLayer(map.current, startTravel, endTravel)
+            addRouteLayer(map.current, startTravel, endTravel)
             loadEvangileMarker(map.current);
         });
         getUserPlayEvent(map.current);
@@ -95,16 +95,16 @@ export default function Map2DByUserId({ params }) {
             };
             setMapStyle(styles[season]);
             map.current.setStyle(mapStyle);
-
+            addRouteLayer(map.current, startTravel, endTravel);
             loadEvangileMarker(map.current);
         }
     }, [season, mapStyle, evangileEvents]);
 
     useEffect(() => {
-        if(map.current) {
-            getUserPlayEvent(map.current);
-        }
-    }, [locationPlay])
+      if (map.current) {
+        getUserPlayEvent(map.current);
+      }
+    }, [locationPlay, startTravel, endTravel])
 
     // Fetch all events from Firebase
     const getAllEvent = () => {
@@ -121,13 +121,21 @@ export default function Map2DByUserId({ params }) {
 
     //Received the location of the event who play by user and zoom in them
     const getUserPlayEvent = async (mapEvent) => {
-        const location = await userPlayEvent(userId);
-        console.log(location)
-        setLocationPlay(location)
-        mapEvent.flyTo({
-            center: [location.longitude, location.latitude],
-            zoom: 20
-        });
+      const location = await userPlayEvent(userId);
+      setLocationPlay(location)
+      setStartTravel([location.longitude, location.latitude]);
+  
+       // Find the next event in the list
+      const currentIndex = evangileEvents.findIndex(event => event.id === location.id);
+      if (currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
+        const nextEvent = evangileEvents[currentIndex + 1];
+        setEndTravel([nextEvent.longitude, nextEvent.latitude]);
+      }
+  
+      mapEvent.flyTo({
+        center: [location.longitude, location.latitude],
+        zoom: 15
+      });
     }
 
     // Load markers for evangile events
