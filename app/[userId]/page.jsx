@@ -132,6 +132,34 @@ export default function MapByUserId({ params }) {
             setEndTravel([nextEvent.longitude, nextEvent.latitude]);
         }
         if (location) {
+            const anneeEvent = parseInt(location.event_date)
+            if (anneeEvent < 0) {
+                setMountainHeight(50)
+                setShowBuilding(false)
+                updateTerrain(mapEvent, 50, false)
+            } else {
+                setMountainHeight(0)
+                setShowBuilding(false)
+                updateTerrain(mapEvent, 10, false)
+            }
+
+            const day = location.detail_jour;
+            if (day === "Nuit") {
+                mapEvent.setStyle(winterDark);
+                setShowTemple(true);
+            } else if (day === "Matin") {
+                mapEvent.setStyle(summerLight);
+            } else {
+                mapEvent.setStyle(winterDark);
+                addSnowLayer(mapEvent)
+            }
+
+            const meteo = location.meteo;
+            if (meteo === "Pluvieux") {
+                addRainLayer(mapEvent)
+            } else if (meteo === "Neigeux") {
+                addSnowLayer(mapEvent)
+            }
             mapEvent.flyTo({
                 center: [location.longitude, location.latitude],
                 zoom: 15
@@ -165,34 +193,6 @@ export default function MapByUserId({ params }) {
                     zoom: 20
                 });
             })
-
-            const anneeEvent = parseInt(location.event_date)
-            if (anneeEvent < 0) {
-                setMountainHeight(50)
-                setShowBuilding(false)
-                updateTerrain(mapEvent, 50, false)
-            } else {
-                setMountainHeight(0)
-                setShowBuilding(false)
-                updateTerrain(mapEvent, 10, false)
-            }
-
-            const day = location.detail_jour;
-            if (day === "Nuit") {
-                mapEvent.setStyle(winterDark);
-            } else if (day === "Matin") {
-                mapEvent.setStyle(summerLight);
-            } else {
-                mapEvent.setStyle(winterDark);
-                addSnowLayer(mapEvent)
-            }
-
-            const meteo = location.meteo;
-            if (meteo === "Pluvieux") {
-                addRainLayer(mapEvent)
-            } else if (meteo === "Neigeux") {
-                addSnowLayer(mapEvent)
-            }
         });
     };
 

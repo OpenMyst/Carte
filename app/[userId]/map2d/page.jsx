@@ -118,11 +118,40 @@ export default function Map2DByUserId({ params }) {
       const nextEvent = evangileEvents[currentIndex + 1];
       setEndTravel([nextEvent.longitude, nextEvent.latitude]);
     }
+    if (location) {
+      const anneeEvent = parseInt(location.event_date)
+      if (anneeEvent < 0) {
+        setMountainHeight(50)
+        setShowBuilding(false)
+        updateTerrain(mapEvent, 50, false)
+      } else {
+        setMountainHeight(0)
+        setShowBuilding(false)
+        updateTerrain(mapEvent, 10, false)
+      }
 
-    mapEvent.flyTo({
-      center: [location.longitude, location.latitude],
-      zoom: 15
-    });
+      const day = location.detail_jour;
+      if (day === "Nuit") {
+        mapEvent.setStyle(winterDark);
+        setShowTemple(true);
+      } else if (day === "Matin") {
+        mapEvent.setStyle(summerLight);
+      } else {
+        mapEvent.setStyle(winterDark);
+        addSnowLayer(mapEvent)
+      }
+
+      const meteo = location.meteo;
+      if (meteo === "Pluvieux") {
+        addRainLayer(mapEvent)
+      } else if (meteo === "Neigeux") {
+        addSnowLayer(mapEvent)
+      }
+      mapEvent.flyTo({
+        center: [location.longitude, location.latitude],
+        zoom: 15
+      });
+    }
   }
 
   const updateMapSettings = () => {
@@ -172,34 +201,6 @@ export default function Map2DByUserId({ params }) {
           zoom: 20
         });
       })
-
-      const anneeEvent = parseInt(location.event_date)
-      if (anneeEvent < 0) {
-        setMountainHeight(50)
-        setShowBuilding(false)
-        updateTerrain(mapEvent, 50, false);
-      } else {
-        setMountainHeight(0)
-        setShowBuilding(false)
-        updateTerrain(mapEvent, 10, false);
-      }
-
-      const day = location.detail_jour;
-      if (day === "Nuit") {
-        mapEvent.setStyle(winterDark);
-      } else if (day === "Matin") {
-        mapEvent.setStyle(summerLight);
-      } else {
-        mapEvent.setStyle(winterDark);
-        addSnowLayer(mapEvent)
-      }
-
-      const meteo = location.meteo;
-      if (meteo === "Pluvieux") {
-        addRainLayer(mapEvent)
-      } else if (meteo === "Neigeux") {
-        addSnowLayer(mapEvent)
-      }
     });
   };
 
@@ -210,7 +211,7 @@ export default function Map2DByUserId({ params }) {
       handleCheckboxChange('building-extrusion', 'visibility', show);
     });
   };
-  
+
   // Handle checkbox change for building visibility
   const handleCheckboxChange = (layerId, property, value) => {
     if (map.current) {
