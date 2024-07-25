@@ -5,7 +5,7 @@ import { database } from "@/tool/firebase";
  * Retrieves the first event associated with a given user's play locations.
  * 
  * @param {string} userId - The ID of the user for whom to retrieve the play events.
- * @returns {Promise<object[]>} - A promise that resolves to an array containing the first event found, or an empty array if no events are found.
+ * @returns {Promise<string>} - A promise that resolves to ID of event to zooming
  */
 export const userPlayEvent = async (userId) => {
   try {
