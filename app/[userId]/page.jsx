@@ -101,7 +101,7 @@ export default function MapByUserId({ params }) {
     }, [season, mapStyle, evangileEvents]);
 
     useEffect(() => {
-        if(map.current) {
+        if (map.current) {
             getUserPlayEvent(map.current);
         }
     }, [locationPlay])
@@ -161,13 +161,13 @@ export default function MapByUserId({ params }) {
             if (anneeEvent < 0) {
                 setMountainHeight(50)
                 setShowBuilding(false)
-                mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 50 / 100 });
-                handleCheckboxChange('building-extrusion', 'visibility', true);
+                setShowTemple(true)
+                updateTerrain(map, 50, false)
             } else {
                 setMountainHeight(0)
                 setShowBuilding(false)
-                mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 10 / 100 });
-                handleCheckboxChange('building-extrusion', 'visibility', show);
+                setShowTemple(false)
+                updateTerrain(map, 10, true)
             }
 
             const day = location.detail_jour;
@@ -186,6 +186,14 @@ export default function MapByUserId({ params }) {
             } else if (meteo === "Neigeux") {
                 addSnowLayer(mapEvent)
             }
+        });
+    };
+
+    //update the terrain in the map when the height of mountain has changed
+    const updateTerrain = (map, height, show) => {
+        map.on('style.load', () => {
+            map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
+            handleCheckboxChange('building-extrusion', 'visibility', show);
         });
     };
 

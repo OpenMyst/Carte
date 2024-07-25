@@ -79,7 +79,7 @@ const Map3DComponent = ({ params }) => {
     setLocationPlay(location)
     setStartTravel([location.longitude, location.latitude]);
 
-     // Find the next event in the list
+    // Find the next event in the list
     const currentIndex = evangileEvents.findIndex(event => event.id === location.id);
     if (currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
       const nextEvent = evangileEvents[currentIndex + 1];

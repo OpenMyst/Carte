@@ -177,13 +177,11 @@ export default function Map2DByUserId({ params }) {
       if (anneeEvent < 0) {
         setMountainHeight(50)
         setShowBuilding(false)
-        mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 50 / 100 });
-        handleCheckboxChange('building-extrusion', 'visibility', true);
+        updateTerrain(mapEvent, 50, false);
       } else {
         setMountainHeight(0)
         setShowBuilding(false)
-        mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 10 / 100 });
-        handleCheckboxChange('building-extrusion', 'visibility', show);
+        updateTerrain(mapEvent, 10, false);
       }
 
       const day = location.detail_jour;
@@ -205,6 +203,14 @@ export default function Map2DByUserId({ params }) {
     });
   };
 
+  //update the terrain in the map when the height of mountain has changed
+  const updateTerrain = (map, height, show) => {
+    map.on('style.load', () => {
+      map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
+      handleCheckboxChange('building-extrusion', 'visibility', show);
+    });
+  };
+  
   // Handle checkbox change for building visibility
   const handleCheckboxChange = (layerId, property, value) => {
     if (map.current) {
