@@ -86,7 +86,6 @@ const Map3DComponent = ({ params }) => {
       setEndTravel([nextEvent.longitude, nextEvent.latitude]);
     }
     if(location) {
-      console.log(location)
       mapEvent.flyTo({
         center: [location.longitude, location.latitude],
         zoom: 15
