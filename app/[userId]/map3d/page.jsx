@@ -51,7 +51,7 @@ const Map3DComponent = ({ params }) => {
   }, [mountainHeight, showBuilding]);
 
   useEffect(() => {
-    if (map) {
+    if (map && locationPlay) {
       getUserPlayEvent(map);
     }
   }, [locationPlay, startTravel, endTravel])
@@ -85,11 +85,14 @@ const Map3DComponent = ({ params }) => {
       const nextEvent = evangileEvents[currentIndex + 1];
       setEndTravel([nextEvent.longitude, nextEvent.latitude]);
     }
-
-    mapEvent.flyTo({
-      center: [location.longitude, location.latitude],
-      zoom: 15
-    });
+    if(location) {
+      console.log(location)
+      mapEvent.flyTo({
+        center: [location.longitude, location.latitude],
+        zoom: 15
+      });
+    }
+    
   }
 
   //Load the Threebox librairie
