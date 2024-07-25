@@ -148,7 +148,7 @@ export default function Home() {
         setMountainHeight(0)
         setShowBuilding(false)
         setShowTemple(false)
-        updateTerrain(map, 10, true)
+        updateTerrain(map, 10, false)
       }
 
       const day = location.detail_jour;
