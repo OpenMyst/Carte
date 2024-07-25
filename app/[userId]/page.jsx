@@ -77,7 +77,7 @@ export default function MapByUserId({ params }) {
             loadEvangileMarker(map.current);
         });
         getUserPlayEvent(map.current);
-    }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
+    }, [map, mapStyle, evangileEvents, showMap3D, showBuilding, locationPlay]);
 
     useEffect(() => {
         if (map.current) {
@@ -99,13 +99,6 @@ export default function MapByUserId({ params }) {
             loadEvangileMarker(map.current);
         }
     }, [season, mapStyle, evangileEvents]);
-
-    useEffect(() => {
-        if (map.current) {
-            getUserPlayEvent(map.current);
-            addRouteLayer(map.current, startTravel, endTravel);
-        }
-    }, [locationPlay, startTravel, endTravel])
 
     // Fetch all events from Firebase
     const getAllEvent = () => {
