@@ -148,7 +148,7 @@ export default function Home() {
         setMountainHeight(0)
         setShowBuilding(false)
         mapEvent.setTerrain({ source: 'mapbox-dem', exaggeration: 10 / 100 });
-        handleCheckboxChange('building-extrusion', 'visibility', show);
+        handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
       }
 
       const day = location.detail_jour;
