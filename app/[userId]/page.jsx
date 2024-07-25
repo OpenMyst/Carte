@@ -215,17 +215,6 @@ export default function MapByUserId({ params }) {
                     </svg>
                 </button>
                 <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
-
-                    <fieldset>
-                        <label>Passer la carte en 3D</label>
-                        <input
-                            type="checkbox"
-                            checked={showMap3D}
-                            onChange={(e) => {
-                                setShowMap3D(e.target.checked);
-                            }}
-                        />
-                    </fieldset>
                     <fieldset>
                         <Label htmlFor="show-building">Show Building</Label>
                         <Switch
