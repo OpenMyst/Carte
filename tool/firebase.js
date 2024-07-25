@@ -2,12 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCpCO7Wa40DQ1m9_tQb5xetfQ-jEDQ6QFA",
-    authDomain: "openmyst-77788.firebaseapp.com",
-    projectId: "openmyst-77788",
-    storageBucket: "openmyst-77788.appspot.com",
-    messagingSenderId: "291395040943",
-    appId: "1:291395040943:web:ffbde69f062d0b2e65065a"
+    apiKey: "AIzaSyAWbc5U--CUsew7K9EgAqRVRnWP1V6mVdI",
+    authDomain: "openmyst-e2268.firebaseapp.com",
+    projectId: "openmyst-e2268",
+    storageBucket: "openmyst-e2268.appspot.com",
+    messagingSenderId: "518574925795",
+    appId: "1:518574925795:web:f1432fada0e72bfeca62d6"
 };
 
 const app = initializeApp(firebaseConfig);
