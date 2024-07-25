@@ -28,8 +28,8 @@ const Map3DComponent = ({ params }) => {
   const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
-  const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
-  const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
+  const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
+  const [endTravel, setEndTravel] = useState([]); // End coordinates for route
   const [locationPlay, setLocationPlay] = useState({}); // data of the location of event
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const Map3DComponent = ({ params }) => {
     if (map) {
       getUserPlayEvent(map);
     }
-  }, [locationPlay])
+  }, [locationPlay, startTravel, endTravel])
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
@@ -77,6 +77,15 @@ const Map3DComponent = ({ params }) => {
   const getUserPlayEvent = async (mapEvent) => {
     const location = await userPlayEvent(userId);
     setLocationPlay(location)
+    setStartTravel([location.longitude, location.latitude]);
+
+     // Find the next event in the list
+    const currentIndex = evangileEvents.findIndex(event => event.id === location.id);
+    if (currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
+      const nextEvent = evangileEvents[currentIndex + 1];
+      setEndTravel([nextEvent.longitude, nextEvent.latitude]);
+    }
+
     mapEvent.flyTo({
       center: [location.longitude, location.latitude],
       zoom: 15

@@ -20,8 +20,8 @@ export default function MapByUserId({ params }) {
     const [lat, setLat] = useState(31.76904); // Latitude state
     const [zoom, setZoom] = useState(9); // Zoom level state
     const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
-    const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
-    const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
+    const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
+    const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
     const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
     const [season, setSeason] = useState('spring'); // Season state
     const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
@@ -73,7 +73,7 @@ export default function MapByUserId({ params }) {
             handleCheckboxChange('bridge-majore-link-2', 'visibility', showRoad);
 
             map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-            addRouteLayer(map.current, startTravel, endTravel)
+            // addRouteLayer(map.current, startTravel, endTravel)
             loadEvangileMarker(map.current);
         });
         getUserPlayEvent(map.current);
