@@ -47,12 +47,14 @@ const Map3DComponent = ({ params }) => {
   useEffect(() => {
     if (map) {
       updateMapSettings();
+      addRouteLayer(map, startTravel, endTravel)
     }
-  }, [mountainHeight, showBuilding]);
+  }, [mountainHeight, showBuilding, showRoad]);
 
   useEffect(() => {
     if (map && locationPlay) {
       getUserPlayEvent(map);
+      addRouteLayer(map, startTravel, endTravel);
     }
   }, [locationPlay, startTravel, endTravel])
 

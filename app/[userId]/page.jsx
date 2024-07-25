@@ -73,7 +73,7 @@ export default function MapByUserId({ params }) {
             handleCheckboxChange('bridge-majore-link-2', 'visibility', showRoad);
 
             map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-            // addRouteLayer(map.current, startTravel, endTravel)
+            addRouteLayer(map.current, startTravel, endTravel)
             loadEvangileMarker(map.current);
         });
         getUserPlayEvent(map.current);
@@ -103,8 +103,9 @@ export default function MapByUserId({ params }) {
     useEffect(() => {
         if (map.current) {
             getUserPlayEvent(map.current);
+            addRouteLayer(map.current, startTravel, endTravel);
         }
-    }, [locationPlay])
+    }, [locationPlay, startTravel, endTravel])
 
     // Fetch all events from Firebase
     const getAllEvent = () => {
