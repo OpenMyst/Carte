@@ -33,10 +33,102 @@ export default function MapByUserId({ params }) {
 
     useEffect(() => {
         getAllEvent();
-    }, [])
+    }, []);
 
     useEffect(() => {
         if (map.current) return;
+        initializeMap()
+    }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
+
+    useEffect(() => {
+        if (map.current) {
+            map.current.setPitch(showMap3D ? 62 : 0);
+        }
+    }, [showMap3D]);
+
+    useEffect(() => {
+        if (map.current) {
+            const styles = {
+                spring: sprintStyle,
+                summer: summerLight,
+                autumn: automnStyle,
+                winter: winterDark,
+            };
+            setMapStyle(styles[season]);
+            map.current.setStyle(mapStyle);
+            getUserPlayEvent(map.current);
+            loadEvangileMarker(map.current);
+        }
+    }, [season, mapStyle, evangileEvents, locationPlayId]);
+
+    useEffect(() => {
+        const fetchLocationPlayId = async () => {
+            const location = await userPlayEvent(userId);
+            setLocationPlayId(location);
+        };
+
+        // Load the changment in the firebase
+        const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
+            fetchLocationPlayId();
+        });
+
+        fetchLocationPlayId();
+        return () => unsubscribe();
+    }, [userId]);
+
+    useEffect(() => {
+        if (map.current && locationPlayId) {
+            getUserPlayEvent(map.current);
+        }
+    }, [locationPlayId, evangileEvents, map, winterDark, summerLight])
+
+    useEffect(() => {
+        if (locationPlayId) {
+            getTravelRoute();
+        }
+    }, [evangileEvents, locationPlayId]);
+
+    useEffect(() => {
+        if (map.current && startTravel && endTravel) {
+            map.current.on('style.load', () => {
+                if (startTravel && endTravel) {
+                    addRouteLayer(map.current, startTravel, endTravel);
+                }
+            });
+
+            if (startTravel && endTravel && map.current.isStyleLoaded()) {
+                addRouteLayer(map.current, startTravel, endTravel);
+            }
+        }
+    }, [map, startTravel, endTravel]);
+
+    // Initialize the start and End travel using the locationPlayId
+    const getTravelRoute = () => {
+        // Find the next event in the list
+        const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
+        const currentEvents = evangileEvents[currentIndex];
+        if (currentEvents && currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
+            setStartTravel([currentEvents.longitude, currentEvents.latitude]);
+            const nextEvent = evangileEvents[currentIndex + 1];
+            setEndTravel([nextEvent.longitude, nextEvent.latitude]);
+        }
+    }
+
+    // Fetch all events from Firebase
+    const getAllEvent = () => {
+        const q = query(collection(database, 'events'))
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            let eventsArray = []
+
+            querySnapshot.forEach(doc => {
+                eventsArray.push({ ...doc.data(), id: doc.id })
+            })
+            setEvangileEvents(eventsArray);
+        })
+    }
+
+    // Initialize the map into 3D
+    const initializeMap = () => {
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
             style: mapStyle,
@@ -74,91 +166,6 @@ export default function MapByUserId({ params }) {
             map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             loadEvangileMarker(map.current);
         });
-    }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
-
-    useEffect(() => {
-        if (map.current) {
-            map.current.setPitch(showMap3D ? 62 : 0);
-        }
-    }, [showMap3D]);
-
-    useEffect(() => {
-        if (map.current) {
-            const styles = {
-                spring: sprintStyle,
-                summer: summerLight,
-                autumn: automnStyle,
-                winter: winterDark,
-            };
-            setMapStyle(styles[season]);
-            map.current.setStyle(mapStyle);
-            getUserPlayEvent(map.current);
-            loadEvangileMarker(map.current);
-        }
-    }, [season, mapStyle, evangileEvents, locationPlayId]);
-
-    useEffect(() => {
-        const fetchLocationPlayId = async () => {
-            const location = await userPlayEvent(userId);
-            setLocationPlayId(location);
-        };
-
-        const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-            fetchLocationPlayId();
-        });
-
-        fetchLocationPlayId();
-        return () => unsubscribe();
-    }, [userId]);
-
-    useEffect(() => {
-        if (map.current && locationPlayId) {
-            getUserPlayEvent(map.current);
-        }
-    }, [locationPlayId, evangileEvents, map, winterDark, summerLight])
-
-    useEffect(() => {
-        if (locationPlayId) {
-            getTravelRoute();
-        }
-    }, [evangileEvents, locationPlayId]);
-
-    useEffect(() => {
-        if (map.current && startTravel && endTravel) {
-            map.current.on('style.load', () => {
-                if (startTravel && endTravel) {
-                    addRouteLayer(map.current, startTravel, endTravel);
-                }
-            });
-
-            if (startTravel && endTravel && map.current.isStyleLoaded()) {
-                addRouteLayer(map.current, startTravel, endTravel);
-            }
-        }
-    }, [map, startTravel, endTravel]);
-
-    const getTravelRoute = () => {
-        // Find the next event in the list
-        const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
-        const currentEvents = evangileEvents[currentIndex];
-        if (currentEvents && currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
-            setStartTravel([currentEvents.longitude, currentEvents.latitude]);
-            const nextEvent = evangileEvents[currentIndex + 1];
-            setEndTravel([nextEvent.longitude, nextEvent.latitude]);
-        }
-    }
-
-    // Fetch all events from Firebase
-    const getAllEvent = () => {
-        const q = query(collection(database, 'events'))
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            let eventsArray = []
-
-            querySnapshot.forEach(doc => {
-                eventsArray.push({ ...doc.data(), id: doc.id })
-            })
-            setEvangileEvents(eventsArray);
-        })
     }
 
     //Received the location of the event who play by user and zoom in them
@@ -169,15 +176,15 @@ export default function MapByUserId({ params }) {
             const currentEvents = evangileEvents[currentIndex];
 
             if (currentEvents) {
-                const anneeEvent = parseInt(currentEvents.event_date)
+                const anneeEvent = parseInt(currentEvents.event_date);
                 if (anneeEvent < 0) {
-                    setMountainHeight(50)
-                    setShowBuilding(false)
-                    updateTerrain(mapEvent, 50, false)
+                    setMountainHeight(50);
+                    setShowBuilding(false);
+                    updateTerrain(mapEvent, 50, false);
                 } else {
-                    setMountainHeight(0)
-                    setShowBuilding(false)
-                    updateTerrain(mapEvent, 10, false)
+                    setMountainHeight(0);
+                    setShowBuilding(false);
+                    updateTerrain(mapEvent, 10, false);
                 }
 
                 const day = currentEvents.detail_jour;
@@ -187,14 +194,14 @@ export default function MapByUserId({ params }) {
                     mapEvent.setStyle(summerLight);
                 } else {
                     mapEvent.setStyle(winterDark);
-                    addSnowLayer(mapEvent)
+                    addSnowLayer(mapEvent);
                 }
 
                 const meteo = currentEvents.meteo;
                 if (meteo === "Pluvieux") {
-                    addRainLayer(mapEvent)
+                    addRainLayer(mapEvent);
                 } else if (meteo === "Neigeux") {
-                    addSnowLayer(mapEvent)
+                    addSnowLayer(mapEvent);
                 }
                 mapEvent.flyTo({
                     center: [currentEvents.longitude, currentEvents.latitude],
@@ -221,7 +228,7 @@ export default function MapByUserId({ params }) {
 
             const marker = new mapboxgl.Marker()
                 .setLngLat([location.longitude, location.latitude])
-                .setPopup(popup)  // Associe le popup au marqueur
+                .setPopup(popup) // Associe le popup au marqueur
                 .addTo(mapEvent);
 
             marker.getElement().addEventListener('click', () => {

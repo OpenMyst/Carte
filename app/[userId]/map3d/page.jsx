@@ -23,7 +23,6 @@ const Map3DComponent = ({ params }) => {
   const [zoom, setZoom] = useState(9); // Zoom level state
   const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
-  const [showTemple, setShowTemple] = useState(true); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
@@ -57,6 +56,7 @@ const Map3DComponent = ({ params }) => {
       setLocationPlayId(location);
     };
 
+    // Load the changment in the firebase
     const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
       fetchLocationPlayId();
     });
@@ -69,7 +69,7 @@ const Map3DComponent = ({ params }) => {
     if (map && locationPlayId) {
       getUserPlayEvent(map);
     }
-  }, [locationPlayId, evangileEvents, map, winterDark, summerLight])
+  }, [locationPlayId, evangileEvents, map, winterDark, summerLight]);
 
   useEffect(() => {
     if (locationPlayId) {
@@ -91,6 +91,7 @@ const Map3DComponent = ({ params }) => {
     }
   }, [map, startTravel, endTravel]);
 
+  // Initialize the start and End travel using the locationPlayId
   const getTravelRoute = () => {
     // Find the next event in the list
     const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
@@ -104,12 +105,12 @@ const Map3DComponent = ({ params }) => {
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
-    const q = query(collection(database, 'events'))
+    const q = query(collection(database, 'events'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let eventsArray = []
+      let eventsArray = [];
 
       querySnapshot.forEach(doc => {
-        eventsArray.push({ ...doc.data(), id: doc.id })
+        eventsArray.push({ ...doc.data(), id: doc.id });
       })
       setEvangileEvents(eventsArray);
     })
@@ -122,33 +123,32 @@ const Map3DComponent = ({ params }) => {
     const currentEvents = evangileEvents[currentIndex];
 
     if (currentEvents) {
-      const anneeEvent = parseInt(currentEvents.event_date)
+      const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(50)
-        setShowBuilding(false)
-        updateTerrain(mapEvent, 50, false)
+        setMountainHeight(50);
+        setShowBuilding(false);
+        updateTerrain(mapEvent, 50, false);
       } else {
-        setMountainHeight(0)
-        setShowBuilding(false)
-        updateTerrain(mapEvent, 10, false)
+        setMountainHeight(0);
+        setShowBuilding(false);
+        updateTerrain(mapEvent, 10, false);
       }
 
       const day = currentEvents.detail_jour;
       if (day === "Nuit") {
         mapEvent.setStyle(winterDark);
-        setShowTemple(true);
       } else if (day === "Matin") {
         mapEvent.setStyle(summerLight);
       } else {
         mapEvent.setStyle(winterDark);
-        addSnowLayer(mapEvent)
+        addSnowLayer(mapEvent);
       }
 
       const meteo = currentEvents.meteo;
       if (meteo === "Pluvieux") {
-        addRainLayer(mapEvent)
+        addRainLayer(mapEvent);
       } else if (meteo === "Neigeux") {
-        addSnowLayer(mapEvent)
+        addSnowLayer(mapEvent);
       }
       mapEvent.flyTo({
         center: [currentEvents.longitude, currentEvents.latitude],
@@ -205,7 +205,6 @@ const Map3DComponent = ({ params }) => {
       });
       map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
-      // map.setLayoutProperty('building', 'visibility', showBuilding ? "vissible": "none");
       map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible" : "none");
       map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
       map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible" : "none");
@@ -289,7 +288,7 @@ const Map3DComponent = ({ params }) => {
         handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
         handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
         map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-      })
+      });
     }
   };
 

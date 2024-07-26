@@ -94,6 +94,7 @@ export default function Map2DByUserId({ params }) {
       setLocationPlayId(location);
     };
 
+    // Load the changment in the firebase
     const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
       fetchLocationPlayId();
     });
@@ -106,7 +107,7 @@ export default function Map2DByUserId({ params }) {
     if (map.current && locationPlayId) {
       getUserPlayEvent(map.current);
     }
-  }, [locationPlayId, evangileEvents, map, winterDark, summerLight])
+  }, [locationPlayId, evangileEvents, map, winterDark, summerLight]);
 
   useEffect(() => {
     if (locationPlayId) {
@@ -128,6 +129,7 @@ export default function Map2DByUserId({ params }) {
     }
   }, [map, startTravel, endTravel]);
 
+  // Initialize the start and End travel using the locationPlayId
   const getTravelRoute = () => {
     // Find the next event in the list
     const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
@@ -141,12 +143,12 @@ export default function Map2DByUserId({ params }) {
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
-    const q = query(collection(database, 'events'))
+    const q = query(collection(database, 'events'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let eventsArray = []
+      let eventsArray = [];
 
       querySnapshot.forEach(doc => {
-        eventsArray.push({ ...doc.data(), id: doc.id })
+        eventsArray.push({ ...doc.data(), id: doc.id });
       })
       setEvangileEvents(eventsArray);
     })
@@ -159,15 +161,15 @@ export default function Map2DByUserId({ params }) {
     const currentEvents = evangileEvents[currentIndex];
 
     if (currentEvents) {
-      const anneeEvent = parseInt(currentEvents.event_date)
+      const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(50)
-        setShowBuilding(false)
-        updateTerrain(mapEvent, 50, false)
+        setMountainHeight(50);
+        setShowBuilding(false);
+        updateTerrain(mapEvent, 50, false);
       } else {
-        setMountainHeight(0)
-        setShowBuilding(false)
-        updateTerrain(mapEvent, 10, false)
+        setMountainHeight(0);
+        setShowBuilding(false);
+        updateTerrain(mapEvent, 10, false);
       }
 
       const day = currentEvents.detail_jour;
@@ -177,14 +179,14 @@ export default function Map2DByUserId({ params }) {
         mapEvent.setStyle(summerLight);
       } else {
         mapEvent.setStyle(winterDark);
-        addSnowLayer(mapEvent)
+        addSnowLayer(mapEvent);
       }
 
       const meteo = currentEvents.meteo;
       if (meteo === "Pluvieux") {
-        addRainLayer(mapEvent)
+        addRainLayer(mapEvent);
       } else if (meteo === "Neigeux") {
-        addSnowLayer(mapEvent)
+        addSnowLayer(mapEvent);
       }
       mapEvent.flyTo({
         center: [currentEvents.longitude, currentEvents.latitude],
@@ -211,7 +213,7 @@ export default function Map2DByUserId({ params }) {
         handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
         handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
         map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-      })
+      });
     }
   };
   // Load markers for evangile events
