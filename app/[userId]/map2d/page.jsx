@@ -94,8 +94,13 @@ export default function Map2DByUserId({ params }) {
       setLocationPlayId(location);
     };
 
+    const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
+      fetchLocationPlayId();
+    });
+
     fetchLocationPlayId();
-  }, []);
+    return () => unsubscribe();
+  }, [userId]);
 
   useEffect(() => {
     if (map.current && locationPlayId) {

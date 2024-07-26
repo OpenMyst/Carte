@@ -57,8 +57,13 @@ const Map3DComponent = ({ params }) => {
       setLocationPlayId(location);
     };
 
+    const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
+      fetchLocationPlayId();
+    });
+
     fetchLocationPlayId();
-  }, []);
+    return () => unsubscribe();
+  }, [userId]);
 
   useEffect(() => {
     if (map && locationPlayId) {
