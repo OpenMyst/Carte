@@ -47,7 +47,7 @@ const Map3DComponent = ({ params }) => {
   useEffect(() => {
     if (map) {
       updateMapSettings();
-      addRouteLayer(map, startTravel, endTravel)
+      addRouteLayer(map, startTravel, endTravel);
     }
   }, [mountainHeight, showBuilding, showRoad]);
 
@@ -76,10 +76,12 @@ const Map3DComponent = ({ params }) => {
     // Find the next event in the list
     const currentIndex = evangileEvents.findIndex(event => event.id === location);
     const currentEvents = evangileEvents[currentIndex];
+    console.log(currentEvents)
     setStartTravel([currentEvents.longitude, currentEvents.latitude]);
     if (currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
       const nextEvent = evangileEvents[currentIndex + 1];
       setEndTravel([nextEvent.longitude, nextEvent.latitude]);
+      addRouteLayer(map, startTravel, endTravel);
     }
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date)
@@ -179,6 +181,7 @@ const Map3DComponent = ({ params }) => {
       map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
 
       loadEvangileMarker(map);
+      addRouteLayer(map, startTravel, endTravel);
 
       map.addLayer({
         id: 'custom-threebox-model',
@@ -227,8 +230,6 @@ const Map3DComponent = ({ params }) => {
           tb.update();
         }
       });
-
-      addRouteLayer(map, startTravel, endTravel);
     });
 
     setMap(map);
