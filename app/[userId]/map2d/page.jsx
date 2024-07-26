@@ -55,7 +55,8 @@ export default function Map2DByUserId({ params }) {
     map.current.addControl(new mapboxgl.NavigationControl());
 
     updateMapSettings();
-    addRouteLayer(map.current, startTravel, endTravel)
+    addRouteLayer(map.current, startTravel, endTravel);
+    getUserPlayEvent(map.current);
     loadEvangileMarker(map.current);
   }, [map, mapStyle, evangileEvents, showMap3D]);
 
@@ -94,7 +95,7 @@ export default function Map2DByUserId({ params }) {
     };
 
     fetchLocationPlayId();
-  }, [userId, locationPlayId]);
+  }, []);
 
   useEffect(() => {
     if (map.current && locationPlayId) {

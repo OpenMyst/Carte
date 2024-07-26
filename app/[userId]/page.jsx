@@ -73,6 +73,7 @@ export default function MapByUserId({ params }) {
 
             map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             loadEvangileMarker(map.current);
+            getUserPlayEvent(map.current);
         });
     }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
 
@@ -104,7 +105,7 @@ export default function MapByUserId({ params }) {
         };
 
         fetchLocationPlayId();
-    }, [userId, locationPlayId]);
+    }, []);
 
     useEffect(() => {
         if (map.current && locationPlayId) {

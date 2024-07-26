@@ -40,6 +40,7 @@ const Map3DComponent = ({ params }) => {
   useEffect(() => {
     if (map) {
       loadEvangileMarker(map);
+      getUserPlayEvent(map);
     }
   }, [evangileEvents, map]);
 
@@ -57,7 +58,7 @@ const Map3DComponent = ({ params }) => {
     };
 
     fetchLocationPlayId();
-  }, [userId, locationPlayId]);
+  }, []);
 
   useEffect(() => {
     if (map && locationPlayId) {
