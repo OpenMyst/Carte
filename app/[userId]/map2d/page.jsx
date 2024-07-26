@@ -168,7 +168,6 @@ export default function Map2DByUserId({ params }) {
       const day = currentEvents.detail_jour;
       if (day === "Nuit") {
         mapEvent.setStyle(winterDark);
-        setShowTemple(true);
       } else if (day === "Matin") {
         mapEvent.setStyle(summerLight);
       } else {

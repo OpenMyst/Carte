@@ -159,43 +159,44 @@ export default function MapByUserId({ params }) {
 
     //Received the location of the event who play by user and zoom in them
     const getUserPlayEvent = async (mapEvent) => {
-        // Find the next event in the list
-        const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
-        const currentEvents = evangileEvents[currentIndex];
+        if (locationPlayId) {
+            // Find the next event in the list
+            const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
+            const currentEvents = evangileEvents[currentIndex];
 
-        if (currentEvents) {
-            const anneeEvent = parseInt(currentEvents.event_date)
-            if (anneeEvent < 0) {
-                setMountainHeight(50)
-                setShowBuilding(false)
-                updateTerrain(mapEvent, 50, false)
-            } else {
-                setMountainHeight(0)
-                setShowBuilding(false)
-                updateTerrain(mapEvent, 10, false)
-            }
+            if (currentEvents) {
+                const anneeEvent = parseInt(currentEvents.event_date)
+                if (anneeEvent < 0) {
+                    setMountainHeight(50)
+                    setShowBuilding(false)
+                    updateTerrain(mapEvent, 50, false)
+                } else {
+                    setMountainHeight(0)
+                    setShowBuilding(false)
+                    updateTerrain(mapEvent, 10, false)
+                }
 
-            const day = currentEvents.detail_jour;
-            if (day === "Nuit") {
-                mapEvent.setStyle(winterDark);
-                setShowTemple(true);
-            } else if (day === "Matin") {
-                mapEvent.setStyle(summerLight);
-            } else {
-                mapEvent.setStyle(winterDark);
-                addSnowLayer(mapEvent)
-            }
+                const day = currentEvents.detail_jour;
+                if (day === "Nuit") {
+                    mapEvent.setStyle(winterDark);
+                } else if (day === "Matin") {
+                    mapEvent.setStyle(summerLight);
+                } else {
+                    mapEvent.setStyle(winterDark);
+                    addSnowLayer(mapEvent)
+                }
 
-            const meteo = currentEvents.meteo;
-            if (meteo === "Pluvieux") {
-                addRainLayer(mapEvent)
-            } else if (meteo === "Neigeux") {
-                addSnowLayer(mapEvent)
+                const meteo = currentEvents.meteo;
+                if (meteo === "Pluvieux") {
+                    addRainLayer(mapEvent)
+                } else if (meteo === "Neigeux") {
+                    addSnowLayer(mapEvent)
+                }
+                mapEvent.flyTo({
+                    center: [currentEvents.longitude, currentEvents.latitude],
+                    zoom: 15
+                });
             }
-            mapEvent.flyTo({
-                center: [currentEvents.longitude, currentEvents.latitude],
-                zoom: 15
-            });
         }
     }
 
