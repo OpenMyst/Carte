@@ -1,5 +1,5 @@
 "use client";
-import { MAPBOX_TOKEN, automnStyle, sprintStyle, winterDark, sprintStyleNight, summerLight } from "@/tool/security";
+import { MAPBOX_TOKEN, automnStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
