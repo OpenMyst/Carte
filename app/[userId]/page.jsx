@@ -27,8 +27,8 @@ export default function MapByUserId({ params }) {
     const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
     const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
     const [open, setOpen] = useState(true); // Toggle for overlay visibility
-    const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
-    const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
+    const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
+    const [endTravel, setEndTravel] = useState([]); // End coordinates for route
     const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
 
     useEffect(() => {
@@ -70,10 +70,8 @@ export default function MapByUserId({ params }) {
             handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
             handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
             handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
-            handleCheckboxChange('bridge-majore-link-2', 'visibility', showRoad);
 
             map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-            addRouteLayer(map.current, startTravel, endTravel)
             loadEvangileMarker(map.current);
         });
     }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
@@ -99,6 +97,52 @@ export default function MapByUserId({ params }) {
         }
     }, [season, mapStyle, evangileEvents, locationPlayId]);
 
+    useEffect(() => {
+        const fetchLocationPlayId = async () => {
+            const location = await userPlayEvent(userId);
+            setLocationPlayId(location);
+        };
+
+        fetchLocationPlayId();
+    }, [userId, locationPlayId]);
+
+    useEffect(() => {
+        if (map.current && locationPlayId) {
+            getUserPlayEvent(map.current);
+        }
+    }, [locationPlayId, evangileEvents, map, winterDark, summerLight])
+
+    useEffect(() => {
+        if (locationPlayId) {
+            getTravelRoute();
+        }
+    }, [evangileEvents, locationPlayId]);
+
+    useEffect(() => {
+        if (map.current && startTravel && endTravel) {
+            map.current.on('style.load', () => {
+                if (startTravel && endTravel) {
+                    addRouteLayer(map.current, startTravel, endTravel);
+                }
+            });
+
+            if (startTravel && endTravel && map.current.isStyleLoaded()) {
+                addRouteLayer(map.current, startTravel, endTravel);
+            }
+        }
+    }, [map, startTravel, endTravel]);
+
+    const getTravelRoute = () => {
+        // Find the next event in the list
+        const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
+        const currentEvents = evangileEvents[currentIndex];
+        if (currentEvents && currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
+            setStartTravel([currentEvents.longitude, currentEvents.latitude]);
+            const nextEvent = evangileEvents[currentIndex + 1];
+            setEndTravel([nextEvent.longitude, nextEvent.latitude]);
+        }
+    }
+
     // Fetch all events from Firebase
     const getAllEvent = () => {
         const q = query(collection(database, 'events'))
@@ -114,17 +158,10 @@ export default function MapByUserId({ params }) {
 
     //Received the location of the event who play by user and zoom in them
     const getUserPlayEvent = async (mapEvent) => {
-        const location = await userPlayEvent(userId);
-        setLocationPlayId(location)
-
         // Find the next event in the list
-        const currentIndex = evangileEvents.findIndex(event => event.id === location);
+        const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
         const currentEvents = evangileEvents[currentIndex];
-        setStartTravel([currentEvents.longitude, currentEvents.latitude]);
-        if (currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
-            const nextEvent = evangileEvents[currentIndex + 1];
-            setEndTravel([nextEvent.longitude, nextEvent.latitude]);
-        }
+
         if (currentEvents) {
             const anneeEvent = parseInt(currentEvents.event_date)
             if (anneeEvent < 0) {
@@ -250,7 +287,6 @@ export default function MapByUserId({ params }) {
                                 handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
                                 handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
                                 handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-                                handleCheckboxChange('bridge-majore-link-2', 'visibility', !showRoad);
                             }}
                         />
                     </fieldset>

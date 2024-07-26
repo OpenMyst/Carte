@@ -61,6 +61,12 @@ export default function Map2DByUserId({ params }) {
 
   useEffect(() => {
     if (map.current) {
+      updateMapSettings();
+    }
+  }, [mountainHeight, showBuilding, showRoad]);
+
+  useEffect(() => {
+    if (map.current) {
       map.current.setPitch(showMap3D ? 62 : 0);
     }
   }, [showMap3D]);
@@ -82,10 +88,50 @@ export default function Map2DByUserId({ params }) {
   }, [season, mapStyle, evangileEvents, locationPlayId]);
 
   useEffect(() => {
-    if (map.current) {
-      updateMapSettings();
+    const fetchLocationPlayId = async () => {
+      const location = await userPlayEvent(userId);
+      setLocationPlayId(location);
+    };
+
+    fetchLocationPlayId();
+  }, [userId, locationPlayId]);
+
+  useEffect(() => {
+    if (map.current && locationPlayId) {
+      getUserPlayEvent(map.current);
     }
-  }, [mountainHeight, showBuilding, showRoad]);
+  }, [locationPlayId, evangileEvents, map, winterDark, summerLight])
+
+  useEffect(() => {
+    if (locationPlayId) {
+      getTravelRoute();
+    }
+  }, [evangileEvents, locationPlayId]);
+
+  useEffect(() => {
+    if (map.current && startTravel && endTravel) {
+      map.current.on('style.load', () => {
+        if (startTravel && endTravel) {
+          addRouteLayer(map.current, startTravel, endTravel);
+        }
+      });
+
+      if (startTravel && endTravel && map.current.isStyleLoaded()) {
+        addRouteLayer(map.current, startTravel, endTravel);
+      }
+    }
+  }, [map, startTravel, endTravel]);
+
+  const getTravelRoute = () => {
+    // Find the next event in the list
+    const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
+    const currentEvents = evangileEvents[currentIndex];
+    if (currentEvents && currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
+      setStartTravel([currentEvents.longitude, currentEvents.latitude]);
+      const nextEvent = evangileEvents[currentIndex + 1];
+      setEndTravel([nextEvent.longitude, nextEvent.latitude]);
+    }
+  }
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
@@ -102,17 +148,10 @@ export default function Map2DByUserId({ params }) {
 
   //Received the location of the event who play by user and zoom in them
   const getUserPlayEvent = async (mapEvent) => {
-    const location = await userPlayEvent(userId);
-    setLocationPlayId(location)
-
     // Find the next event in the list
-    const currentIndex = evangileEvents.findIndex(event => event.id === location);
+    const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
     const currentEvents = evangileEvents[currentIndex];
-    setStartTravel([currentEvents.longitude, currentEvents.latitude]);
-    if (currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
-      const nextEvent = evangileEvents[currentIndex + 1];
-      setEndTravel([nextEvent.longitude, nextEvent.latitude]);
-    }
+
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date)
       if (anneeEvent < 0) {

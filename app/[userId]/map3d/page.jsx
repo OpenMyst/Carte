@@ -35,14 +35,13 @@ const Map3DComponent = ({ params }) => {
   useEffect(() => {
     getAllEvent();
     loadThreeboxScript();
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (map) {
       loadEvangileMarker(map);
-      getUserPlayEvent(map);
     }
-  }, [evangileEvents, map, locationPlayId]);
+  }, [evangileEvents, map]);
 
   useEffect(() => {
     if (map) {
@@ -51,48 +50,79 @@ const Map3DComponent = ({ params }) => {
     }
   }, [mountainHeight, showBuilding, showRoad]);
 
+  useEffect(() => {
+    const fetchLocationPlayId = async () => {
+      const location = await userPlayEvent(userId);
+      setLocationPlayId(location);
+    };
+
+    fetchLocationPlayId();
+  }, [userId, locationPlayId]);
+
+  useEffect(() => {
+    if (map && locationPlayId) {
+      getUserPlayEvent(map);
+    }
+  }, [locationPlayId, evangileEvents, map, winterDark, summerLight])
+
+  useEffect(() => {
+    if (locationPlayId) {
+      getTravelRoute();
+    }
+  }, [evangileEvents, locationPlayId]);
+
+  useEffect(() => {
+    if (map && startTravel && endTravel) {
+      map.on('style.load', () => {
+        if (startTravel && endTravel) {
+          addRouteLayer(map, startTravel, endTravel);
+        }
+      });
+
+      if (startTravel && endTravel && map.isStyleLoaded()) {
+        addRouteLayer(map, startTravel, endTravel);
+      }
+    }
+  }, [map, startTravel, endTravel]);
+
+  const getTravelRoute = () => {
+    // Find the next event in the list
+    const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
+    const currentEvents = evangileEvents[currentIndex];
+    if (currentEvents && currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
+      setStartTravel([currentEvents.longitude, currentEvents.latitude]);
+      const nextEvent = evangileEvents[currentIndex + 1];
+      setEndTravel([nextEvent.longitude, nextEvent.latitude]);
+    }
+  }
+
   // Fetch all events from Firebase
   const getAllEvent = () => {
-    try {
-      const q = query(collection(database, 'events'))
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        let eventsArray = []
+    const q = query(collection(database, 'events'))
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let eventsArray = []
 
-        querySnapshot.forEach(doc => {
-          eventsArray.push({ ...doc.data(), id: doc.id })
-        })
-        setEvangileEvents(eventsArray);
+      querySnapshot.forEach(doc => {
+        eventsArray.push({ ...doc.data(), id: doc.id })
       })
-    } catch (error) {
-      console.log(error)
-    }
+      setEvangileEvents(eventsArray);
+    })
   }
 
   //Received the location of the event who play by user and zoom in them
   const getUserPlayEvent = async (mapEvent) => {
-    const location = await userPlayEvent(userId);
-    setLocationPlayId(location)
-
     // Find the next event in the list
-    const currentIndex = evangileEvents.findIndex(event => event.id === location);
+    const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
     const currentEvents = evangileEvents[currentIndex];
-    console.log(currentEvents)
-    setStartTravel([currentEvents.longitude, currentEvents.latitude]);
-    if (currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
-      const nextEvent = evangileEvents[currentIndex + 1];
-      setEndTravel([nextEvent.longitude, nextEvent.latitude]);
-      addRouteLayer(map, startTravel, endTravel);
-    }
+
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date)
       if (anneeEvent < 0) {
         setMountainHeight(50)
-        setShowTemple(true);
         setShowBuilding(false)
         updateTerrain(mapEvent, 50, false)
       } else {
         setMountainHeight(0)
-        setShowTemple(false);
         setShowBuilding(false)
         updateTerrain(mapEvent, 10, false)
       }
