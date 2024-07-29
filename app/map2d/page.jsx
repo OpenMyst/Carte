@@ -13,7 +13,6 @@ import { userPlayEvent } from "@/tool/service";
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
 export default function Map2DByUserId({ params }) {
-  const userId = params.userId;
   const mapContainer = useRef(null); // Reference to the map container
   const map = useRef(null); // Reference to the map object
   const [lng, setLng] = useState(35.21633); // Longitude state
@@ -27,9 +26,6 @@ export default function Map2DByUserId({ params }) {
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
-  const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
-  const [endTravel, setEndTravel] = useState([]); // End coordinates for route
-  const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
 
   useEffect(() => {
     getAllEvent();
@@ -55,8 +51,6 @@ export default function Map2DByUserId({ params }) {
     map.current.addControl(new mapboxgl.NavigationControl());
 
     updateMapSettings();
-    addRouteLayer(map.current, startTravel, endTravel);
-    getUserPlayEvent(map.current);
     loadEvangileMarker(map.current);
   }, [map, mapStyle, evangileEvents, showMap3D]);
 
@@ -82,64 +76,9 @@ export default function Map2DByUserId({ params }) {
       };
       setMapStyle(styles[season]);
       map.current.setStyle(mapStyle);
-      addRouteLayer(map.current, startTravel, endTravel);
       loadEvangileMarker(map.current);
-      getUserPlayEvent(map.current);
     }
-  }, [season, mapStyle, evangileEvents, locationPlayId]);
-
-  useEffect(() => {
-    const fetchLocationPlayId = async () => {
-      const location = await userPlayEvent(userId);
-      setLocationPlayId(location);
-    };
-
-    // Load the changment in the firebase
-    const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-      fetchLocationPlayId();
-    });
-
-    fetchLocationPlayId();
-    return () => unsubscribe();
-  }, [userId]);
-
-  useEffect(() => {
-    if (map.current && locationPlayId) {
-      getUserPlayEvent(map.current);
-    }
-  }, [locationPlayId, evangileEvents, map, winterDark, summerLight]);
-
-  useEffect(() => {
-    if (locationPlayId) {
-      getTravelRoute();
-    }
-  }, [evangileEvents, locationPlayId]);
-
-  useEffect(() => {
-    if (map.current && startTravel && endTravel) {
-      map.current.on('style.load', () => {
-        if (startTravel && endTravel) {
-          addRouteLayer(map.current, startTravel, endTravel);
-        }
-      });
-
-      if (startTravel && endTravel && map.current.isStyleLoaded()) {
-        addRouteLayer(map.current, startTravel, endTravel);
-      }
-    }
-  }, [map, startTravel, endTravel]);
-
-  // Initialize the start and End travel using the locationPlayId
-  const getTravelRoute = () => {
-    // Find the next event in the list
-    const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
-    const currentEvents = evangileEvents[currentIndex];
-    if (currentEvents && currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
-      setStartTravel([currentEvents.longitude, currentEvents.latitude]);
-      const nextEvent = evangileEvents[currentIndex + 1];
-      setEndTravel([nextEvent.longitude, nextEvent.latitude]);
-    }
-  }
+  }, [season, mapStyle, evangileEvents]);
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
@@ -152,47 +91,6 @@ export default function Map2DByUserId({ params }) {
       })
       setEvangileEvents(eventsArray);
     })
-  }
-
-  //Received the location of the event who play by user and zoom in them
-  const getUserPlayEvent = async (mapEvent) => {
-    // Find the next event in the list
-    const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
-    const currentEvents = evangileEvents[currentIndex];
-
-    if (currentEvents) {
-      const anneeEvent = parseInt(currentEvents.event_date);
-      if (anneeEvent < 0) {
-        setMountainHeight(50);
-        setShowBuilding(false);
-        updateTerrain(mapEvent, 50, false);
-      } else {
-        setMountainHeight(0);
-        setShowBuilding(false);
-        updateTerrain(mapEvent, 10, false);
-      }
-
-      const day = currentEvents.detail_jour;
-      if (day === "Nuit") {
-        mapEvent.setStyle(winterDark);
-      } else if (day === "Matin") {
-        mapEvent.setStyle(summerLight);
-      } else {
-        mapEvent.setStyle(winterDark);
-        addSnowLayer(mapEvent);
-      }
-
-      const meteo = currentEvents.meteo;
-      if (meteo === "Pluvieux") {
-        addRainLayer(mapEvent);
-      } else if (meteo === "Neigeux") {
-        addSnowLayer(mapEvent);
-      }
-      mapEvent.flyTo({
-        center: [currentEvents.longitude, currentEvents.latitude],
-        zoom: 15
-      });
-    }
   }
 
   const updateMapSettings = () => {
@@ -242,6 +140,38 @@ export default function Map2DByUserId({ params }) {
           zoom: 20
         });
       })
+
+      const anneeEvent = parseInt(location.event_date);
+      if (anneeEvent < 0) {
+        setMountainHeight(50);
+        setShowBuilding(false);
+        updateTerrain(mapEvent, 50, false);
+      } else {
+        setMountainHeight(0);
+        setShowBuilding(false);
+        updateTerrain(mapEvent, 10, false);
+      }
+
+      const day = location.detail_jour;
+      if (day === "Nuit") {
+        mapEvent.setStyle(winterDark);
+      } else if (day === "Matin") {
+        mapEvent.setStyle(summerLight);
+      } else {
+        mapEvent.setStyle(winterDark);
+        addSnowLayer(mapEvent);
+      }
+
+      const meteo = location.meteo;
+      if (meteo === "Pluvieux") {
+        addRainLayer(mapEvent);
+      } else if (meteo === "Neigeux") {
+        addSnowLayer(mapEvent);
+      }
+      mapEvent.flyTo({
+        center: [location.longitude, location.latitude],
+        zoom: 15
+      });
     });
   };
 
