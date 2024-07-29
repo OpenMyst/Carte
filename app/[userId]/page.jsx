@@ -215,13 +215,13 @@ export default function MapByUserId({ params }) {
     const loadEvangileMarker = (mapEvent) => {
         evangileEvents.forEach((location) => {
             const popup = new mapboxgl.Popup().setHTML(`
-                <div class="flex flex-row h-[300px] w-[220px]  static">
-                    <div class="w-full h-[5vw] bg-red relative">
-                    <img src="${location.image}" alt="${location.label}" class="w-full sm:h-[120px] md:h-[80px]"/>
+                <div class="flex flex-row h-[300px] w-[220px] static">
+                    <div class="w-full h-[60px] relative">
+                        <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
                     </div>
-                    <div class="mt-[120px] fixed md:mt-[80px]">
-                    <h3 class="text-base font-bold text-center">${location.label}</h3>
-                    <p class="h-[160px] overflow-y-scroll">${location.description}</p>
+                    <div class="mt-[150px] fixed">
+                        <h3 class="text-base font-bold text-center">${location.label}</h3>
+                        <p class="h-[110px] overflow-y-scroll">${location.description}</p>
                     </div>
                 </div>
                 `);
@@ -266,7 +266,7 @@ export default function MapByUserId({ params }) {
 
     return (
         <main className="m-2">
-            <div id="map" ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }}></div>
+            <div id="map" ref={mapContainer}></div>
             <div className={`map-overlay top w-[20vw] `}>
                 <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">

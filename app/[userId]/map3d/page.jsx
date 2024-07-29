@@ -296,13 +296,13 @@ const Map3DComponent = ({ params }) => {
   const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
-            <div class="flex flex-row h-[300px] w-[220px]  static">
-              <div class="w-full h-[5vw] bg-red relative">
-                <img src="${location.image}" alt="${location.label}" class="w-full sm:h-[120px] md:h-[80px]"/>
+            <div class="flex flex-row h-[300px] w-[220px] static">
+              <div class="w-full h-[60px] relative">
+                <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
               </div>
-              <div class="mt-[120px] fixed md:mt-[80px]">
+              <div class="mt-[150px] fixed">
                 <h3 class="text-base font-bold text-center">${location.label}</h3>
-                <p class="h-[160px] overflow-y-scroll">${location.description}</p>
+                <p class="h-[110px] overflow-y-scroll">${location.description}</p>
               </div>
             </div>
           `);
