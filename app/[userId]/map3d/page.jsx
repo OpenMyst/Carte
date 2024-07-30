@@ -223,8 +223,8 @@ const Map3DComponent = ({ params }) => {
         type: 'custom',
         renderingMode: '3d',
         onAdd: function () {
-          const scale = 10;
-          const heightMultiple = mountainHeight < 50 ? 1 : 3;
+          const scale = 2;
+          const heightMultiple = mountainHeight < 50 ? 1 : 2;
 
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
@@ -237,7 +237,7 @@ const Map3DComponent = ({ params }) => {
           const options1 = {
             obj: '/assets/jerusalem2.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale * heightMultiple, z: 15 },
+            scale: { x: scale * 5, y: scale * 4 * heightMultiple, z: 10 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
@@ -246,7 +246,7 @@ const Map3DComponent = ({ params }) => {
           const options2 = {
             obj: '/assets/golgot.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale, z: 15 },
+            scale: { x: scale, y: scale, z: 5 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
@@ -255,7 +255,7 @@ const Map3DComponent = ({ params }) => {
           const options3 = {
             obj: '/assets/Palais_de_Lazare.gltf',
             type: 'gltf',
-            scale: { x: scale * 1.5, y: scale, z: 15 },
+            scale: { x: scale, y: scale * heightMultiple, z:2 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
