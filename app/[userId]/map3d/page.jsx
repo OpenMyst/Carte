@@ -224,7 +224,7 @@ const Map3DComponent = ({ params }) => {
         renderingMode: '3d',
         onAdd: function () {
           const scale = 10;
-          const heightMultiple = mountainHeight < 50 ? 1 : 2;
+          const heightMultiple = mountainHeight < 50 ? 1 : 3;
 
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
