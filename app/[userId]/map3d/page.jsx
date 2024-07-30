@@ -255,7 +255,7 @@ const Map3DComponent = ({ params }) => {
           const options3 = {
             obj: '/assets/Palais_de_Lazare.gltf',
             type: 'gltf',
-            scale: { x: scale * 1.5, y: scale * heightMultiple, z: 15 },
+            scale: { x: scale * 1.5, y: scale, z: 15 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
