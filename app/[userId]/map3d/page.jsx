@@ -246,7 +246,7 @@ const Map3DComponent = ({ params }) => {
           const options2 = {
             obj: '/assets/golgot.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale, z: 5 },
+            scale: { x: scale * 5, y: scale * 4 * heightMultiple, z: 10 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
