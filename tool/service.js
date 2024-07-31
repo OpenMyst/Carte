@@ -116,6 +116,7 @@ export const saveCoordonneEvent = async (userId, coordinates) => {
     const eventDocRef = await addDoc(collection(database, 'events'), {
       longitude: coordinates.lng,
       latitude: coordinates.lat,
+      event_date: 1944,
       timestamp: new Date().toISOString() // Add a timestamp to help with retrieval
     });
 
