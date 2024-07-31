@@ -8,7 +8,7 @@ import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { userPlayEvent } from "@/tool/service";
+import { addMarkerEvent, userPlayEvent } from "@/tool/service";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -82,37 +82,37 @@ export default function MapByUserId({ params }) {
         }
     }, [locationPlayId, evangileEvents, map, winterDark, summerLight])
 
-    useEffect(() => {
-        if (locationPlayId) {
-            getTravelRoute();
-        }
-    }, [evangileEvents, locationPlayId]);
+    // useEffect(() => {
+    //     if (locationPlayId) {
+    //         getTravelRoute();
+    //     }
+    // }, [evangileEvents, locationPlayId]);
 
-    useEffect(() => {
-        if (map.current && startTravel && endTravel) {
-            map.current.on('style.load', () => {
-                if (startTravel && endTravel) {
-                    addRouteLayer(map.current, startTravel, endTravel);
-                }
-            });
+    // useEffect(() => {
+    //     if (map.current && startTravel && endTravel) {
+    //         map.current.on('style.load', () => {
+    //             if (startTravel && endTravel) {
+    //                 addRouteLayer(map.current, startTravel, endTravel);
+    //             }
+    //         });
 
-            if (startTravel && endTravel && map.current.isStyleLoaded()) {
-                addRouteLayer(map.current, startTravel, endTravel);
-            }
-        }
-    }, [map, startTravel, endTravel]);
+    //         if (startTravel && endTravel && map.current.isStyleLoaded()) {
+    //             addRouteLayer(map.current, startTravel, endTravel);
+    //         }
+    //     }
+    // }, [map, startTravel, endTravel]);
 
-    // Initialize the start and End travel using the locationPlayId
-    const getTravelRoute = () => {
-        // Find the next event in the list
-        const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
-        const currentEvents = evangileEvents[currentIndex];
-        if (currentEvents && currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
-            setStartTravel([currentEvents.longitude, currentEvents.latitude]);
-            const nextEvent = evangileEvents[currentIndex + 1];
-            setEndTravel([nextEvent.longitude, nextEvent.latitude]);
-        }
-    }
+    // // Initialize the start and End travel using the locationPlayId
+    // const getTravelRoute = () => {
+    //     // Find the next event in the list
+    //     const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
+    //     const currentEvents = evangileEvents[currentIndex];
+    //     if (currentEvents && currentIndex >= 0 && currentIndex < evangileEvents.length - 1) {
+    //         setStartTravel([currentEvents.longitude, currentEvents.latitude]);
+    //         const nextEvent = evangileEvents[currentIndex + 1];
+    //         setEndTravel([nextEvent.longitude, nextEvent.latitude]);
+    //     }
+    // }
 
     // Fetch all events from Firebase
     const getAllEvent = () => {
@@ -145,6 +145,8 @@ export default function MapByUserId({ params }) {
         });
 
         map.current.addControl(new mapboxgl.NavigationControl());
+
+        addMarkerEvent(map.current, userId);
 
         map.current.on('style.load', () => {
             map.current.addSource('mapbox-dem', {
