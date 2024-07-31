@@ -50,7 +50,11 @@ export const addMarkerEvent = (map, userId) => {
     console.log(coordinates);
 
     const popupContent = document.createElement('div');
-    popupContent.className = 'flex flex-row h-[100px] w-[100px] static';
+    popupContent.className = 'h-[200px] w-[100px] static';
+
+    const popupTitle = document.createElement('h4');
+    popupTitle.className = "text-lg";
+    popupTitle.innerText = "Vous voulez enregistrer dans l'evenement?"
 
     const saveButton = document.createElement('button');
     saveButton.style.backgroundColor = "blue";
@@ -72,6 +76,7 @@ export const addMarkerEvent = (map, userId) => {
       marker.remove();
     };
 
+    popupContent.appendChild(popupTitle);
     popupContent.appendChild(saveButton);
     popupContent.appendChild(deleteButton);
 

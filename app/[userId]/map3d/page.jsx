@@ -8,7 +8,7 @@ import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { userPlayEvent } from "@/tool/service";
+import { addMarkerEvent, userPlayEvent } from "@/tool/service";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 /*
@@ -197,6 +197,8 @@ const Map3DComponent = ({ params }) => {
         defaultLights: true
       }
     ));
+
+    addMarkerEvent(map, userId);
 
     map.on('style.load', () => {
       map.addSource('mapbox-dem', {
