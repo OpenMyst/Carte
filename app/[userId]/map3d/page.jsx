@@ -315,21 +315,8 @@ const Map3DComponent = ({ params }) => {
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
-      const popup = new mapboxgl.Popup().setHTML(`
-            <div class="flex flex-row h-[300px] w-[220px] static">
-              <div class="w-full h-[60px] relative">
-                <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
-              </div>
-              <div class="mt-[150px] fixed">
-                <h3 class="text-base font-bold text-center">${location.label}</h3>
-                <p class="h-[110px] overflow-y-scroll">${location.description}</p>
-              </div>
-            </div>
-          `);
-
       const marker = new mapboxgl.Marker()
         .setLngLat([location.longitude, location.latitude])
-        .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
     });
   };
