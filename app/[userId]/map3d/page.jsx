@@ -150,6 +150,24 @@ const Map3DComponent = ({ params }) => {
       } else if (meteo === "Neigeux") {
         addSnowLayer(mapEvent);
       }
+
+      const popup = new mapboxgl.Popup().setHTML(`
+        <div class="flex flex-row h-[300px] w-[220px] static">
+          <div class="w-full h-[60px] relative">
+            <img src="${currentEvents.image}" alt="${currentEvents.label}" class="w-full h-[150px]"/>
+          </div>
+          <div class="mt-[150px] fixed">
+            <h3 class="text-base font-bold text-center">${currentEvents.label}</h3>
+            <p class="h-[110px] overflow-y-scroll">${currentEvents.description}</p>
+          </div>
+        </div>
+      `);
+
+      const marker = new mapboxgl.Marker()
+        .setLngLat([currentEvents.longitude, currentEvents.latitude])
+        .setPopup(popup)  // Associe le popup au marqueur
+        .addTo(mapEvent)
+        .togglePopup();
       mapEvent.flyTo({
         center: [currentEvents.longitude, currentEvents.latitude],
         zoom: 15
