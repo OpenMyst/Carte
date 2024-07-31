@@ -117,6 +117,7 @@ export const saveCoordonneEvent = async (userId, coordinates) => {
       longitude: coordinates.lng,
       latitude: coordinates.lat,
       event_date: "1944",
+      etat: 0
     });
 
     const eventId = eventDocRef.id;
