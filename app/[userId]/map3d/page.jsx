@@ -331,13 +331,6 @@ const Map3DComponent = ({ params }) => {
         .setLngLat([location.longitude, location.latitude])
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
-
-      marker.getElement().addEventListener('click', () => {
-        mapEvent.flyTo({
-          center: [location.longitude, location.latitude],
-          zoom: 20
-        });
-      })
     });
   };
 
