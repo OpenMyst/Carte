@@ -53,10 +53,11 @@ export const addMarkerEvent = (map, userId) => {
     popupContent.className = 'h-[200px] w-[100px] static';
 
     const popupTitle = document.createElement('h4');
-    popupTitle.className = "text-lg";
+    popupTitle.className = "text-lg text-center";
     popupTitle.innerText = "Vous voulez enregistrer dans l'evenement?"
 
     const saveButton = document.createElement('button');
+    saveButton.className = "w-full";
     saveButton.style.backgroundColor = "blue";
     saveButton.style.color = "white";
     saveButton.style.margin = "1px";
@@ -67,6 +68,7 @@ export const addMarkerEvent = (map, userId) => {
     };
 
     const deleteButton = document.createElement('button');
+    deleteButton.className = "w-full";
     deleteButton.style.backgroundColor = "red";
     deleteButton.style.color = "white";
     deleteButton.style.margin = "1px";
