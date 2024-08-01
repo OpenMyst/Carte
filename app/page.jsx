@@ -204,16 +204,7 @@ export default function Home() {
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <fieldset>
-            <Label htmlFor="show-building">Pass in 3D</Label>
-            <Switch
-              id="show-building"
-              checked={showMap3D}
-              onCheckedChange={() => {
-                setShowMap3D(!showMap3D);
-              }} />
-          </fieldset>
-          <fieldset>
-            <Label htmlFor="show-building">Show Building</Label>
+            <Label htmlFor="show-building">Building</Label>
             <Switch
               id="show-building"
               checked={showBuilding}
@@ -223,7 +214,7 @@ export default function Home() {
               }} />
           </fieldset>
           <fieldset>
-            <Label htmlFor="showRoad">Show Road</Label>
+            <Label htmlFor="showRoad">Paths</Label>
             <Switch
               id="showRoad"
               checked={showRoad}
@@ -242,6 +233,15 @@ export default function Home() {
             />
           </fieldset>
           <fieldset>
+            <Label htmlFor="show-building">3D</Label>
+            <Switch
+              id="show-building"
+              checked={showMap3D}
+              onCheckedChange={() => {
+                setShowMap3D(!showMap3D);
+              }} />
+          </fieldset>
+          <fieldset>
             <label>Variation du Temps: {mountainHeight >= 100 ? -2000 : 2000}</label>
             <input
               type="range"
@@ -252,12 +252,9 @@ export default function Home() {
             />
           </fieldset>
           <fieldset>
-            <Label>Longitude</Label>
-            <input type="number" value={lng} step="any" className="lat-lng" readOnly />
-          </fieldset>
-          <fieldset>
-            <Label>Latitude</Label>
-            <input type="number" value={lat} step="any" className="lat-lng" readOnly />
+            <Label>My position</Label>
+            <input type="number" value={lng} step="any" className="w-20 bg-transparent" readOnly />
+            <input type="number" value={lat} step="any" className="w-20 bg-transparent" readOnly />
           </fieldset>
         </div>
       </div>

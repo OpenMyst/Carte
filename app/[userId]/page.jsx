@@ -37,14 +37,8 @@ export default function MapByUserId({ params }) {
 
     useEffect(() => {
         if (map.current) return;
-        initializeMap()
+        initializeMap();
     }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
-
-    useEffect(() => {
-        if (map.current) {
-            map.current.setPitch(showMap3D ? 62 : 0);
-        }
-    }, [showMap3D]);
 
     useEffect(() => {
         if (map.current) {
@@ -58,8 +52,23 @@ export default function MapByUserId({ params }) {
             map.current.setStyle(mapStyle);
             getUserPlayEvent(map.current);
             loadEvangileMarker(map.current);
+            addRouteLayer(map.current, startTravel, endTravel);
         }
     }, [season, mapStyle, evangileEvents, locationPlayId]);
+
+    useEffect(() => {
+        if (map.current) {
+          loadEvangileMarker(map.current);
+          getUserPlayEvent(map.current);
+        }
+      }, [evangileEvents, map]);
+
+    useEffect(() => {
+        if (map.current) {
+            updateMapSettings();
+            addRouteLayer(map.current, startTravel, endTravel);
+        }
+    }, [mountainHeight, showBuilding, showRoad]);
 
     useEffect(() => {
         const fetchLocationPlayId = async () => {
@@ -77,10 +86,16 @@ export default function MapByUserId({ params }) {
     }, [userId]);
 
     useEffect(() => {
+        if (map.current) {
+            map.current.setPitch(showMap3D ? 62 : 0);
+        }
+    }, [showMap3D]);
+
+    useEffect(() => {
         if (map.current && locationPlayId) {
             getUserPlayEvent(map.current);
         }
-    }, [locationPlayId, evangileEvents, map, winterDark, summerLight])
+    }, [locationPlayId, evangileEvents, map, winterDark, summerLight]);
 
     useEffect(() => {
         if (locationPlayId) {
@@ -92,7 +107,7 @@ export default function MapByUserId({ params }) {
         if (map.current && startTravel && endTravel) {
             map.current.on('style.load', () => {
                 if (startTravel && endTravel) {
-                    addRouteLayer(map.current, startTravel, endTravel);
+                    addRouteLayer(map, startTravel, endTravel);
                 }
             });
 
@@ -116,16 +131,97 @@ export default function MapByUserId({ params }) {
 
     // Fetch all events from Firebase
     const getAllEvent = () => {
-        const q = query(collection(database, 'events'))
+        const q = query(collection(database, 'events'));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            let eventsArray = []
+            let eventsArray = [];
 
             querySnapshot.forEach(doc => {
-                eventsArray.push({ ...doc.data(), id: doc.id })
+                eventsArray.push({ ...doc.data(), id: doc.id });
             })
             setEvangileEvents(eventsArray);
         })
     }
+
+    //Received the location of the event who play by user and zoom in them
+    const getUserPlayEvent = async (mapEvent) => {
+        // Find the next event in the list
+        const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
+        const currentEvents = evangileEvents[currentIndex];
+
+        if (currentEvents) {
+            const anneeEvent = parseInt(currentEvents.event_date);
+            if (anneeEvent < 0) {
+                setMountainHeight(50);
+                setShowBuilding(false);
+                updateTerrain(mapEvent, 50, false);
+            } else {
+                setMountainHeight(0);
+                setShowBuilding(false);
+                updateTerrain(mapEvent, 10, false);
+            }
+
+            const day = currentEvents.detail_jour;
+            if (day === "Nuit") {
+                mapEvent.setStyle(winterDark);
+            } else if (day === "Matin") {
+                mapEvent.setStyle(summerLight);
+            } else {
+                mapEvent.setStyle(winterDark);
+                addSnowLayer(mapEvent);
+            }
+
+            const meteo = currentEvents.meteo;
+            if (meteo === "Pluvieux") {
+                addRainLayer(mapEvent);
+            } else if (meteo === "Neigeux") {
+                addSnowLayer(mapEvent);
+            }
+
+            const popup = new mapboxgl.Popup().setHTML(`
+            <div class="flex flex-row h-[300px] w-[220px] static">
+              <div class="w-full h-[60px] relative">
+                <img src="${currentEvents.image}" alt="${currentEvents.label}" class="w-full h-[150px]"/>
+              </div>
+              <div class="mt-[150px] fixed">
+                <h3 class="text-base font-bold text-center">${currentEvents.label}</h3>
+                <p class="h-[110px] overflow-y-scroll">${currentEvents.description}</p>
+              </div>
+            </div>
+          `);
+
+            const marker = new mapboxgl.Marker()
+                .setLngLat([currentEvents.longitude, currentEvents.latitude])
+                .setPopup(popup)  // Associe le popup au marqueur
+                .addTo(mapEvent)
+                .togglePopup();
+            mapEvent.flyTo({
+                center: [currentEvents.longitude, currentEvents.latitude],
+                zoom: 15
+            });
+        }
+    }
+
+    const updateMapSettings = () => {
+        if (map.current) {
+            map.current.on('style.load', () => {
+                map.current.addSource('mapbox-dem', {
+                    type: 'raster-dem',
+                    url: 'mapbox://mapbox.terrain-rgb'
+                });
+                handleCheckboxChange(map.current, 'building-extrusion', 'visibility', showBuilding);
+                handleCheckboxChange('road-primary', 'visibility', showRoad);
+                handleCheckboxChange('road-secondary-tertiary', 'visibility', showRoad);
+                handleCheckboxChange('road-street', 'visibility', showRoad);
+                handleCheckboxChange('road-minor', 'visibility', showRoad);
+                handleCheckboxChange('road-major-link', 'visibility', showRoad);
+                handleCheckboxChange('road-motorway-trunk', 'visibility', showRoad);
+                handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
+                handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
+                handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
+                map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+            });
+        }
+    };
 
     // Initialize the map into 3D
     const initializeMap = () => {
@@ -147,6 +243,7 @@ export default function MapByUserId({ params }) {
         map.current.addControl(new mapboxgl.NavigationControl());
 
         addMarkerEvent(map.current, userId);
+        addRouteLayer(map.current, startTravel, endTravel);
 
         map.current.on('style.load', () => {
             map.current.addSource('mapbox-dem', {
@@ -168,49 +265,6 @@ export default function MapByUserId({ params }) {
             map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             loadEvangileMarker(map.current);
         });
-    }
-
-    //Received the location of the event who play by user and zoom in them
-    const getUserPlayEvent = async (mapEvent) => {
-        if (locationPlayId) {
-            // Find the next event in the list
-            const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
-            const currentEvents = evangileEvents[currentIndex];
-
-            if (currentEvents) {
-                const anneeEvent = parseInt(currentEvents.event_date);
-                if (anneeEvent < 0) {
-                    setMountainHeight(50);
-                    setShowBuilding(false);
-                    updateTerrain(mapEvent, 50, false);
-                } else {
-                    setMountainHeight(0);
-                    setShowBuilding(false);
-                    updateTerrain(mapEvent, 10, false);
-                }
-
-                const day = currentEvents.detail_jour;
-                if (day === "Nuit") {
-                    mapEvent.setStyle(winterDark);
-                } else if (day === "Matin") {
-                    mapEvent.setStyle(summerLight);
-                } else {
-                    mapEvent.setStyle(winterDark);
-                    addSnowLayer(mapEvent);
-                }
-
-                const meteo = currentEvents.meteo;
-                if (meteo === "Pluvieux") {
-                    addRainLayer(mapEvent);
-                } else if (meteo === "Neigeux") {
-                    addSnowLayer(mapEvent);
-                }
-                mapEvent.flyTo({
-                    center: [currentEvents.longitude, currentEvents.latitude],
-                    zoom: 15
-                });
-            }
-        }
     }
 
     // Load markers for evangile events
@@ -270,14 +324,14 @@ export default function MapByUserId({ params }) {
         <main className="m-2">
             <div id="map" ref={mapContainer}></div>
             <div className={`map-overlay top w-[20vw] `}>
-                <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
+                <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded " onClick={e => { e.preventDefault(); setOpen(!open) }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
                     </svg>
                 </button>
                 <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
                     <fieldset>
-                        <Label htmlFor="show-building">Show Building</Label>
+                        <Label htmlFor="show-building">Building</Label>
                         <Switch
                             id="show-building"
                             checked={showBuilding}
@@ -287,7 +341,7 @@ export default function MapByUserId({ params }) {
                             }} />
                     </fieldset>
                     <fieldset>
-                        <Label htmlFor="showRoad">Show Road</Label>
+                        <Label htmlFor="showRoad">Paths</Label>
                         <Switch
                             id="showRoad"
                             checked={showRoad}
@@ -306,22 +360,18 @@ export default function MapByUserId({ params }) {
                         />
                     </fieldset>
                     <fieldset>
-                        <label>Variation du Temps: {mountainHeight >= 100 ? -2000 : 2000}</label>
-                        <input
-                            type="range"
-                            min="0"
-                            max="300"
-                            value={mountainHeight}
-                            onChange={handleMountainHeightChange}
-                        />
+                        <Label htmlFor="show-building">3D</Label>
+                        <Switch
+                            id="show-building"
+                            checked={showMap3D}
+                            onCheckedChange={() => {
+                                setShowMap3D(!showMap3D);
+                            }} />
                     </fieldset>
                     <fieldset>
-                        <Label>Longitude</Label>
-                        <input type="number" value={lng} step="any" className="lat-lng" readOnly />
-                    </fieldset>
-                    <fieldset>
-                        <Label>Latitude</Label>
-                        <input type="number" value={lat} step="any" className="lat-lng" readOnly />
+                        <Label>My position</Label>
+                        <input type="number" value={lng} step="any" className="w-20 bg-transparent" readOnly />
+                        <input type="number" value={lat} step="any" className="w-20 bg-transparent" readOnly />
                     </fieldset>
                 </div>
             </div>

@@ -24,6 +24,7 @@ const Map3DComponent = ({ params }) => {
   const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
+  const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
   const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
@@ -64,6 +65,12 @@ const Map3DComponent = ({ params }) => {
     fetchLocationPlayId();
     return () => unsubscribe();
   }, [userId]);
+
+  useEffect(() => {
+    if (map) {
+      map.setPitch(showMap3D ? 62 : 0);
+    }
+  }, [showMap3D]);
 
   useEffect(() => {
     if (map && locationPlayId) {
@@ -250,6 +257,13 @@ const Map3DComponent = ({ params }) => {
             tb.loadObj(options, (model) => {
               model.setCoords(coords);
               model.setRotation({ x: 0, y: 0, z: 241 });
+              // Traverse the model to set opacity
+              model.traverse((child) => {
+                if (child.isMesh) {
+                  child.material.transparent = true;
+                  child.material.opacity = 0.77;
+                }
+              });
               tb.add(model);
             });
           };
@@ -275,7 +289,7 @@ const Map3DComponent = ({ params }) => {
           const options3 = {
             obj: '/assets/Palais_de_Lazare.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale * heightMultiple, z:2 },
+            scale: { x: scale, y: scale * heightMultiple, z: 2 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
@@ -340,14 +354,14 @@ const Map3DComponent = ({ params }) => {
     <div>
       <div ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
       <div className="map-overlay top w-[20vw]">
-        <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
+        <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded block" onClick={e => { e.preventDefault(); setOpen(!open) }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
           </svg>
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <fieldset>
-            <Label htmlFor="show-building">Show Building</Label>
+            <Label htmlFor="show-building">Building</Label>
             <Switch
               id="show-building"
               checked={showBuilding}
@@ -357,7 +371,7 @@ const Map3DComponent = ({ params }) => {
               }} />
           </fieldset>
           <fieldset>
-            <Label htmlFor="showRoad">Show Road</Label>
+            <Label htmlFor="showRoad">Paths</Label>
             <Switch
               id="showRoad"
               checked={showRoad}
@@ -376,12 +390,18 @@ const Map3DComponent = ({ params }) => {
             />
           </fieldset>
           <fieldset>
-            <Label>Longitude</Label>
-            <input type="number" value={lng} step="any" className="lat-lng" readOnly />
+            <Label htmlFor="show-building">3D</Label>
+            <Switch
+              id="show-building"
+              checked={showMap3D}
+              onCheckedChange={() => {
+                setShowMap3D(!showMap3D);
+              }} />
           </fieldset>
           <fieldset>
-            <Label>Latitude</Label>
-            <input type="number" value={lat} step="any" className="lat-lng" readOnly />
+            <Label>My position</Label>
+            <input type="number" value={lng} step="any" className="w-20 bg-transparent" readOnly />
+            <input type="number" value={lat} step="any" className="w-20 bg-transparent" readOnly />
           </fieldset>
         </div>
       </div>
