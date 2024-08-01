@@ -20,7 +20,7 @@ export default function Map2DByUserId({ params }) {
   const [zoom, setZoom] = useState(9); // Zoom level state
   const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
   const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
-  const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
+  const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(false); // Toggle for 3D map view
   const [season, setSeason] = useState('spring'); // Season state
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
