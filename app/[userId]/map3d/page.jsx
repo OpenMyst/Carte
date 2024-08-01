@@ -271,9 +271,9 @@ const Map3DComponent = ({ params }) => {
           const options1 = {
             obj: '/assets/jerusalem2.gltf',
             type: 'gltf',
-            scale: { x: scale * 5, y: scale * 4 * heightMultiple, z: 10 },
+            scale: { x: scale * 5, y: scale * 5 * heightMultiple, z: 10 },
             units: 'meters',
-            rotation: { x: 90, y: -90, z: 0 }
+            rotation: { x: 90, y: -90, z: 2 }
           };
           loadAndPlaceModel(options1, [35.2297, 31.7738]);
 
