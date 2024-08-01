@@ -202,7 +202,7 @@ export default function Map2DByUserId({ params }) {
 
   return (
     <main className="m-2">
-      <div id="map" ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }}></div>
+      <div id="map" ref={mapContainer}></div>
       <div className={`map-overlay top w-[20vw] `}>
         <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
@@ -211,7 +211,7 @@ export default function Map2DByUserId({ params }) {
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <fieldset>
-            <Label htmlFor="show-building">Show Building</Label>
+            <Label htmlFor="show-building">Building</Label>
             <Switch
               id="show-building"
               checked={showBuilding}
@@ -221,7 +221,7 @@ export default function Map2DByUserId({ params }) {
               }} />
           </fieldset>
           <fieldset>
-            <Label htmlFor="showRoad">Show Road</Label>
+            <Label htmlFor="showRoad">Paths</Label>
             <Switch
               id="showRoad"
               checked={showRoad}
@@ -251,12 +251,9 @@ export default function Map2DByUserId({ params }) {
             />
           </fieldset>
           <fieldset>
-            <Label>Longitude</Label>
-            <input type="number" value={lng} step="any" className="lat-lng" readOnly />
-          </fieldset>
-          <fieldset>
-            <Label>Latitude</Label>
-            <input type="number" value={lat} step="any" className="lat-lng" readOnly />
+            <Label>My position</Label>
+            <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
+            <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
           </fieldset>
         </div>
       </div>

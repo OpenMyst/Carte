@@ -370,8 +370,8 @@ export default function MapByUserId({ params }) {
                     </fieldset>
                     <fieldset>
                         <Label>My position</Label>
-                        <input type="number" value={lng} step="any" className="w-20 bg-transparent" readOnly />
-                        <input type="number" value={lat} step="any" className="w-20 bg-transparent" readOnly />
+                        <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
+                        <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
                     </fieldset>
                 </div>
             </div>
