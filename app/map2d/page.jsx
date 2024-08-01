@@ -26,6 +26,8 @@ export default function Map2DByUserId({ params }) {
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
+  const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
+  const [endTravel, setEndTravel] = useState([]); // End coordinates for route
 
   useEffect(() => {
     getAllEvent();
@@ -52,6 +54,7 @@ export default function Map2DByUserId({ params }) {
 
     updateMapSettings();
     loadEvangileMarker(map.current);
+    addRouteLayer(map.current, startTravel, endTravel);
   }, [map, mapStyle, evangileEvents, showMap3D]);
 
   useEffect(() => {
@@ -77,6 +80,7 @@ export default function Map2DByUserId({ params }) {
       setMapStyle(styles[season]);
       map.current.setStyle(mapStyle);
       loadEvangileMarker(map.current);
+      addRouteLayer(map.current, startTravel, endTravel);
     }
   }, [season, mapStyle, evangileEvents]);
 
@@ -96,6 +100,7 @@ export default function Map2DByUserId({ params }) {
   const updateMapSettings = () => {
     if (map.current) {
       map.current.on('style.load', () => {
+        addRouteLayer(map.current, startTravel, endTravel);
         map.current.addSource('mapbox-dem', {
           type: 'raster-dem',
           url: 'mapbox://mapbox.terrain-rgb'
@@ -168,10 +173,6 @@ export default function Map2DByUserId({ params }) {
       } else if (meteo === "Neigeux") {
         addSnowLayer(mapEvent);
       }
-      mapEvent.flyTo({
-        center: [location.longitude, location.latitude],
-        zoom: 15
-      });
     });
   };
 
@@ -209,15 +210,6 @@ export default function Map2DByUserId({ params }) {
           </svg>
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
-          <fieldset>
-            <Label htmlFor="show-building">Pass in 3D</Label>
-            <Switch
-              id="show-building"
-              checked={showMap3D}
-              onCheckedChange={() => {
-                setShowMap3D(!showMap3D);
-              }} />
-          </fieldset>
           <fieldset>
             <Label htmlFor="show-building">Show Building</Label>
             <Switch
