@@ -9,6 +9,7 @@ import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { addMarkerEvent, userPlayEvent } from "@/tool/service";
+import { Menu } from "lucide-react";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 /*
@@ -355,9 +356,7 @@ const Map3DComponent = ({ params }) => {
       <div ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
       <div className="map-overlay top w-[20vw]">
         <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded block" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
-          </svg>
+          <Menu />
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <fieldset>
