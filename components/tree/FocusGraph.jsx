@@ -48,9 +48,10 @@ export default function FocusGraph() {
         nodeLabel="nom"
         linkLabel={(link) => link.relation}
         onNodeClick={handleClick}
-        linkColor={() => 'rgba(255,255,255,0.5)'}
+        linkColor={() => 'rgba(255,255,255,1)'}
         linkDirectionalParticles={1}
-        linkDirectionalParticleWidth={1}
+        linkWidth={1}
+        linkDirectionalParticleWidth={2}
       />
     )
   );
