@@ -36,7 +36,9 @@ export default function FocusGraph() {
 
   const nodeThreeObject = (node) => {
     const sphereGeometry = new THREE.SphereGeometry(node.nom === "Jésus " ? 10 : 5, 32, 32); // Change size based on node name
-    const sphereMaterial = new THREE.MeshBasicMaterial({ color: node.nom === "Jésus " ? 0xFFFFFF : 0xD9EB71 });
+    const sphereMaterial = new THREE.MeshBasicMaterial({ 
+        color: node.nom === "Jésus " ? 0xFFFFFF : 
+        node.testament === "encien" ? 0xF47512 : 0xD9EB71 });
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
     // Add label as a child of the sphere
