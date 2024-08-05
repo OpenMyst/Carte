@@ -44,7 +44,7 @@ export default function FocusGraph() {
     sprite.color = node.nom === "Jésus " ? '#ff0000' : 'white';
     sprite.textHeight = node.nom === "Jésus " ? 8 : 4;
     sphere.add(sprite);
-    
+
     // Adjust label position
     sprite.position.set(0, 0, node.nom === "Jésus " ? 10 : 6);
 
@@ -52,36 +52,36 @@ export default function FocusGraph() {
   };
 
   return (
-      <ForceGraph3D
-        ref={fgRef}
-        graphData={data}
-        nodeColor={node => node.nom === "Jésus " ? "#F5501C" : "#D9EB71"}
-        nodeLabel="nom"
-        onNodeClick={handleClick}
-        nodeThreeObject={nodeThreeObject}
-        nodeThreeObjectExtend={true}
-        nodeAutoColorBy={link => link.relation}
-        linkLabel={(link) => link.relation}
-        linkDirectionalParticles={1}
-        linkWidth={1}
-        linkDirectionalParticleWidth={2}
-        linkAutoColorBy={link => link.relation}
-        linkThreeObjectExtend={true}
-          linkThreeObject={link => {
-            // extend link with text sprite
-            const sprite = new SpriteText(`${link.relation}`);
-            sprite.color = 'lightgrey';
-            sprite.textHeight = 1.5;
-            return sprite;
-          }}
-          linkPositionUpdate={(sprite, { start, end }) => {
-            const middlePos = Object.assign(...['x', 'y', 'z'].map(c => ({
-              [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
-            })));
+    <ForceGraph3D
+      ref={fgRef}
+      graphData={data}
+      nodeColor={node => node.nom === "Jésus " ? "#F5501C" : "#D9EB71"}
+      nodeLabel="nom"
+      onNodeClick={handleClick}
+      nodeThreeObject={nodeThreeObject}
+      nodeThreeObjectExtend={true}
+      nodeAutoColorBy={link => link.relation}
+      linkLabel={(link) => link.relation}
+      linkDirectionalParticles={1}
+      linkWidth={1}
+      linkDirectionalParticleWidth={2}
+      linkAutoColorBy={link => link.relation}
+      linkThreeObjectExtend={true}
+      linkThreeObject={link => {
+        // extend link with text sprite
+        const sprite = new SpriteText(`${link.relation}`);
+        sprite.color = 'lightgrey';
+        sprite.textHeight = 1.5;
+        return sprite;
+      }}
+      linkPositionUpdate={(sprite, { start, end }) => {
+        const middlePos = Object.assign(...['x', 'y', 'z'].map(c => ({
+          [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
+        })));
 
-            // Position sprite
-            Object.assign(sprite.position, middlePos);
-          }}
-      />
+        // Position sprite
+        Object.assign(sprite.position, middlePos);
+      }}
+    />
   );
 }
