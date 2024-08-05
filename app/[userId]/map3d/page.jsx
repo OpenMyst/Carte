@@ -26,7 +26,7 @@ const Map3DComponent = ({ params }) => {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-  const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
@@ -133,9 +133,9 @@ const Map3DComponent = ({ params }) => {
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(50);
+        setMountainHeight(100);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 50, false);
+        updateTerrain(mapEvent, 100, false);
       } else {
         setMountainHeight(0);
         setShowBuilding(false);
@@ -352,7 +352,7 @@ const Map3DComponent = ({ params }) => {
 
   return (
     <div>
-      <div ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
+      <div id="map" ref={mapContainer} />
       <div className="map-overlay top w-[20vw]">
         <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded block" onClick={e => { e.preventDefault(); setOpen(!open) }}>
           <Menu />
