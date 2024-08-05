@@ -149,7 +149,6 @@ const Map3DComponent = ({ params }) => {
         mapEvent.setStyle(summerLight);
       } else {
         mapEvent.setStyle(winterDark);
-        addSnowLayer(mapEvent);
       }
 
       const meteo = currentEvents.meteo;

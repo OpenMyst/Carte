@@ -157,7 +157,6 @@ export default function Home() {
         mapEvent.setStyle(summerLight);
       } else {
         mapEvent.setStyle(winterDark);
-        addSnowLayer(mapEvent)
       }
 
       const meteo = location.meteo;

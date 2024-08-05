@@ -165,7 +165,6 @@ export default function Map2DByUserId({ params }) {
         mapEvent.setStyle(summerLight);
       } else {
         mapEvent.setStyle(winterDark);
-        addSnowLayer(mapEvent);
       }
 
       const meteo = location.meteo;
