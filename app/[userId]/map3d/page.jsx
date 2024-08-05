@@ -26,7 +26,7 @@ const Map3DComponent = ({ params }) => {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-  const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
@@ -133,9 +133,9 @@ const Map3DComponent = ({ params }) => {
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(100);
+        setMountainHeight(50);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 100, false);
+        updateTerrain(mapEvent, 50, false);
       } else {
         setMountainHeight(0);
         setShowBuilding(false);
