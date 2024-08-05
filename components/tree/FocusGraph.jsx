@@ -1,19 +1,27 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { getFamilyTreeFromFirebase } from './action';
-import { ForceGraph3D } from 'react-force-graph';
 import SpriteText from 'three-spritetext';
+import dynamic from 'next/dynamic';
 
+let ForceGraph3D;
 
+if (typeof window !== 'undefined') {
+  ForceGraph3D = require('react-force-graph').ForceGraph3D;
+}
 export default function FocusGraph() {
   const [data, setData] = useState({ nodes: [], links: [] });
   const fgRef = useRef();
 
   useEffect(() => {
     const fetchData = async () => {
-      const treeData = await getFamilyTreeFromFirebase();
-      setData(treeData);
-      console.log(treeData)
+      try {
+        const treeData = await getFamilyTreeFromFirebase();
+        setData(treeData);
+        console.log(treeData)
+      } catch (error) {
+        console.log(error)
+      }      
     };
     fetchData();
   }, []);
