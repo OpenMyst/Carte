@@ -139,7 +139,7 @@ const Map3DComponent = ({ params }) => {
       } else {
         setMountainHeight(0);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 10, false);
+        updateTerrain(mapEvent, 50, false);
       }
 
       const day = currentEvents.detail_jour;
