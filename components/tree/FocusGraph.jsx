@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import dynamic from 'next/dynamic';
 import { getFamilyTreeFromFirebase } from './action';
 import { ForceGraph3D } from 'react-force-graph';
 import SpriteText from 'three-spritetext';
