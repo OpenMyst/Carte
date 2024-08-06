@@ -26,7 +26,7 @@ const Map3DComponent = ({ params }) => {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-  const [mountainHeight, setMountainHeight] = useState(70); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
@@ -133,13 +133,13 @@ const Map3DComponent = ({ params }) => {
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(70);
+        setMountainHeight(50);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 70, false);
+        updateTerrain(mapEvent, 50, false);
       } else {
         setMountainHeight(0);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 70, false);
+        updateTerrain(mapEvent, 50, false);
       }
 
       const day = currentEvents.detail_jour;
@@ -251,7 +251,7 @@ const Map3DComponent = ({ params }) => {
         renderingMode: '3d',
         onAdd: function () {
           const scale = 2;
-          const heightMultiple = mountainHeight < 70 ? 1 : 2;
+          const heightMultiple = mountainHeight < 50 ? 1 : 2;
 
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
@@ -273,7 +273,7 @@ const Map3DComponent = ({ params }) => {
             type: 'gltf',
             scale: { x: scale * 5, y: scale * 5 * heightMultiple, z: 10 },
             units: 'meters',
-            rotation: { x: 90, y: -90, z: 2 }
+            rotation: { x: 90, y: -90, z: 5 }
           };
           loadAndPlaceModel(options1, [35.2297, 31.7738]);
 
