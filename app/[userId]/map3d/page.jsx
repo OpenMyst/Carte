@@ -10,6 +10,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { addMarkerEvent, userPlayEvent } from "@/tool/service";
 import { Menu } from "lucide-react";
+import Spline from "@splinetool/react-spline";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 /*
@@ -33,6 +35,7 @@ const Map3DComponent = ({ params }) => {
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
   const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
+  const [openDialogCity, setOpenDialogCity] = useState(false);
 
   useEffect(() => {
     getAllEvent();
@@ -101,7 +104,7 @@ const Map3DComponent = ({ params }) => {
   }, [map, startTravel, endTravel]);
 
   const handleMapClick = useCallback((event) => {
-      addMarkerEvent(map, userId, event);
+    addMarkerEvent(map, userId, event);
   }, [canAddEvent, map, userId]);
 
   useEffect(() => {
@@ -109,7 +112,7 @@ const Map3DComponent = ({ params }) => {
       console.log(canAddEvent)
       if (canAddEvent) {
         map.on('click', handleMapClick);
-      }  else {
+      } else {
         map.off('click', handleMapClick);
       }
     }
@@ -393,6 +396,18 @@ const Map3DComponent = ({ params }) => {
           <Menu />
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
+          <fieldset>
+            <Drawer direction="right">
+              <DrawerTrigger>
+                <button type="submit">
+                  <Label htmlFor="show-building">Show Jerusalem City</Label>
+                </button>
+              </DrawerTrigger>
+              <DrawerContent >
+                <Spline scene="https://prod.spline.design/3k6H1cbqT90axTHH/scene.splinecode" />
+              </DrawerContent>
+            </Drawer>
+          </fieldset>
           <fieldset>
             <Label htmlFor="show-building">Building</Label>
             <Switch
