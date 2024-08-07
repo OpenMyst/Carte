@@ -40,68 +40,62 @@ export const userPlayEvent = async (userId) => {
  * @param {object} map - The Mapbox GL JS map instance.
  * @param {string} userId - The ID of the user for whom to save the event.
  */
-export const addMarkerEvent = (map, userId) => {
-  // Array to store markers (currently not used)
-  const markers = [];
+export const addMarkerEvent = (map, userId, event) => {
+  const coordinates = event.lngLat;
+  console.log(coordinates);
 
-  // Add click event listener to the map
-  map.on('click', async (e) => {
-    const coordinates = e.lngLat;
-    console.log(coordinates);
+  const popupContent = document.createElement('div');
+  popupContent.className = 'h-[200px] w-[100px] static';
 
-    const popupContent = document.createElement('div');
-    popupContent.className = 'h-[200px] w-[100px] static';
+  const popupTitle = document.createElement('h4');
+  popupTitle.className = "text-lg text-center";
+  popupTitle.innerText = "Want to check in to the event?"
 
-    const popupTitle = document.createElement('h4');
-    popupTitle.className = "text-lg text-center";
-    popupTitle.innerText = "Vous voulez enregistrer dans l'evenement?"
+  const saveButton = document.createElement('button');
+  saveButton.className = "w-full";
+  saveButton.style.backgroundColor = "blue";
+  saveButton.style.color = "white";
+  saveButton.style.margin = "1px";
+  saveButton.style.padding = "5px";
+  saveButton.innerText = 'Save';
+  saveButton.onclick = async () => {
+    await saveCoordonneEvent(userId, coordinates);
+  };
 
-    const saveButton = document.createElement('button');
-    saveButton.className = "w-full";
-    saveButton.style.backgroundColor = "blue";
-    saveButton.style.color = "white";
-    saveButton.style.margin = "1px";
-    saveButton.style.padding = "5px";
-    saveButton.innerText = 'Save';
-    saveButton.onclick = async () => {
-      await saveCoordonneEvent(userId, coordinates);
-    };
+  const deleteButton = document.createElement('button');
+  deleteButton.className = "w-full";
+  deleteButton.style.backgroundColor = "red";
+  deleteButton.style.color = "white";
+  deleteButton.style.margin = "1px";
+  deleteButton.style.padding = "5px";
+  deleteButton.innerText = 'Delete';
+  deleteButton.onclick = () => {
+    marker.remove();
+  };
 
-    const deleteButton = document.createElement('button');
-    deleteButton.className = "w-full";
-    deleteButton.style.backgroundColor = "red";
-    deleteButton.style.color = "white";
-    deleteButton.style.margin = "1px";
-    deleteButton.style.padding = "5px";
-    deleteButton.innerText = 'Delete';
-    deleteButton.onclick = () => {
-      marker.remove();
-    };
+  popupContent.appendChild(popupTitle);
+  popupContent.appendChild(saveButton);
+  popupContent.appendChild(deleteButton);
 
-    popupContent.appendChild(popupTitle);
-    popupContent.appendChild(saveButton);
-    popupContent.appendChild(deleteButton);
+  const popup = new mapboxgl.Popup().setDOMContent(popupContent);
 
-    const popup = new mapboxgl.Popup().setDOMContent(popupContent);
+  // Create a new marker and add it to the map
+  const marker = new mapboxgl.Marker({ color: 'red' })
+    .setLngLat(coordinates)
+    .setPopup(popup)
+    .addTo(map)
+    .togglePopup();
 
-    // Create a new marker and add it to the map
-    const marker = new mapboxgl.Marker({ color: 'red' })
-      .setLngLat(coordinates)
-      .setPopup(popup)
-      .addTo(map)
-      .togglePopup();
-
-    // Optional: Uncomment to add the marker to the array and enable removal on click
-    // markers.push(marker);
-    // marker.getElement().addEventListener('click', (event) => {
-    //   event.stopPropagation();
-    //   marker.remove();
-    //   const index = markers.indexOf(marker);
-    //   if (index > -1) {
-    //     markers.splice(index, 1);
-    //   }
-    // });
-  });
+  // Optional: Uncomment to add the marker to the array and enable removal on click
+  // markers.push(marker);
+  // marker.getElement().addEventListener('click', (event) => {
+  //   event.stopPropagation();
+  //   marker.remove();
+  //   const index = markers.indexOf(marker);
+  //   if (index > -1) {
+  //     markers.splice(index, 1);
+  //   }
+  // });
 }
 
 /**

@@ -1,6 +1,6 @@
 "use client"
 import { MAPBOX_TOKEN, sprintStyleNight, sprintStyle, winterDark, summerLight } from "@/tool/security";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore";
 import { database } from "@/tool/firebase";
@@ -29,6 +29,7 @@ const Map3DComponent = ({ params }) => {
   const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
+  const [canAddEvent, setCanAddEvent] = useState(false); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
   const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
@@ -98,6 +99,21 @@ const Map3DComponent = ({ params }) => {
       }
     }
   }, [map, startTravel, endTravel]);
+
+  const handleMapClick = useCallback((event) => {
+      addMarkerEvent(map, userId, event);
+  }, [canAddEvent, map, userId]);
+
+  useEffect(() => {
+    if (map) {
+      console.log(canAddEvent)
+      if (canAddEvent) {
+        map.on('click', handleMapClick);
+      }  else {
+        map.off('click', handleMapClick);
+      }
+    }
+  }, [canAddEvent, map, handleMapClick]);
 
   // Initialize the start and End travel using the locationPlayId
   const getTravelRoute = () => {
@@ -223,8 +239,6 @@ const Map3DComponent = ({ params }) => {
       }
     ));
 
-    addMarkerEvent(map, userId);
-
     map.on('style.load', () => {
       map.addSource('mapbox-dem', {
         type: 'raster-dem',
@@ -271,7 +285,7 @@ const Map3DComponent = ({ params }) => {
           const options1 = {
             obj: '/assets/jerusalem2.gltf',
             type: 'gltf',
-            scale: { x: scale * 5, y: scale * 5 * heightMultiple, z: 10 },
+            scale: { x: scale * 5, y: scale * 4 * heightMultiple, z: 10 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 5 }
           };
@@ -329,9 +343,30 @@ const Map3DComponent = ({ params }) => {
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
+      const popup = new mapboxgl.Popup().setHTML(`
+        <div class="flex flex-row h-[300px] w-[220px] static">
+          <div class="w-full h-[60px] relative">
+            <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
+          </div>
+          <div class="mt-[150px] fixed">
+            <h3 class="text-base font-bold text-center">${location.label}</h3>
+            <p class="h-[110px] overflow-y-scroll">${location.description}</p>
+          </div>
+        </div>
+        `);
+
       const marker = new mapboxgl.Marker()
         .setLngLat([location.longitude, location.latitude])
+        .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
+
+      marker.getElement().addEventListener('click', () => {
+        mapEvent.flyTo({
+          center: [location.longitude, location.latitude],
+          zoom: 20
+        });
+      })
+
     });
   };
 
@@ -366,6 +401,16 @@ const Map3DComponent = ({ params }) => {
               onCheckedChange={() => {
                 setShowBuilding(!showBuilding);
                 handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
+              }} />
+          </fieldset>
+          <fieldset>
+            <Label htmlFor="show-building">Add Event</Label>
+            <Switch
+              id="show-building"
+              checked={canAddEvent}
+              onCheckedChange={() => {
+                setCanAddEvent(!canAddEvent);
+                // handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
               }} />
           </fieldset>
           <fieldset>
