@@ -178,14 +178,17 @@ const Map3DComponent = ({ params }) => {
       }
 
       const popup = new mapboxgl.Popup().setHTML(`
-        <div class="flex flex-row h-[300px] w-[220px] static">
-          <div class="w-full h-[60px] relative">
-            <img src="${currentEvents.image}" alt="${currentEvents.label}" class="w-full h-[150px]"/>
+        <div>
+          <div class="flex flex-row h-[300px] w-[220px] static">
+            <div class="w-full h-[60px] relative">
+              <img src="${currentEvents.image}" alt="${currentEvents.label}" class="w-full h-[150px]"/>
+            </div>
+            <div class="mt-[150px] fixed">
+              <h3 class="text-base font-bold text-center">${currentEvents.label}</h3>
+              <p class="h-[110px] overflow-y-scroll">${currentEvents.description}</p>
+            </div>
           </div>
-          <div class="mt-[150px] fixed">
-            <h3 class="text-base font-bold text-center">${currentEvents.label}</h3>
-            <p class="h-[110px] overflow-y-scroll">${currentEvents.description}</p>
-          </div>
+          <button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button>
         </div>
       `);
 
@@ -194,6 +197,16 @@ const Map3DComponent = ({ params }) => {
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent)
         .togglePopup();
+
+        popup.on('open', () => {
+          // Ajoutez l'écouteur d'événement lorsque le popup est ouvert
+          const button = document.getElementById('showJerusalemButton');
+          if (button) {
+            button.addEventListener('click', () => {
+              setOpenDialogCity(true);
+            });
+          }
+        });
       mapEvent.flyTo({
         center: [currentEvents.longitude, currentEvents.latitude],
         zoom: 15
@@ -346,15 +359,28 @@ const Map3DComponent = ({ params }) => {
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
+      const saveButton = document.createElement('button');
+      saveButton.className = "w-full";
+      saveButton.style.backgroundColor = "blue";
+      saveButton.style.color = "white";
+      saveButton.style.margin = "1px";
+      saveButton.style.padding = "5px";
+      saveButton.innerText = 'Show Jerusalem';
+      saveButton.onclick = () => {
+        setOpenDialogCity(true);
+      };
       const popup = new mapboxgl.Popup().setHTML(`
-        <div class="flex flex-row h-[300px] w-[220px] static">
-          <div class="w-full h-[60px] relative">
-            <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
+        <div>
+          <div class="flex flex-row h-[300px] w-[220px] static">
+            <div class="w-full h-[60px] relative">
+              <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
+            </div>
+            <div class="mt-[150px] fixed">
+              <h3 class="text-base font-bold text-center">${location.label}</h3>
+              <p class="h-[110px] overflow-y-scroll">${location.description}</p>
+            </div>
           </div>
-          <div class="mt-[150px] fixed">
-            <h3 class="text-base font-bold text-center">${location.label}</h3>
-            <p class="h-[110px] overflow-y-scroll">${location.description}</p>
-          </div>
+          <button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button>
         </div>
         `);
 
@@ -363,7 +389,18 @@ const Map3DComponent = ({ params }) => {
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
 
+        popup.on('open', () => {
+          // Ajoutez l'écouteur d'événement lorsque le popup est ouvert
+          const button = document.getElementById('showJerusalemButton');
+          if (button) {
+            button.addEventListener('click', () => {
+              setOpenDialogCity(true);
+            });
+          }
+        });
+
       marker.getElement().addEventListener('click', () => {
+        // setOpenDialogCity(true);
         mapEvent.flyTo({
           center: [location.longitude, location.latitude],
           zoom: 20
