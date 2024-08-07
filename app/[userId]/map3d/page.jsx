@@ -396,18 +396,23 @@ const Map3DComponent = ({ params }) => {
           <Menu />
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
-          <fieldset>
-            <Drawer direction="right">
-              <DrawerTrigger>
-                <button type="submit">
-                  <Label htmlFor="show-building">Show Jerusalem City</Label>
-                </button>
-              </DrawerTrigger>
-              <DrawerContent >
-                <Spline scene="https://prod.spline.design/3k6H1cbqT90axTHH/scene.splinecode" />
-              </DrawerContent>
-            </Drawer>
-          </fieldset>
+          <Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>
+            <DrawerTrigger>
+              <fieldset>
+                <Label htmlFor="show-building">Show Jerusalem City</Label>
+                <Switch
+                  className="ml-[4.7vw]"
+                  id="show-building"
+                  checked={openDialogCity}
+                  onCheckedChange={() => {
+                    setOpenDialogCity(!openDialogCity);
+                  }} />
+              </fieldset>
+            </DrawerTrigger>
+            <DrawerContent >
+              <Spline scene="https://prod.spline.design/3k6H1cbqT90axTHH/scene.splinecode" />
+            </DrawerContent>
+          </Drawer>
           <fieldset>
             <Label htmlFor="show-building">Building</Label>
             <Switch
