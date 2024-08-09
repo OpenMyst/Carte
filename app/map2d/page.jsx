@@ -42,6 +42,7 @@ export default function Map2DByUserId({ params }) {
       center: [lng, lat],
       zoom: zoom,
       pitch: 0,
+      pitchWithRotate: false,
       bearing: -20,
     });
 
