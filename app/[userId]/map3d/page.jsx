@@ -438,7 +438,7 @@ const Map3DComponent = ({ params }) => {
               <fieldset>
                 <Label htmlFor="show-building">Show Jerusalem City</Label>
                 <Switch
-                  className="ml-[4.7vw]"
+                  className="ml-[75px]"
                   id="show-building"
                   checked={openDialogCity}
                   onCheckedChange={() => {
