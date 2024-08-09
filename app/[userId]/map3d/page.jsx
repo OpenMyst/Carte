@@ -185,7 +185,7 @@ const Map3DComponent = ({ params }) => {
             </div>
             <div class="mt-[150px] fixed">
               <h3 class="text-base font-bold text-center">${currentEvents.label}</h3>
-              <p class="h-[110px] overflow-y-scroll">${currentEvents.description}</p>
+              <p class="h-[100px] overflow-y-scroll">${currentEvents.description}</p>
             </div>
           </div>
           <button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button>
@@ -377,7 +377,7 @@ const Map3DComponent = ({ params }) => {
             </div>
             <div class="mt-[150px] fixed">
               <h3 class="text-base font-bold text-center">${location.label}</h3>
-              <p class="h-[110px] overflow-y-scroll">${location.description}</p>
+              <p class="h-[100px] overflow-y-scroll">${location.description}</p>
             </div>
           </div>
           <button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button>
