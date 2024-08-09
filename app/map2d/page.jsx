@@ -41,7 +41,7 @@ export default function Map2DByUserId({ params }) {
       style: mapStyle,
       center: [lng, lat],
       zoom: zoom,
-      pitch: 62,
+      pitch: 0,
       bearing: -20,
     });
 
