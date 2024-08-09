@@ -62,6 +62,7 @@ export default function Map2DByUserId({ params }) {
   useEffect(() => {
     if (map.current) {
       updateMapSettings();
+      addRouteLayer(map.current, startTravel, endTravel);
     }
   }, [mountainHeight, showBuilding, showRoad]);
 
@@ -82,7 +83,6 @@ export default function Map2DByUserId({ params }) {
       setMapStyle(styles[season]);
       map.current.setStyle(mapStyle);
       loadEvangileMarker(map.current);
-      addRouteLayer(map.current, startTravel, endTravel);
     }
   }, [season, mapStyle, evangileEvents]);
 
