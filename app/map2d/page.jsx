@@ -240,7 +240,7 @@ export default function Map2DByUserId({ params }) {
             />
           </fieldset>
           <fieldset>
-            <label>Variation du Temps: {mountainHeight >= 100 ? -2000 : 2000}</label>
+            <label>Time Variation: {mountainHeight >= 100 ? -2000 : 2000}</label>
             <input
               type="range"
               min="0"
