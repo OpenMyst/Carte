@@ -1,261 +1,64 @@
-"use client";
-import { MAPBOX_TOKEN, automnStyle, sprintStyle, winterDark, sprintStyleNight, summerLight } from "@/tool/security";
-import React, { useState, useEffect, useRef } from "react";
-import mapboxgl from 'mapbox-gl';
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { database } from "@/tool/firebase";
-import { addSnowLayer, addRainLayer, } from "@/lib/climat";
-import { addRouteLayer } from "@/lib/layers";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Menu } from "lucide-react";
+"use client"
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import React from 'react'
 
-mapboxgl.accessToken = MAPBOX_TOKEN;
+const services = [
+  {
+    id: 1,
+    title: "Collaboratif",
+    description: "Contribuez à cette magnifique cathédrale de données. Construisons ensemble la base de connaissances la plus complète sur la vie de Jésus."
+  },
+  {
+    id: 2,
+    title: "Immersion 3D",
+    description: "Plongez dans la Bible et suivez Jésus, jour après jour, village par village. Grâce à notre cartographie 3D, visualisez où chaque événement a eu lieu."
+  },
+  {
+    id: 3,
+    title: "Non lucratif",
+    description: "L'utilisation de la plateforme, avec ou sans compte, est gratuite. La générosité de notre communauté permet à OpenMyst de rester accessible à tous."
+  },
+  {
+    id: 4,
+    title: "International",
+    description: "Notre objectif est de rendre OpenMyst disponible dans autant de langues que possible afin que vous puissiez lire Jésus dans votre propre langue."
+  },
+]
 
-export default function Home() {
-  const mapContainer = useRef(null); // Reference to the map container
-  const map = useRef(null); // Reference to the map object
-  const [lng, setLng] = useState(35.21633); // Longitude state
-  const [lat, setLat] = useState(31.76904); // Latitude state
-  const [zoom, setZoom] = useState(9); // Zoom level state
-  const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
-  const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
-  const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
-  const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-  const [season, setSeason] = useState('spring'); // Season state
-  const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
-  const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
-  const [open, setOpen] = useState(true); // Toggle for overlay visibility
-  const [startTravel, setStartTravel] = useState([35.2297, 31.7738]); // Start coordinates for route
-  const [endTravel, setEndTravel] = useState([35.207639, 31.704306]); // End coordinates for route
-
-  useEffect(() => {
-    getAllEvent();
-  }, [])
-
-  useEffect(() => {
-    if (map.current) return;
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: mapStyle,
-      center: [lng, lat],
-      zoom: zoom,
-      pitch: 62,
-      bearing: -20,
-    });
-
-    map.current.on('move', () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
-    });
-
-    map.current.addControl(new mapboxgl.NavigationControl());
-
-    map.current.on('style.load', () => {
-      map.current.addSource('mapbox-dem', {
-        type: 'raster-dem',
-        url: 'mapbox://mapbox.terrain-rgb'
-      });
-
-      handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
-      handleCheckboxChange('road-primary', 'visibility', showRoad);
-      handleCheckboxChange('road-secondary-tertiary', 'visibility', showRoad);
-      handleCheckboxChange('road-street', 'visibility', showRoad);
-      handleCheckboxChange('road-minor', 'visibility', showRoad);
-      handleCheckboxChange('road-major-link', 'visibility', showRoad);
-      handleCheckboxChange('road-motorway-trunk', 'visibility', showRoad);
-      handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
-      handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
-      handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
-
-      map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-      addRouteLayer(map.current, startTravel, endTravel)
-      loadEvangileMarker(map.current);
-    });
-    console.log(map)
-
-  }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
-
-  useEffect(() => {
-    if (map.current) {
-      map.current.setPitch(showMap3D ? 62 : 0);
-    }
-  }, [showMap3D]);
-
-  useEffect(() => {
-    if (map.current) {
-      const styles = {
-        spring: sprintStyle,
-        summer: summerLight,
-        autumn: automnStyle,
-        winter: winterDark,
-      };
-      setMapStyle(styles[season]);
-      map.current.setStyle(mapStyle);
-
-      addRouteLayer(map.current, startTravel, endTravel)
-      loadEvangileMarker(map.current);
-    }
-  }, [season, mapStyle, evangileEvents]);
-
-  // Fetch all events from Firebase
-  const getAllEvent = () => {
-    const q = query(collection(database, 'events'))
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let eventsArray = []
-
-      querySnapshot.forEach(doc => {
-        eventsArray.push({ ...doc.data(), id: doc.id })
-      })
-      setEvangileEvents(eventsArray);
-    })
-  }
-
-  // Load markers for evangile events
-  const loadEvangileMarker = (mapEvent) => {
-    evangileEvents.forEach((location) => {
-      const popup = new mapboxgl.Popup().setHTML(`
-          <div class="flex flex-row h-[300px] w-[220px] static">
-            <div class="w-full h-[60px] relative">
-              <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
-            </div>
-            <div class="mt-[150px] fixed">
-              <h3 class="text-base font-bold text-center">${location.label}</h3>
-              <p class="h-[110px] overflow-y-scroll">${location.description}</p>
-            </div>
-          </div>
-        `);
-
-      const marker = new mapboxgl.Marker()
-        .setLngLat([location.longitude, location.latitude])
-        .setPopup(popup)  // Associe le popup au marqueur
-        .addTo(mapEvent);
-
-      marker.getElement().addEventListener('click', () => {
-        mapEvent.flyTo({
-          center: [location.longitude, location.latitude],
-          zoom: 20
-        });
-      })
-
-      const anneeEvent = parseInt(location.event_date)
-      if (anneeEvent < 0) {
-        setMountainHeight(50)
-        setShowBuilding(false)
-        updateTerrain(mapEvent, 50, false)
-      } else {
-        setMountainHeight(0)
-        setShowBuilding(false)
-        updateTerrain(mapEvent, 10, false)
-      }
-
-      const day = location.detail_jour;
-      if (day === "Nuit") {
-        mapEvent.setStyle(winterDark);
-      } else if (day === "Matin") {
-        mapEvent.setStyle(summerLight);
-      } else {
-        mapEvent.setStyle(winterDark);
-      }
-
-      const meteo = location.meteo;
-      console.log(meteo)
-      if (meteo === "Pluvieux") {
-        addRainLayer(mapEvent)
-      } else if (meteo === "Neigeux") {
-        addSnowLayer(mapEvent)
-      }
-    });
-  };
-
-  //update the terrain in the map when the height of mountain has changed
-  const updateTerrain = (map, height, show) => {
-    map.on('style.load', () => {
-      map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
-      handleCheckboxChange('building-extrusion', 'visibility', show);
-    });
-  };
-
-  // Handle checkbox change for building visibility
-  const handleCheckboxChange = (layerId, property, value) => {
-    if (map.current) {
-      map.current.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
-    }
-  };
-
-  // Handle mountain height change
-  const handleMountainHeightChange = (event) => {
-    const height = event.target.value;
-    setMountainHeight(height);
-    if (map.current.getTerrain()) {
-      map.current.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
-    }
-  };
-
+const Home = () => {
   return (
-    <main className="m-2">
-      <div id="map" ref={mapContainer}></div>
-      <div className={`map-overlay top w-[20vw] `}>
-        <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <Menu />
-        </button>
-        <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
-          <fieldset>
-            <Label htmlFor="show-building">Building</Label>
-            <Switch
-              id="show-building"
-              checked={showBuilding}
-              onCheckedChange={() => {
-                setShowBuilding(!showBuilding);
-                handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
-              }} />
-          </fieldset>
-          <fieldset>
-            <Label htmlFor="showRoad">Paths</Label>
-            <Switch
-              id="showRoad"
-              checked={showRoad}
-              onCheckedChange={() => {
-                setShowRoad(!showRoad);
-                handleCheckboxChange('road-primary', 'visibility', !showRoad);
-                handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
-                handleCheckboxChange('road-street', 'visibility', !showRoad);
-                handleCheckboxChange('road-minor', 'visibility', !showRoad);
-                handleCheckboxChange('road-major-link', 'visibility', !showRoad);
-                handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
-                handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
-                handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
-                handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-              }}
-            />
-          </fieldset>
-          <fieldset>
-            <Label htmlFor="show-building">3D</Label>
-            <Switch
-              id="show-building"
-              checked={showMap3D}
-              onCheckedChange={() => {
-                setShowMap3D(!showMap3D);
-              }} />
-          </fieldset>
-          <fieldset>
-            <label>Variation du Temps: {mountainHeight >= 100 ? -2000 : 2000}</label>
-            <input
-              type="range"
-              min="0"
-              max="300"
-              value={mountainHeight}
-              onChange={handleMountainHeightChange}
-            />
-          </fieldset>
-          <fieldset>
-            <Label>My position</Label>
-            <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
-            <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
-          </fieldset>
-        </div>
+    <div className='m-10 text-center flex flex-col items-center'>
+      <div>
+        <Card className="border-none mb-0">
+          <CardHeader>
+            <CardTitle className="text-center font-bold">OpenMyst</CardTitle>
+            <CardDescription className="font-medium text-lg mb-0">Connaître sa vie changera la vôtre</CardDescription>
+          </CardHeader>
+          <CardContent className="text-start">
+          OpenMyst est une platforme de visualisation 3D qui rassemble des données les plus fiables disponibles sur la vie de Jésus
+          </CardContent>
+        </Card>
       </div>
-    </main>
-  );
+      <div className='grid grid-cols-3 ml-5 mr-5 mb-0 md:w-[50vw] sm:w-full'>
+        <Button variant="outline">Se connecter</Button>
+        <Button variant="outline">Créer un compte</Button>
+        <Button variant="outline">Accès sans compte</Button>
+      </div>
+      <div className='grid md:grid-cols-2 sm:grid-cols-1 m-5 md:w-[50vw] sm:w-full'>
+        {services.map(item => (
+          <Card key={item.id} className="border-none">
+            <CardHeader>
+              <CardTitle className="text-start">{item.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="text-start">
+              {item.description}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
 }
+
+export default Home
