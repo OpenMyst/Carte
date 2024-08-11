@@ -111,7 +111,12 @@ export const saveCoordonneEvent = async (userId, coordinates) => {
       longitude: coordinates.lng,
       latitude: coordinates.lat,
       event_date: "1944",
-      etat: 0
+      etat: 0,
+      chapitre: 1,
+      description : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam consectetur tincidunt aliquam. Proin ut consequat tortor, sed pellentesque ex. Fusce elementum ultrices lectus, sed aliquam dolor sodales eget. Mauris dictum porttitor libero at lacinia. Maecenas at arcu eu nunc posuere sollicitudin. Donec vel varius nisl. Vestibulum rutrum nulla diam, non bibendum ante auctor ut. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed augue vitae erat facilisis vulputate. Nam aliquam nibh vitae dui vulputate efficitur. Nulla bibendum at magna vitae ultrices.",
+      evangile : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam consectetur tincidunt aliquam. Proin ut consequat tortor, sed pellentesque ex. Fusce elementum ultrices lectus, sed aliquam dolor sodales eget. Mauris dictum porttitor libero at lacinia. Maecenas at arcu eu nunc posuere sollicitudin. Donec vel varius nisl. Vestibulum rutrum nulla diam, non bibendum ante auctor ut. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed augue vitae erat facilisis vulputate. Nam aliquam nibh vitae dui vulputate efficitur. Nulla bibendum at magna vitae ultrices.",
+      poeme : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam consectetur tincidunt aliquam. Proin ut consequat tortor, sed pellentesque ex. Fusce elementum ultrices lectus, sed aliquam dolor sodales eget. Mauris dictum porttitor libero at lacinia. Maecenas at arcu eu nunc posuere sollicitudin. Donec vel varius nisl. Vestibulum rutrum nulla diam, non bibendum ante auctor ut. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed augue vitae erat facilisis vulputate. Nam aliquam nibh vitae dui vulputate efficitur. Nulla bibendum at magna vitae ultrices.",
+      label :"Lorem ipsum"
     });
 
     const eventId = eventDocRef.id;
