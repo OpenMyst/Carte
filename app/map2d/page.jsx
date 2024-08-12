@@ -217,7 +217,7 @@ export default function Map2DByUserId({ params }) {
             <DialogContent>
               <h4 className="text-center text-lg">To access this feature, please register</h4>
               <Button>
-                <Link href="https://prytane.com/registration">Sign In</Link>
+                <Link href="https://prytane.com/registration">Register</Link>
               </Button>
               <Button className="bg-red-500 hover:bg-red-400" onClick={() => setOpenDialogCity(false)}>
                 Cancel
