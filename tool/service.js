@@ -60,6 +60,8 @@ export const addMarkerEvent = (map, userId, event) => {
   saveButton.innerText = 'Save';
   saveButton.onclick = async () => {
     await saveCoordonneEvent(userId, coordinates);
+    // Fermer le popup
+    marker.remove();
   };
 
   const deleteButton = document.createElement('button');

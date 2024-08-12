@@ -435,7 +435,7 @@ const Map3DComponent = ({ params }) => {
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>
             <DrawerTrigger>
-              <fieldset>
+              {/*<fieldset>
                 <Label htmlFor="show-building">Show Jerusalem City</Label>
                 <Switch
                   className="ml-[75px]"
@@ -444,7 +444,7 @@ const Map3DComponent = ({ params }) => {
                   onCheckedChange={() => {
                     setOpenDialogCity(!openDialogCity);
                   }} />
-              </fieldset>
+              </fieldset> */}
             </DrawerTrigger>
             <DrawerContent >
               <Spline scene="https://prod.spline.design/3k6H1cbqT90axTHH/scene.splinecode" />
