@@ -236,7 +236,7 @@ const Map3DComponent = ({ params }) => {
       center: [lng, lat],
       zoom: zoom,
       pitch: 62,
-      bearing: -20,
+      bearing: 0,
     });
 
     map.on('move', () => {

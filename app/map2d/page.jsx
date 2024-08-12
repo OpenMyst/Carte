@@ -47,7 +47,7 @@ export default function Map2DByUserId({ params }) {
       zoom: zoom,
       pitch: 0,
       pitchWithRotate: false,
-      bearing: -20,
+      bearing: 0,
     });
 
     map.current.on('move', () => {
