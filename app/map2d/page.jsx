@@ -10,6 +10,9 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { userPlayEvent } from "@/tool/service";
 import { Menu } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -29,6 +32,7 @@ export default function Map2DByUserId({ params }) {
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
+  const [openDialogCity, setOpenDialogCity] = useState(false);
 
   useEffect(() => {
     getAllEvent();
@@ -209,6 +213,17 @@ export default function Map2DByUserId({ params }) {
           <Menu />
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
+          <Dialog open={openDialogCity} onOpenChange={setOpenDialogCity}>
+            <DialogContent>
+              <h4 className="text-center text-lg">To access this feature, please register</h4>
+              <Button>
+                <Link href="https://prytane.com/registration">Sign In</Link>
+              </Button>
+              <Button className="bg-red-500 hover:bg-red-400" onClick={() => setOpenDialogCity(false)}>
+                Cancel
+              </Button>
+            </DialogContent>
+          </Dialog>
           <fieldset>
             <Label htmlFor="show-building">Building</Label>
             <Switch
@@ -217,6 +232,16 @@ export default function Map2DByUserId({ params }) {
               onCheckedChange={() => {
                 setShowBuilding(!showBuilding);
                 handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
+              }} />
+          </fieldset>
+          <fieldset>
+            <Label htmlFor="show-building">Add Event</Label>
+            <Switch
+              id="show-building"
+              checked={openDialogCity}
+              onCheckedChange={() => {
+                setOpenDialogCity(!openDialogCity);
+                // handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
               }} />
           </fieldset>
           <fieldset>
@@ -235,19 +260,17 @@ export default function Map2DByUserId({ params }) {
                 handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
                 handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
                 handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-                handleCheckboxChange('bridge-majore-link-2', 'visibility', !showRoad);
               }}
             />
           </fieldset>
           <fieldset>
-            <label>Time Variation: {mountainHeight >= 100 ? -2000 : 2000}</label>
-            <input
-              type="range"
-              min="0"
-              max="300"
-              value={mountainHeight}
-              onChange={handleMountainHeightChange}
-            />
+            <Label htmlFor="show-building">3D</Label>
+            <Switch
+              id="show-building"
+              checked={openDialogCity}
+              onCheckedChange={() => {
+                setOpenDialogCity(!openDialogCity);
+              }} />
           </fieldset>
           <fieldset>
             <Label>My position</Label>
