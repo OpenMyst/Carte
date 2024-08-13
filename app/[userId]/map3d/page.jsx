@@ -111,9 +111,9 @@ const Map3DComponent = ({ params }) => {
     if (map) {
       console.log(canAddEvent)
       if (canAddEvent) {
-        map.on('click', handleMapClick);
+        map.on('contextmenu', handleMapClick);
       } else {
-        map.off('click', handleMapClick);
+        map.off('contextmenu', handleMapClick);
       }
     }
   }, [canAddEvent, map, handleMapClick]);
@@ -198,15 +198,15 @@ const Map3DComponent = ({ params }) => {
         .addTo(mapEvent)
         .togglePopup();
 
-        popup.on('open', () => {
-          // Ajoutez l'écouteur d'événement lorsque le popup est ouvert
-          const button = document.getElementById('showJerusalemButton');
-          if (button) {
-            button.addEventListener('click', () => {
-              setOpenDialogCity(true);
-            });
-          }
-        });
+      popup.on('open', () => {
+        // Ajoutez l'écouteur d'événement lorsque le popup est ouvert
+        const button = document.getElementById('showJerusalemButton');
+        if (button) {
+          button.addEventListener('click', () => {
+            setOpenDialogCity(true);
+          });
+        }
+      });
       mapEvent.flyTo({
         center: [currentEvents.longitude, currentEvents.latitude],
         zoom: 15
@@ -389,15 +389,15 @@ const Map3DComponent = ({ params }) => {
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
 
-        popup.on('open', () => {
-          // Ajoutez l'écouteur d'événement lorsque le popup est ouvert
-          const button = document.getElementById('showJerusalemButton');
-          if (button) {
-            button.addEventListener('click', () => {
-              setOpenDialogCity(true);
-            });
-          }
-        });
+      popup.on('open', () => {
+        // Ajoutez l'écouteur d'événement lorsque le popup est ouvert
+        const button = document.getElementById('showJerusalemButton');
+        if (button) {
+          button.addEventListener('click', () => {
+            setOpenDialogCity(true);
+          });
+        }
+      });
 
       marker.getElement().addEventListener('click', () => {
         // setOpenDialogCity(true);
@@ -429,8 +429,8 @@ const Map3DComponent = ({ params }) => {
     <div>
       <div id="map" ref={mapContainer} />
       <div className="map-overlay top w-[20vw]">
-        <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded block" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <Menu />
+        <button className="bg-[#1d4ed8]/50  p-2 m-1 text-white rounded" onClick={e => { e.preventDefault(); setOpen(!open) }}>
+          <Menu className="text-black" />
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>

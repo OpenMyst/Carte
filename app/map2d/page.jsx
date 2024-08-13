@@ -213,8 +213,8 @@ export default function Map2DByUserId({ params }) {
     <main className="m-2">
       <div id="map" ref={mapContainer}></div>
       <div className={`map-overlay top w-[20vw] `}>
-        <button className="bg-[#1d4ed8] p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <Menu />
+        <button className="bg-[#1d4ed8]/50  p-2 m-1 text-white rounded" onClick={e => { e.preventDefault(); setOpen(!open) }}>
+          <Menu className="text-black"/>
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <Dialog open={openDialogCity} onOpenChange={setOpenDialogCity}>
