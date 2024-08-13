@@ -205,6 +205,10 @@ export default function Map2DByUserId({ params }) {
     }
   };
 
+  const handleRegisterClick = () => {
+    window.location.href = "https://prytane.com/registration"; // Redirige vers le lien voulu
+  };
+
   return (
     <main className="m-2">
       <div id="map" ref={mapContainer}></div>
@@ -216,8 +220,8 @@ export default function Map2DByUserId({ params }) {
           <Dialog open={openDialogCity} onOpenChange={setOpenDialogCity}>
             <DialogContent>
               <h4 className="text-center text-lg">To access this feature, please register</h4>
-              <Button>
-                <Link href="https://prytane.com/registration">Register</Link>
+              <Button onClick={handleRegisterClick}>
+                Register
               </Button>
               <Button className="bg-red-500 hover:bg-red-400" onClick={() => setOpenDialogCity(false)}>
                 Cancel
