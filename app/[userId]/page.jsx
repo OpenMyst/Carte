@@ -1,6 +1,6 @@
 "use client";
 import { MAPBOX_TOKEN, automnStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
@@ -16,7 +16,7 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 export default function MapByUserId({ params }) {
     const userId = params.userId;
     const mapContainer = useRef(null); // Reference to the map container
-    const map = useRef(null); // Reference to the map object
+    const [map, setMap] = useState(null); // Reference to the map object
     const [lng, setLng] = useState(35.21633); // Longitude state
     const [lat, setLat] = useState(31.76904); // Latitude state
     const [zoom, setZoom] = useState(9); // Zoom level state
@@ -31,18 +31,19 @@ export default function MapByUserId({ params }) {
     const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
     const [endTravel, setEndTravel] = useState([]); // End coordinates for route
     const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
+    const [canAddEvent, setCanAddEvent] = useState(false); // Toggle for overlay visibility
 
     useEffect(() => {
         getAllEvent();
     }, []);
 
     useEffect(() => {
-        if (map.current) return;
+        if (map) return;
         initializeMap();
     }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
 
     useEffect(() => {
-        if (map.current) {
+        if (map) {
             const styles = {
                 spring: sprintStyle,
                 summer: summerLight,
@@ -50,24 +51,24 @@ export default function MapByUserId({ params }) {
                 winter: winterDark,
             };
             setMapStyle(styles[season]);
-            map.current.setStyle(mapStyle);
-            getUserPlayEvent(map.current);
-            loadEvangileMarker(map.current);
-            addRouteLayer(map.current, startTravel, endTravel);
+            map.setStyle(mapStyle);
+            getUserPlayEvent(map);
+            loadEvangileMarker(map);
+            addRouteLayer(map, startTravel, endTravel);
         }
     }, [season, mapStyle, evangileEvents, locationPlayId]);
 
     useEffect(() => {
-        if (map.current) {
-          loadEvangileMarker(map.current);
-          getUserPlayEvent(map.current);
+        if (map) {
+            loadEvangileMarker(map);
+            getUserPlayEvent(map);
         }
-      }, [evangileEvents, map]);
+    }, [evangileEvents, map]);
 
     useEffect(() => {
-        if (map.current) {
+        if (map) {
             updateMapSettings();
-            addRouteLayer(map.current, startTravel, endTravel);
+            addRouteLayer(map, startTravel, endTravel);
         }
     }, [mountainHeight, showBuilding, showRoad]);
 
@@ -87,14 +88,14 @@ export default function MapByUserId({ params }) {
     }, [userId]);
 
     useEffect(() => {
-        if (map.current) {
-            map.current.setPitch(showMap3D ? 62 : 0);
+        if (map) {
+            map.setPitch(showMap3D ? 62 : 0);
         }
     }, [showMap3D]);
 
     useEffect(() => {
-        if (map.current && locationPlayId) {
-            getUserPlayEvent(map.current);
+        if (map && locationPlayId) {
+            getUserPlayEvent(map);
         }
     }, [locationPlayId, evangileEvents, map, winterDark, summerLight]);
 
@@ -105,18 +106,33 @@ export default function MapByUserId({ params }) {
     }, [evangileEvents, locationPlayId]);
 
     useEffect(() => {
-        if (map.current && startTravel && endTravel) {
-            map.current.on('style.load', () => {
+        if (map && startTravel && endTravel) {
+            map.on('style.load', () => {
                 if (startTravel && endTravel) {
                     addRouteLayer(map, startTravel, endTravel);
                 }
             });
 
-            if (startTravel && endTravel && map.current.isStyleLoaded()) {
-                addRouteLayer(map.current, startTravel, endTravel);
+            if (startTravel && endTravel && map.isStyleLoaded()) {
+                addRouteLayer(map, startTravel, endTravel);
             }
         }
     }, [map, startTravel, endTravel]);
+
+    const handleMapClick = useCallback((event) => {
+        addMarkerEvent(map, userId, event);
+    }, [canAddEvent, map, userId]);
+
+    useEffect(() => {
+        if (map) {
+            console.log(canAddEvent)
+            if (canAddEvent) {
+                map.on('contextmenu', handleMapClick);
+            } else {
+                map.off('contextmenu', handleMapClick);
+            }
+        }
+    }, [canAddEvent, map, handleMapClick]);
 
     // Initialize the start and End travel using the locationPlayId
     const getTravelRoute = () => {
@@ -202,13 +218,13 @@ export default function MapByUserId({ params }) {
     }
 
     const updateMapSettings = () => {
-        if (map.current) {
-            map.current.on('style.load', () => {
-                map.current.addSource('mapbox-dem', {
+        if (map) {
+            map.on('style.load', () => {
+                map.addSource('mapbox-dem', {
                     type: 'raster-dem',
                     url: 'mapbox://mapbox.terrain-rgb'
                 });
-                handleCheckboxChange(map.current, 'building-extrusion', 'visibility', showBuilding);
+                handleCheckboxChange(map, 'building-extrusion', 'visibility', showBuilding);
                 handleCheckboxChange('road-primary', 'visibility', showRoad);
                 handleCheckboxChange('road-secondary-tertiary', 'visibility', showRoad);
                 handleCheckboxChange('road-street', 'visibility', showRoad);
@@ -218,14 +234,14 @@ export default function MapByUserId({ params }) {
                 handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
                 handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
                 handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
-                map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+                map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             });
         }
     };
 
     // Initialize the map into 3D
     const initializeMap = () => {
-        map.current = new mapboxgl.Map({
+        const map = new mapboxgl.Map({
             container: mapContainer.current,
             style: mapStyle,
             center: [lng, lat],
@@ -234,19 +250,18 @@ export default function MapByUserId({ params }) {
             bearing: -20,
         });
 
-        map.current.on('move', () => {
-            setLng(map.current.getCenter().lng.toFixed(4));
-            setLat(map.current.getCenter().lat.toFixed(4));
-            setZoom(map.current.getZoom().toFixed(2));
+        map.on('move', () => {
+            setLng(map.getCenter().lng.toFixed(4));
+            setLat(map.getCenter().lat.toFixed(4));
+            setZoom(map.getZoom().toFixed(2));
         });
 
-        map.current.addControl(new mapboxgl.NavigationControl());
+        map.addControl(new mapboxgl.NavigationControl());
 
-        addMarkerEvent(map.current, userId);
-        addRouteLayer(map.current, startTravel, endTravel);
+        addRouteLayer(map, startTravel, endTravel);
 
-        map.current.on('style.load', () => {
-            map.current.addSource('mapbox-dem', {
+        map.on('style.load', () => {
+            map.addSource('mapbox-dem', {
                 type: 'raster-dem',
                 url: 'mapbox://mapbox.terrain-rgb'
             });
@@ -262,9 +277,11 @@ export default function MapByUserId({ params }) {
             handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
             handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
 
-            map.current.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-            loadEvangileMarker(map.current);
+            map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+            loadEvangileMarker(map);
         });
+
+        setMap(map);
     }
 
     // Load markers for evangile events
@@ -306,8 +323,8 @@ export default function MapByUserId({ params }) {
 
     // Handle checkbox change for building visibility
     const handleCheckboxChange = (layerId, property, value) => {
-        if (map.current) {
-            map.current.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
+        if (map) {
+            map.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
         }
     };
 
@@ -315,8 +332,8 @@ export default function MapByUserId({ params }) {
     const handleMountainHeightChange = (event) => {
         const height = event.target.value;
         setMountainHeight(height);
-        if (map.current.getTerrain()) {
-            map.current.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
+        if (map.getTerrain()) {
+            map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
         }
     };
 
@@ -336,6 +353,16 @@ export default function MapByUserId({ params }) {
                             onCheckedChange={() => {
                                 setShowBuilding(!showBuilding);
                                 handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
+                            }} />
+                    </fieldset>
+                    <fieldset>
+                        <Label htmlFor="show-building">Add Event</Label>
+                        <Switch
+                            id="show-building"
+                            checked={canAddEvent}
+                            onCheckedChange={() => {
+                                setCanAddEvent(!canAddEvent);
+                                // handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
                             }} />
                     </fieldset>
                     <fieldset>
