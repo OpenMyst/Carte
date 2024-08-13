@@ -428,7 +428,7 @@ const Map3DComponent = ({ params }) => {
   return (
     <div>
       <div id="map" ref={mapContainer} />
-      <div className="map-overlay top w-[20vw]">
+      <div className="map-overlay top w-[20vw] mt-10">
         <button className="bg-[#2E2F31]/20  p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
           <Menu className="text-black" />
         </button>
