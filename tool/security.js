@@ -7,6 +7,5 @@ export const winterDark = "mapbox://styles/ads-eo/clygvjmcy00v601pgbeuy1vab";
 export const summerLight = "mapbox://styles/ads-eo/clxuf88xd00sl01qq0v2fambq";
 export const automnStyle = "mapbox://styles/ads-eo/clxa4lsrz020e01qs8g2796co";
 
-
 export const dayStyle = "mapbox://styles/ads-eo/clxuf88xd00sl01qq0v2fambq";
 export const nightStyle = "mapbox://styles/ads-eo/clxacwshz021f01qsdrn2cza3";

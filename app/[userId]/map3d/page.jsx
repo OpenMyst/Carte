@@ -1,5 +1,5 @@
 "use client"
-import { MAPBOX_TOKEN, sprintStyleNight, sprintStyle, winterDark, summerLight } from "@/tool/security";
+import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore";
@@ -24,7 +24,7 @@ const Map3DComponent = ({ params }) => {
   const [lng, setLng] = useState(35.21633); // Longitude state
   const [lat, setLat] = useState(31.76904); // Latitude state
   const [zoom, setZoom] = useState(9); // Zoom level state
-  const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
+  const [mapStyle, setMapStyle] = useState(nightStyle); // Map style state
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
@@ -161,19 +161,21 @@ const Map3DComponent = ({ params }) => {
         updateTerrain(mapEvent, 50, false);
       }
 
-      const day = currentEvents.detail_jour;
+      const day = location.detail_jour;
       if (day === "Nuit") {
-        mapEvent.setStyle(winterDark);
+        mapEvent.setStyle(sprintStyleNight);
       } else if (day === "Matin") {
         mapEvent.setStyle(summerLight);
       } else {
         mapEvent.setStyle(winterDark);
       }
 
-      const meteo = currentEvents.meteo;
+      const meteo = location.meteo;
       if (meteo === "Pluvieux") {
+        mapEvent.setStyle(sprintStyle);
         addRainLayer(mapEvent);
       } else if (meteo === "Neigeux") {
+        mapEvent.setStyle(winterDark);
         addSnowLayer(mapEvent);
       }
 
@@ -431,7 +433,7 @@ const Map3DComponent = ({ params }) => {
       <div className={`map-overlay top w-[20vw]`}>
         <div className="w-16 h-16 m-0 mb-1 bg-slate-400"></div>
         <button className="bg-[#2E2F31]/20  p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <PanelTopOpen className="text-black"/>
+          <PanelTopOpen className="text-black" />
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>

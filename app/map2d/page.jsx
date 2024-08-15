@@ -1,5 +1,5 @@
 "use client";
-import { MAPBOX_TOKEN, automnStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
+import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -22,7 +22,7 @@ export default function Map2DByUserId({ params }) {
   const [lng, setLng] = useState(35.21633); // Longitude state
   const [lat, setLat] = useState(31.76904); // Latitude state
   const [zoom, setZoom] = useState(9); // Zoom level state
-  const [mapStyle, setMapStyle] = useState(sprintStyle); // Map style state
+  const [mapStyle, setMapStyle] = useState(nightStyle); // Map style state
   const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(false); // Toggle for 3D map view
@@ -75,20 +75,6 @@ export default function Map2DByUserId({ params }) {
       map.current.setPitch(showMap3D ? 62 : 0);
     }
   }, [showMap3D]);
-
-  useEffect(() => {
-    if (map.current) {
-      const styles = {
-        spring: sprintStyle,
-        summer: summerLight,
-        autumn: automnStyle,
-        winter: winterDark,
-      };
-      setMapStyle(styles[season]);
-      map.current.setStyle(mapStyle);
-      loadEvangileMarker(map.current);
-    }
-  }, [season, mapStyle, evangileEvents]);
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
@@ -165,7 +151,7 @@ export default function Map2DByUserId({ params }) {
 
       const day = location.detail_jour;
       if (day === "Nuit") {
-        mapEvent.setStyle(winterDark);
+        mapEvent.setStyle(sprintStyleNight);
       } else if (day === "Matin") {
         mapEvent.setStyle(summerLight);
       } else {
@@ -174,8 +160,10 @@ export default function Map2DByUserId({ params }) {
 
       const meteo = location.meteo;
       if (meteo === "Pluvieux") {
+        mapEvent.setStyle(sprintStyle);
         addRainLayer(mapEvent);
       } else if (meteo === "Neigeux") {
+        mapEvent.setStyle(winterDark);
         addSnowLayer(mapEvent);
       }
     });
