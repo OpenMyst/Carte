@@ -194,7 +194,7 @@ const Map3DComponent = ({ params }) => {
         </div>
       `);
 
-      const marker = new mapboxgl.Marker()
+      const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([currentEvents.longitude, currentEvents.latitude])
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent)
@@ -386,7 +386,7 @@ const Map3DComponent = ({ params }) => {
         </div>
         `);
 
-      const marker = new mapboxgl.Marker()
+      const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([location.longitude, location.latitude])
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
