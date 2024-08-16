@@ -9,7 +9,7 @@ import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { addMarkerEvent, userPlayEvent } from "@/tool/service";
-import { Menu } from "lucide-react";
+import { PanelTopOpen } from "lucide-react";
 import Spline from "@splinetool/react-spline";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
@@ -430,9 +430,9 @@ const Map3DComponent = ({ params }) => {
   return (
     <div>
       <div id="map" ref={mapContainer} />
-      <div className={`map-overlay top w-[20vw] mt-16`}>
+      <div className={`map-overlay top w-[20vw]`}>
         <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:hidden md:block" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <Menu className="text-black" />
+          <PanelTopOpen className="text-black" />
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>

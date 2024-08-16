@@ -9,7 +9,7 @@ import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { addMarkerEvent, userPlayEvent } from "@/tool/service";
-import { Menu } from "lucide-react";
+import { PanelTopOpen } from "lucide-react";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -127,9 +127,9 @@ export default function MapByUserId({ params }) {
         if (map) {
             console.log(canAddEvent)
             if (canAddEvent) {
-                map.on('contextmenu', handleMapClick);
+                map.on('contextPanelTopOpen', handleMapClick);
             } else {
-                map.off('contextmenu', handleMapClick);
+                map.off('contextPanelTopOpen', handleMapClick);
             }
         }
     }, [canAddEvent, map, handleMapClick]);
@@ -342,9 +342,9 @@ export default function MapByUserId({ params }) {
     return (
         <main className="m-2">
             <div id="map" ref={mapContainer}></div>
-            <div className={`map-overlay top w-[20vw] mt-16`}>
+            <div className={`map-overlay top w-[20vw]`}>
                 <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:hidden md:block" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-                    <Menu className="text-black" />
+                    <PanelTopOpen className="text-black" />
                 </button>
                 <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
                     <fieldset>
