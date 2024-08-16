@@ -193,7 +193,7 @@ export default function Map2DByUserId({ params }) {
   };
 
   const handleRegisterClick = () => {
-    window.location.href = "https://prytane.com/registration"; // Redirige vers le lien voulu
+    window.open("https://prytane.com/registration", "_blank");
   };
 
   return (
