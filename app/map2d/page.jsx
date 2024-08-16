@@ -9,7 +9,7 @@ import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { userPlayEvent } from "@/tool/service";
-import { PanelTopOpen } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -200,9 +200,9 @@ export default function Map2DByUserId({ params }) {
   return (
     <main className="m-2">
       <div id="map" ref={mapContainer}></div>
-      <div className={`map-overlay top w-[20vw] mt-16`}>
-        <button className="bg-[#2E2F31]/20  p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <PanelTopOpen className="text-black"/>
+      <div className={`map-overlay top w-[20vw]`}>
+        <button className="bg-[#2E2F31]/20  p-2 m-1 text-white rounded" onClick={e => { e.preventDefault(); setOpen(!open) }}>
+          <Menu className="text-black"/>
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <Dialog open={openDialogCity} onOpenChange={setOpenDialogCity}>
