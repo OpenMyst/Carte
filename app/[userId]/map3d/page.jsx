@@ -186,7 +186,7 @@ const Map3DComponent = ({ params }) => {
       } else if (day === "Matin") {
         mapEvent.setStyle(summerLight);
       } else {
-        mapEvent.setStyle(winterDark);
+        mapEvent.setStyle(nightStyle);
       }
 
       const meteo = location.meteo;

@@ -81,7 +81,7 @@ export default function MapByUserId({ params }) {
         if (map && locationPlayId) {
             getUserPlayEvent(map);
         }
-    }, [locationPlayId, evangileEvents, map, winterDark, summerLight]);
+    }, [locationPlayId, evangileEvents, map]);
 
     useEffect(() => {
         if (locationPlayId) {
@@ -184,7 +184,7 @@ export default function MapByUserId({ params }) {
             } else if (day === "Matin") {
                 mapEvent.setStyle(summerLight);
             } else {
-                mapEvent.setStyle(winterDark);
+                mapEvent.setStyle(nightStyle);
             }
 
             const meteo = location.meteo;
