@@ -45,20 +45,34 @@ export const addMarkerEvent = (map, userId, event) => {
   let coordinates = event.lngLat;
 
   const popupContent = document.createElement('div');
-  popupContent.className = 'h-[200px] w-[100px] static';
+  popupContent.className = 'h-[200px] w-[200px] static';
 
   const popupTitle = document.createElement('h4');
   popupTitle.className = "text-lg text-center";
   popupTitle.innerText = "Want to check in to the event?"
 
-  const saveButton = document.createElement('button');
-  saveButton.className = "w-full";
-  saveButton.style.backgroundColor = "blue";
-  saveButton.style.color = "white";
-  saveButton.style.margin = "1px";
-  saveButton.style.padding = "5px";
-  saveButton.innerText = 'Save';
-  saveButton.onclick = async () => {
+  const savePlaceButton = document.createElement('button');
+  savePlaceButton.className = "w-full";
+  savePlaceButton.style.backgroundColor = "bg-secondary";
+  savePlaceButton.style.color = "black";
+  savePlaceButton.style.margin = "1px";
+  savePlaceButton.style.padding = "5px";
+  savePlaceButton.innerText = 'Save Place';
+  savePlaceButton.onclick = async () => {
+    console.log(coordinates)
+    await saveCoordonnePlace(userId, coordinates);
+    // Fermer le popup
+    marker.remove();
+  };
+  
+  const saveEventButton = document.createElement('button');
+  saveEventButton.className = "w-full";
+  saveEventButton.style.backgroundColor = "bg-primary";
+  saveEventButton.style.color = "black";
+  saveEventButton.style.margin = "1px";
+  saveEventButton.style.padding = "5px";
+  saveEventButton.innerText = 'Save Event';
+  saveEventButton.onclick = async () => {
     console.log(coordinates)
     await saveCoordonneEvent(userId, coordinates);
     // Fermer le popup
@@ -76,8 +90,13 @@ export const addMarkerEvent = (map, userId, event) => {
     marker.remove();
   };
 
+  const divEventCreate = document.createElement('div');
+  divEventCreate.className = "flex gap-1";
+  divEventCreate.appendChild(saveEventButton);
+  divEventCreate.appendChild(savePlaceButton);
+
   popupContent.appendChild(popupTitle);
-  popupContent.appendChild(saveButton);
+  popupContent.appendChild(divEventCreate);
   popupContent.appendChild(deleteButton);
 
   const popup = new mapboxgl.Popup().setDOMContent(popupContent)
@@ -141,6 +160,28 @@ export const saveCoordonneEvent = async (userId, coordinates) => {
       idUser: userId,
       idEvents: eventId,
       isPlay: false
+    });
+
+    console.log('Event and location successfully created with ID:', eventId);
+    console.log('Location:', location);
+  } catch (error) {
+    console.error('Error adding event and location to Firestore:', error);
+  }
+}
+
+/**
+ * Saves the coordinates of an place to Firestore and associates it with a user.
+ * 
+ * @param {string} userId - The ID of the user for whom to save the event.
+ * @param {object} coordinates - The coordinates of the event (lngLat object).
+ */
+export const saveCoordonnePlace = async (userId, coordinates) => {
+  try {
+    // Save the coordinates to the Firestore `events` collection
+    const eventDocRef = await addDoc(collection(database, 'lieu'), {
+      longitude: coordinates.lng,
+      latitude: coordinates.lat,
+      etat: 0,
     });
 
     console.log('Event and location successfully created with ID:', eventId);

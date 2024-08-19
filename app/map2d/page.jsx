@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { userPlayEvent } from "@/tool/service";
 import { PanelTopOpen } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -194,6 +194,12 @@ export default function Map2DByUserId({ params }) {
 
   const handleRegisterClick = () => {
     window.open("https://prytane.com/registration", "_blank");
+    setOpenDialogCity(false)
+  };
+
+  const handleLogIn = () => {
+    setOpenDialogCity(false)
+    window.open("https://prytane.com/login", "_blank");
   };
 
   return (
@@ -201,18 +207,24 @@ export default function Map2DByUserId({ params }) {
       <div id="map" ref={mapContainer}></div>
       <div className={`map-overlay top w-[20vw]`}>
         <button className="bg-[#2E2F31]/20  p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <PanelTopOpen className="text-black"/>
+          <PanelTopOpen className="text-black" />
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
           <Dialog open={openDialogCity} onOpenChange={setOpenDialogCity}>
-            <DialogContent>
-              <h4 className="text-center text-lg">To access this feature, please register</h4>
-              <Button onClick={handleRegisterClick}>
-                Register
-              </Button>
-              <Button className="bg-red-500 hover:bg-red-400" onClick={() => setOpenDialogCity(false)}>
-                Cancel
-              </Button>
+            <DialogContent className="w-52">
+              <DialogHeader>
+                <DialogTitle>This feature requires having an account</DialogTitle>
+                <DialogDescription>Creating an account takes 1 minute and is free. <br/>
+                  You will then be able to view the map in 3D, resume reading where you left off, enrich the application thanks to the collaborative mode and more.</DialogDescription>
+              </DialogHeader>
+              <div className="flex gap-2">
+                <Button variant="outlined" className="border border-black w-full"  onClick={handleLogIn}>
+                  Log In
+                </Button>
+                <Button className="bg-gradient-to-r from-[#fdb642] to-[#fd5003] w-full" onClick={handleRegisterClick}>
+                  Register
+                </Button>
+              </div>
             </DialogContent>
           </Dialog>
           <fieldset>
