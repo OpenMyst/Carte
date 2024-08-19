@@ -107,9 +107,10 @@ const Map3DComponent = ({ params }) => {
     addMarkerEvent(map, userId, event);
   }, [canAddEvent, map, userId]);
 
+  //quand on decoche add event on desactive add event
+  //assurer que le marker puisse etre deplacable
   useEffect(() => {
     if (map) {
-      console.log(canAddEvent)
       if (canAddEvent) {
         map.on('contextmenu', handleMapClick);
       } else {

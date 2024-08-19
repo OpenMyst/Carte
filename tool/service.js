@@ -80,7 +80,16 @@ export const addMarkerEvent = (map, userId, event) => {
   popupContent.appendChild(saveButton);
   popupContent.appendChild(deleteButton);
 
-  const popup = new mapboxgl.Popup().setDOMContent(popupContent);
+  const popup = new mapboxgl.Popup().setDOMContent(popupContent)
+  .on('open', () => {
+    // Augmenter la taille de la croix de fermeture du popup
+    const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+    if (closeButton) {
+      closeButton.style.fontSize = '50px'; // Augmenter la taille de la croix
+      closeButton.style.width = '50px'; // Augmenter la taille de la zone cliquable
+      closeButton.style.height = '50px';
+    }
+  });;
 
   // Create a new marker and add it to the map
   const marker = new mapboxgl.Marker({ color: 'red' })
