@@ -103,20 +103,27 @@ const Map3DComponent = ({ params }) => {
     }
   }, [map, startTravel, endTravel]);
 
+  //assurer un middleware qui bien determiner les user connecter et celui qui ne pas connecter
   const handleMapClick = useCallback((event) => {
     addMarkerEvent(map, userId, event);
-  }, [canAddEvent, map, userId]);
+  }, [map, userId]);
 
-  //quand on decoche add event on desactive add event
-  //assurer que le marker puisse etre deplacable
   useEffect(() => {
     if (map) {
+      console.log(canAddEvent);
       if (canAddEvent) {
         map.on('contextmenu', handleMapClick);
       } else {
         map.off('contextmenu', handleMapClick);
       }
     }
+
+    // Cleanup pour éviter les fuites de mémoire
+    return () => {
+      if (map) {
+        map.off('contextmenu', handleMapClick);
+      }
+    };
   }, [canAddEvent, map, handleMapClick]);
 
   // Initialize the start and End travel using the locationPlayId
@@ -276,7 +283,6 @@ const Map3DComponent = ({ params }) => {
       map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
 
       loadEvangileMarker(map);
-      addRouteLayer(map, startTravel, endTravel);
 
       map.addLayer({
         id: 'custom-threebox-model',

@@ -42,8 +42,7 @@ export const userPlayEvent = async (userId) => {
  * @param {string} userId - The ID of the user for whom to save the event.
  */
 export const addMarkerEvent = (map, userId, event) => {
-  const coordinates = event.lngLat;
-  console.log(coordinates);
+  let coordinates = event.lngLat;
 
   const popupContent = document.createElement('div');
   popupContent.className = 'h-[200px] w-[100px] static';
@@ -60,6 +59,7 @@ export const addMarkerEvent = (map, userId, event) => {
   saveButton.style.padding = "5px";
   saveButton.innerText = 'Save';
   saveButton.onclick = async () => {
+    console.log(coordinates)
     await saveCoordonneEvent(userId, coordinates);
     // Fermer le popup
     marker.remove();
@@ -89,14 +89,20 @@ export const addMarkerEvent = (map, userId, event) => {
       closeButton.style.width = '50px'; // Augmenter la taille de la zone cliquable
       closeButton.style.height = '50px';
     }
-  });;
+  });
 
   // Create a new marker and add it to the map
-  const marker = new mapboxgl.Marker({ color: 'red' })
+  const marker = new mapboxgl.Marker({ color: 'red', draggable: true })
     .setLngLat(coordinates)
     .setPopup(popup)
     .addTo(map)
     .togglePopup();
+
+  marker.on('dragend', () =>  {
+    const lngLat = marker.getLngLat();
+    coordinates = lngLat;
+    console.log(coordinates)
+  });
 
   // Optional: Uncomment to add the marker to the array and enable removal on click
   // markers.push(marker);

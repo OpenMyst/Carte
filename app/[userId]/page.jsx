@@ -1,5 +1,5 @@
 "use client";
-import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
+import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight, automnStyle } from "@/tool/security";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -24,7 +24,6 @@ export default function MapByUserId({ params }) {
     const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
     const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
     const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-    const [season, setSeason] = useState('spring'); // Season state
     const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
     const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
     const [open, setOpen] = useState(true); // Toggle for overlay visibility
@@ -41,22 +40,6 @@ export default function MapByUserId({ params }) {
         if (map) return;
         initializeMap();
     }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
-
-    useEffect(() => {
-        if (map) {
-            const styles = {
-                spring: sprintStyle,
-                summer: summerLight,
-                autumn: automnStyle,
-                winter: winterDark,
-            };
-            setMapStyle(styles[season]);
-            map.setStyle(mapStyle);
-            getUserPlayEvent(map);
-            loadEvangileMarker(map);
-            addRouteLayer(map, startTravel, endTravel);
-        }
-    }, [season, mapStyle, evangileEvents, locationPlayId]);
 
     useEffect(() => {
         if (map) {
@@ -121,17 +104,24 @@ export default function MapByUserId({ params }) {
 
     const handleMapClick = useCallback((event) => {
         addMarkerEvent(map, userId, event);
-    }, [canAddEvent, map, userId]);
-
+    }, [map, userId]);
+    
     useEffect(() => {
         if (map) {
-            console.log(canAddEvent)
+            console.log(canAddEvent);
             if (canAddEvent) {
-                map.on('contextPanelTopOpen', handleMapClick);
+                map.on('contextmenu', handleMapClick);
             } else {
-                map.off('contextPanelTopOpen', handleMapClick);
+                map.off('contextmenu', handleMapClick);
             }
         }
+    
+        // Cleanup pour éviter les fuites de mémoire
+        return () => {
+            if (map) {
+                map.off('contextmenu', handleMapClick);
+            }
+        };
     }, [canAddEvent, map, handleMapClick]);
 
     // Initialize the start and End travel using the locationPlayId
