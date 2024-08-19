@@ -28,8 +28,9 @@ const Map3DComponent = ({ params }) => {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-  const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(70); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
+  const [lieux, setLieux] = useState([]); // State for storing place
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [canAddEvent, setCanAddEvent] = useState(false); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
@@ -138,7 +139,7 @@ const Map3DComponent = ({ params }) => {
     }
   }
 
-  // Fetch all events from Firebase
+  // Fetch all events and lieu from Firebase
   const getAllEvent = () => {
     const q = query(collection(database, 'events'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -148,6 +149,16 @@ const Map3DComponent = ({ params }) => {
         eventsArray.push({ ...doc.data(), id: doc.id });
       })
       setEvangileEvents(eventsArray);
+    })
+
+    const qLieu = query(collection(database, 'lieu'));
+    const unsubscribeLieu = onSnapshot(qLieu, (querySnapshot) => {
+      let eventsArray = [];
+
+      querySnapshot.forEach(doc => {
+        eventsArray.push({ ...doc.data(), id: doc.id });
+      })
+      setLieux(eventsArray);
     })
   }
 
@@ -160,13 +171,13 @@ const Map3DComponent = ({ params }) => {
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(50);
+        setMountainHeight(70);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 50, false);
+        updateTerrain(mapEvent, 70, false);
       } else {
         setMountainHeight(0);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 50, false);
+        updateTerrain(mapEvent, 20, false);
       }
 
       const day = location.detail_jour;
@@ -209,7 +220,14 @@ const Map3DComponent = ({ params }) => {
         .togglePopup();
 
       popup.on('open', () => {
-        // Ajoutez l'écouteur d'événement lorsque le popup est ouvert
+        //Increase the size of the popup closing cross
+        const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+        if (closeButton) {
+          closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+          closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.height = '30px';
+        }
+        // Add event listener when popup is opened
         const button = document.getElementById('showJerusalemButton');
         if (button) {
           button.addEventListener('click', () => {
@@ -271,6 +289,20 @@ const Map3DComponent = ({ params }) => {
         url: 'mapbox://mapbox.terrain-rgb'
       });
       map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      if (mapStyle === nightStyle) {
+        map.addLayer({
+          id: 'hillshade-layer',
+          type: 'hillshade',
+          source: 'mapbox-dem',
+          paint: {
+            'hillshade-exaggeration': mountainHeight / 100,
+            'hillshade-highlight-color': '#cccccc',
+            'hillshade-shadow-color': '#596575',
+            'hillshade-accent-color': '#596575'
+          }
+        });
+      }
+
       map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
       map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible" : "none");
       map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
@@ -399,7 +431,14 @@ const Map3DComponent = ({ params }) => {
         .addTo(mapEvent);
 
       popup.on('open', () => {
-        // Ajoutez l'écouteur d'événement lorsque le popup est ouvert
+        //Increase the size of the popup closing cross
+        const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+        if (closeButton) {
+          closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+          closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.height = '30px';
+        }
+        // Add event listener when popup is opened
         const button = document.getElementById('showJerusalemButton');
         if (button) {
           button.addEventListener('click', () => {
@@ -417,6 +456,12 @@ const Map3DComponent = ({ params }) => {
       })
 
     });
+    lieux.forEach((loc) => {
+      console.log(loc)
+      const marker = new mapboxgl.Marker({ color: '#0769C5' })
+        .setLngLat([loc.longitude, loc.latitude])
+        .addTo(mapEvent);
+    })
   };
 
   //update the terrain in the map when the height of mountain has changed

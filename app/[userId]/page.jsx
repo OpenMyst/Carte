@@ -26,6 +26,7 @@ export default function MapByUserId({ params }) {
     const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
     const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
     const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
+    const [lieux, setLieux] = useState([]); // State for storing place
     const [open, setOpen] = useState(true); // Toggle for overlay visibility
     const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
     const [endTravel, setEndTravel] = useState([]); // End coordinates for route
@@ -105,7 +106,7 @@ export default function MapByUserId({ params }) {
     const handleMapClick = useCallback((event) => {
         addMarkerEvent(map, userId, event);
     }, [map, userId]);
-    
+
     useEffect(() => {
         if (map) {
             console.log(canAddEvent);
@@ -115,7 +116,7 @@ export default function MapByUserId({ params }) {
                 map.off('contextmenu', handleMapClick);
             }
         }
-    
+
         // Cleanup pour éviter les fuites de mémoire
         return () => {
             if (map) {
@@ -136,7 +137,7 @@ export default function MapByUserId({ params }) {
         }
     }
 
-    // Fetch all events from Firebase
+    // Fetch all events and lieu from Firebase
     const getAllEvent = () => {
         const q = query(collection(database, 'events'));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -146,6 +147,16 @@ export default function MapByUserId({ params }) {
                 eventsArray.push({ ...doc.data(), id: doc.id });
             })
             setEvangileEvents(eventsArray);
+        })
+
+        const qLieu = query(collection(database, 'lieu'));
+        const unsubscribeLieu = onSnapshot(qLieu, (querySnapshot) => {
+            let eventsArray = [];
+
+            querySnapshot.forEach(doc => {
+                eventsArray.push({ ...doc.data(), id: doc.id });
+            })
+            setLieux(eventsArray);
         })
     }
 
@@ -158,9 +169,9 @@ export default function MapByUserId({ params }) {
         if (currentEvents) {
             const anneeEvent = parseInt(currentEvents.event_date);
             if (anneeEvent < 0) {
-                setMountainHeight(50);
+                setMountainHeight(100);
                 setShowBuilding(false);
-                updateTerrain(mapEvent, 50, false);
+                updateTerrain(mapEvent, 100, false);
             } else {
                 setMountainHeight(0);
                 setShowBuilding(false);
@@ -202,6 +213,16 @@ export default function MapByUserId({ params }) {
                 .setPopup(popup)  // Associe le popup au marqueur
                 .addTo(mapEvent)
                 .togglePopup();
+
+            popup.on('open', () => {
+                //Increase the size of the popup closing cross
+                const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+                if (closeButton) {
+                    closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+                    closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+                    closeButton.style.height = '30px';
+                }
+            });
             mapEvent.flyTo({
                 center: [currentEvents.longitude, currentEvents.latitude],
                 zoom: 15
@@ -239,7 +260,7 @@ export default function MapByUserId({ params }) {
             center: [lng, lat],
             zoom: zoom,
             pitch: 62,
-            bearing: -20,
+            bearing: 0,
         });
 
         map.on('move', () => {
@@ -270,6 +291,19 @@ export default function MapByUserId({ params }) {
             handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
 
             map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+            if (mapStyle === nightStyle) {
+                map.addLayer({
+                    id: 'hillshade-layer',
+                    type: 'hillshade',
+                    source: 'mapbox-dem',
+                    paint: {
+                        'hillshade-exaggeration': mountainHeight / 100,
+                        'hillshade-highlight-color': '#9FAABC',
+                        'hillshade-shadow-color': '#596575',
+                        'hillshade-accent-color': '#44505E'
+                    }
+                });
+            }
             loadEvangileMarker(map);
         });
 
@@ -291,10 +325,20 @@ export default function MapByUserId({ params }) {
                 </div>
                 `);
 
-            const marker = new mapboxgl.Marker()
+            const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
                 .setLngLat([location.longitude, location.latitude])
                 .setPopup(popup) // Associe le popup au marqueur
                 .addTo(mapEvent);
+
+            popup.on('open', () => {
+                //Increase the size of the popup closing cross
+                const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+                if (closeButton) {
+                    closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+                    closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+                    closeButton.style.height = '30px';
+                }
+            });
 
             marker.getElement().addEventListener('click', () => {
                 mapEvent.flyTo({
@@ -303,6 +347,13 @@ export default function MapByUserId({ params }) {
                 });
             })
         });
+
+        lieux.forEach((loc) => {
+            console.log(loc)
+            const marker = new mapboxgl.Marker({ color: '#0769C5' })
+                .setLngLat([loc.longitude, loc.latitude])
+                .addTo(mapEvent);
+        })
     };
 
     //update the terrain in the map when the height of mountain has changed

@@ -52,11 +52,7 @@ export const addMarkerEvent = (map, userId, event) => {
   popupTitle.innerText = "Want to check in to the event?"
 
   const savePlaceButton = document.createElement('button');
-  savePlaceButton.className = "w-full";
-  savePlaceButton.style.backgroundColor = "bg-secondary";
-  savePlaceButton.style.color = "black";
-  savePlaceButton.style.margin = "1px";
-  savePlaceButton.style.padding = "5px";
+  savePlaceButton.className = "w-full bg-secondary rounded-sm text-white m-1";
   savePlaceButton.innerText = 'Save Place';
   savePlaceButton.onclick = async () => {
     console.log(coordinates)
@@ -66,11 +62,7 @@ export const addMarkerEvent = (map, userId, event) => {
   };
   
   const saveEventButton = document.createElement('button');
-  saveEventButton.className = "w-full";
-  saveEventButton.style.backgroundColor = "bg-primary";
-  saveEventButton.style.color = "black";
-  saveEventButton.style.margin = "1px";
-  saveEventButton.style.padding = "5px";
+  saveEventButton.className = "w-full bg-primary rounded-sm text-white m-1";
   saveEventButton.innerText = 'Save Event';
   saveEventButton.onclick = async () => {
     console.log(coordinates)
@@ -80,11 +72,8 @@ export const addMarkerEvent = (map, userId, event) => {
   };
 
   const deleteButton = document.createElement('button');
-  deleteButton.className = "w-full";
+  deleteButton.className = "w-full rounded-sm text-white m-1";
   deleteButton.style.backgroundColor = "red";
-  deleteButton.style.color = "white";
-  deleteButton.style.margin = "1px";
-  deleteButton.style.padding = "5px";
   deleteButton.innerText = 'Delete';
   deleteButton.onclick = () => {
     marker.remove();
@@ -104,9 +93,9 @@ export const addMarkerEvent = (map, userId, event) => {
     // Augmenter la taille de la croix de fermeture du popup
     const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
     if (closeButton) {
-      closeButton.style.fontSize = '50px'; // Augmenter la taille de la croix
-      closeButton.style.width = '50px'; // Augmenter la taille de la zone cliquable
-      closeButton.style.height = '50px';
+      closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+      closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+      closeButton.style.height = '30px';
     }
   });
 
@@ -184,8 +173,8 @@ export const saveCoordonnePlace = async (userId, coordinates) => {
       etat: 0,
     });
 
-    console.log('Event and location successfully created with ID:', eventId);
-    console.log('Location:', location);
+    console.log('Event and location successfully created with ID:', eventDocRef);
+    console.log('Location:', coordinates);
   } catch (error) {
     console.error('Error adding event and location to Firestore:', error);
   }
