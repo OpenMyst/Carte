@@ -74,7 +74,7 @@ const Map3DComponent = ({ params }) => {
 
   useEffect(() => {
     if (map) {
-      map.setPitch(showMap3D ? 62 : 0);
+      map.setPitch(showMap3D ? 75 : 0);
     }
   }, [showMap3D]);
 
@@ -263,7 +263,7 @@ const Map3DComponent = ({ params }) => {
       style: mapStyle,
       center: [lng, lat],
       zoom: zoom,
-      pitch: 62,
+      pitch: 75,
       bearing: 0,
     });
 
@@ -322,7 +322,7 @@ const Map3DComponent = ({ params }) => {
         renderingMode: '3d',
         onAdd: function () {
           const scale = 2;
-          const heightMultiple = mountainHeight < 50 ? 1 : 2;
+          const heightMultiple = mountainHeight < 70 ? 1 : 3;
 
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
@@ -342,9 +342,9 @@ const Map3DComponent = ({ params }) => {
           const options1 = {
             obj: '/assets/jerusalem2.gltf',
             type: 'gltf',
-            scale: { x: scale * 5, y: scale * 4 * heightMultiple, z: 10 },
+            scale: { x: scale * 5 * 2, y: scale * 2 * heightMultiple, z: scale * 5 * 2 },
             units: 'meters',
-            rotation: { x: 90, y: -90, z: 5 }
+            rotation: { x: 90, y: -90, z: 0 }
           };
           loadAndPlaceModel(options1, [35.2297, 31.7738]);
 

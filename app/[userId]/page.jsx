@@ -73,7 +73,7 @@ export default function MapByUserId({ params }) {
 
     useEffect(() => {
         if (map) {
-            map.setPitch(showMap3D ? 62 : 0);
+            map.setPitch(showMap3D ? 75 : 0);
         }
     }, [showMap3D]);
 
@@ -259,7 +259,7 @@ export default function MapByUserId({ params }) {
             style: mapStyle,
             center: [lng, lat],
             zoom: zoom,
-            pitch: 62,
+            pitch: 75,
             bearing: 0,
         });
 
