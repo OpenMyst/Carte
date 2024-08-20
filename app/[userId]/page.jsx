@@ -297,7 +297,7 @@ export default function MapByUserId({ params }) {
                     type: 'hillshade',
                     source: 'mapbox-dem',
                     paint: {
-                        'hillshade-exaggeration': mountainHeight / 100,
+                        // 'hillshade-exaggeration': mountainHeight / 100,
                         'hillshade-highlight-color': '#6B7280',
                         'hillshade-shadow-color': '#596575',
                         'hillshade-accent-color': '#596575'
