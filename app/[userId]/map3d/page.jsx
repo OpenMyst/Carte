@@ -288,7 +288,7 @@ const Map3DComponent = ({ params }) => {
         type: 'raster-dem',
         url: 'mapbox://mapbox.terrain-rgb'
       });
-      // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       if (mapStyle === nightStyle) {
         map.addLayer({
           id: 'hillshade-layer',
@@ -301,8 +301,6 @@ const Map3DComponent = ({ params }) => {
             'hillshade-accent-color': '#596575'
           }
         });
-      } else {
-        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       }
 
       map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
