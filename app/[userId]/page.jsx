@@ -290,19 +290,21 @@ export default function MapByUserId({ params }) {
             handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
             handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
 
-            map.setTerrain({ source: 'mapbox-dem', exaggeration: 50 / 100 });
             if (mapStyle === nightStyle) {
+                // map.setTerrain({ source: 'mapbox-dem', exaggeration: 50 / 100 });
                 map.addLayer({
                     id: 'hillshade-layer',
                     type: 'hillshade',
                     source: 'mapbox-dem',
                     paint: {
-                        // 'hillshade-exaggeration': mountainHeight / 100,
+                        'hillshade-exaggeration': mountainHeight / 100,
                         'hillshade-highlight-color': '#6B7280',
                         'hillshade-shadow-color': '#596575',
                         'hillshade-accent-color': '#596575'
                     }
                 });
+            } else {
+                map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             }
             loadEvangileMarker(map);
         });
