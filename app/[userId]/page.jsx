@@ -290,7 +290,7 @@ export default function MapByUserId({ params }) {
             handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
             handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
 
-            // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+            map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             if (mapStyle === nightStyle) {
                 map.addLayer({
                     id: 'hillshade-layer',

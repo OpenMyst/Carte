@@ -288,7 +288,7 @@ const Map3DComponent = ({ params }) => {
         type: 'raster-dem',
         url: 'mapbox://mapbox.terrain-rgb'
       });
-      // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       if (mapStyle === nightStyle) {
         map.addLayer({
           id: 'hillshade-layer',
