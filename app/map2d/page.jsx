@@ -1,5 +1,5 @@
 "use client";
-import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
+import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight, automnStyle } from "@/tool/security";
 import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -60,14 +60,20 @@ export default function Map2DByUserId({ params }) {
     updateMapSettings();
     loadEvangileMarker(map.current);
     addRouteLayer(map.current, startTravel, endTravel);
-  }, [map, mapStyle, evangileEvents, showMap3D]);
+  }, []);
+
+  useEffect(() => {
+    if (map.current) {
+      loadEvangileMarker(map.current);
+    }
+  }, [evangileEvents, map]);
 
   useEffect(() => {
     if (map.current) {
       updateMapSettings();
       addRouteLayer(map.current, startTravel, endTravel);
     }
-  }, [mountainHeight, showBuilding, showRoad]);
+  }, [mountainHeight, evangileEvents, showBuilding, showRoad]);
 
   useEffect(() => {
     if (map.current) {
@@ -152,9 +158,9 @@ export default function Map2DByUserId({ params }) {
       if (day === "Nuit") {
         mapEvent.setStyle(sprintStyleNight);
       } else if (day === "Matin") {
-        mapEvent.setStyle(summerLight);
+        mapEvent.setStyle(automnStyle);
       } else {
-        mapEvent.setStyle(winterDark);
+        mapEvent.setStyle(nightStyle);
       }
 
       const meteo = location.meteo;
