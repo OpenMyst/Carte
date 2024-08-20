@@ -28,7 +28,7 @@ const Map3DComponent = ({ params }) => {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-  const [mountainHeight, setMountainHeight] = useState(50); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(70); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [lieux, setLieux] = useState([]); // State for storing place
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
@@ -171,9 +171,9 @@ const Map3DComponent = ({ params }) => {
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(50);
+        setMountainHeight(70);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 50, false);
+        updateTerrain(mapEvent, 70, false);
       } else {
         setMountainHeight(0);
         setShowBuilding(false);
@@ -288,7 +288,7 @@ const Map3DComponent = ({ params }) => {
         type: 'raster-dem',
         url: 'mapbox://mapbox.terrain-rgb'
       });
-      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       if (mapStyle === nightStyle) {
         map.addLayer({
           id: 'hillshade-layer',
@@ -342,9 +342,10 @@ const Map3DComponent = ({ params }) => {
           const options1 = {
             obj: '/assets/jerusalem2.gltf',
             type: 'gltf',
-            scale: { x: scale * 5 * 2, y: scale * 2 * heightMultiple, z: scale * 5 * 2 },
+            scale: { x: scale * 5 * 2, y: scale * 1.5 * heightMultiple, z: scale * 5 * 2 },
             units: 'meters',
-            rotation: { x: 90, y: -90, z: 0 }
+            rotation: { x: 90, y: -90, z: 1 },
+            altitude: 0
           };
           loadAndPlaceModel(options1, [35.2297, 31.7738]);
 

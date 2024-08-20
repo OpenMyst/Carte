@@ -290,7 +290,7 @@ export default function MapByUserId({ params }) {
             handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
             handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
 
-            map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+            // map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             if (mapStyle === nightStyle) {
                 map.addLayer({
                     id: 'hillshade-layer',
@@ -298,9 +298,9 @@ export default function MapByUserId({ params }) {
                     source: 'mapbox-dem',
                     paint: {
                         'hillshade-exaggeration': mountainHeight / 100,
-                        'hillshade-highlight-color': '#9FAABC',
+                        'hillshade-highlight-color': '#6B7280',
                         'hillshade-shadow-color': '#596575',
-                        'hillshade-accent-color': '#44505E'
+                        'hillshade-accent-color': '#596575'
                     }
                 });
             }
