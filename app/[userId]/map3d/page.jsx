@@ -469,43 +469,43 @@ const Map3DComponent = ({ params }) => {
         </div>
         `);
 
-      // const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
-      //   .setLngLat([location.longitude, location.latitude])
-      //   .setPopup(popup)  // Associe le popup au marqueur
-      //   .addTo(mapEvent);
+      const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
+        .setLngLat([location.longitude, location.latitude])
+        .setPopup(popup)  // Associe le popup au marqueur
+        .addTo(mapEvent);
 
-      // popup.on('open', () => {
-      //   //Increase the size of the popup closing cross
-      //   const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-      //   if (closeButton) {
-      //     closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
-      //     closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
-      //     closeButton.style.height = '30px';
-      //   }
-      //   // Add event listener when popup is opened
-      //   const button = document.getElementById('showJerusalemButton');
-      //   if (button) {
-      //     button.addEventListener('click', () => {
-      //       setOpenDialogCity(true);
-      //     });
-      //   }
-      // });
+      popup.on('open', () => {
+        //Increase the size of the popup closing cross
+        const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+        if (closeButton) {
+          closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+          closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.height = '30px';
+        }
+        // Add event listener when popup is opened
+        const button = document.getElementById('showJerusalemButton');
+        if (button) {
+          button.addEventListener('click', () => {
+            setOpenDialogCity(true);
+          });
+        }
+      });
 
-      // marker.getElement().addEventListener('click', () => {
-      //   // setOpenDialogCity(true);
-      //   mapEvent.flyTo({
-      //     center: [location.longitude, location.latitude],
-      //     zoom: 20
-      //   });
-      // })
+      marker.getElement().addEventListener('click', () => {
+        // setOpenDialogCity(true);
+        mapEvent.flyTo({
+          center: [location.longitude, location.latitude],
+          zoom: 20
+        });
+      })
 
     });
-    // lieux.forEach((loc) => {
-    //   console.log(loc)
-    //   const marker = new mapboxgl.Marker({ color: '#0769C5' })
-    //     .setLngLat([loc.longitude, loc.latitude])
-    //     .addTo(mapEvent);
-    // })
+    lieux.forEach((loc) => {
+      console.log(loc)
+      const marker = new mapboxgl.Marker({ color: '#0769C5' })
+        .setLngLat([loc.longitude, loc.latitude])
+        .addTo(mapEvent);
+    })
   };
 
   //update the terrain in the map when the height of mountain has changed
