@@ -81,7 +81,7 @@ export const addMarkerEvent = (map, userId, event) => {
     if (locationName) {
       console.log('Location:', locationName);
       console.log('Coordinates:', coordinates);
-      await saveCoordonneEvent(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
+      await saveCoordonneEreChretien(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
       // Fermer le popup
       marker.remove();
     } else {
@@ -219,10 +219,7 @@ export const saveCoordonneEreChretien = async (userId, coordinates, place) => {
       ville: place,
       longitude: coordinates.lng,
       latitude: coordinates.lat,
-      event_date: "1944",
       etat: 0,
-      description : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam consectetur tincidunt aliquam. Proin ut consequat tortor, sed pellentesque ex. Fusce elementum ultrices lectus, sed aliquam dolor sodales eget. Mauris dictum porttitor libero at lacinia. Maecenas at arcu eu nunc posuere sollicitudin. Donec vel varius nisl. Vestibulum rutrum nulla diam, non bibendum ante auctor ut. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed augue vitae erat facilisis vulputate. Nam aliquam nibh vitae dui vulputate efficitur. Nulla bibendum at magna vitae ultrices.",
-      label :"Lorem ipsum"
     });
 
     const eventId = eventDocRef.id;
