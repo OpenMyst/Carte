@@ -58,20 +58,20 @@ const Map3DComponent = ({ params }) => {
     }
   }, [mountainHeight, showBuilding, showRoad]);
 
-  useEffect(() => {
-    const fetchLocationPlayId = async () => {
-      const location = await userPlayEvent(userId);
-      setLocationPlayId(location);
-    };
+  // useEffect(() => {
+  //   const fetchLocationPlayId = async () => {
+  //     const location = await userPlayEvent(userId);
+  //     setLocationPlayId(location);
+  //   };
 
-    // Load the changment in the firebase
-    const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-      fetchLocationPlayId();
-    });
+  //   // Load the changment in the firebase
+  //   const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
+  //     fetchLocationPlayId();
+  //   });
 
-    fetchLocationPlayId();
-    return () => unsubscribe();
-  }, [userId]);
+  //   fetchLocationPlayId();
+  //   return () => unsubscribe();
+  // }, [userId]);
 
   useEffect(() => {
     if (map) {
@@ -79,11 +79,11 @@ const Map3DComponent = ({ params }) => {
     }
   }, [showMap3D]);
 
-  useEffect(() => {
-    if (map && locationPlayId) {
-      getUserPlayEvent(map);
-    }
-  }, [locationPlayId, evangileEvents, lieux, map, winterDark, summerLight]);
+  // useEffect(() => {
+  //   if (map && locationPlayId) {
+  //     getUserPlayEvent(map);
+  //   }
+  // }, [locationPlayId, evangileEvents, lieux, map, winterDark, summerLight]);
 
   useEffect(() => {
     if (locationPlayId) {
@@ -252,33 +252,34 @@ const Map3DComponent = ({ params }) => {
           </div>
           <button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button>
         </div>
-      `).on('open', () => {
-        //Increase the size of the popup closing cross
-        const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-        if (closeButton) {
-          closeButton.style.fontSize = '30px';
-          closeButton.style.width = '30px'; 
-          closeButton.style.height = '30px';
-        }
-        // Add event listener when popup is opened
-        const button = document.getElementById('showJerusalemButton');
-        if (button) {
-          button.addEventListener('click', () => {
-            setOpenDialogCity(true);
-          });
-        }
-      });
+      `)
+      // .on('open', () => {
+      //   //Increase the size of the popup closing cross
+      //   const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+      //   if (closeButton) {
+      //     closeButton.style.fontSize = '30px';
+      //     closeButton.style.width = '30px'; 
+      //     closeButton.style.height = '30px';
+      //   }
+      //   // Add event listener when popup is opened
+      //   const button = document.getElementById('showJerusalemButton');
+      //   if (button) {
+      //     button.addEventListener('click', () => {
+      //       setOpenDialogCity(true);
+      //     });
+      //   }
+      // });
 
       const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([currentEvents.longitude, currentEvents.latitude])
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent)
-        .togglePopup();
+      //   .togglePopup();
 
-      mapEvent.flyTo({
-        center: [currentEvents.longitude, currentEvents.latitude],
-        zoom: 15
-      });
+      // mapEvent.flyTo({
+      //   center: [currentEvents.longitude, currentEvents.latitude],
+      //   zoom: 15
+      // });
     }
   }
 
