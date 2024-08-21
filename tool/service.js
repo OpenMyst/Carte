@@ -51,24 +51,42 @@ export const addMarkerEvent = (map, userId, event) => {
   popupTitle.className = "text-lg text-center";
   popupTitle.innerText = "Want to check in to the event?"
 
+  // Créer un input pour le nom de la ville ou de l'emplacement
+  const locationInput = document.createElement('input');
+  locationInput.type = 'text';
+  locationInput.className = 'w-full p-2 border border-gray-300 rounded-sm';
+  locationInput.placeholder = 'Enter location name';
+
   const savePlaceButton = document.createElement('button');
   savePlaceButton.className = "w-full bg-secondary rounded-sm text-white m-1";
   savePlaceButton.innerText = 'Save Place';
   savePlaceButton.onclick = async () => {
-    console.log(coordinates)
-    await saveCoordonnePlace(userId, coordinates);
-    // Fermer le popup
-    marker.remove();
+    const locationName = locationInput.value; // Récupérer la valeur de l'input
+    if (locationName) {
+      console.log('Location:', locationName);
+      console.log('Coordinates:', coordinates);
+      await saveCoordonnePlace(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
+      // Fermer le popup
+      marker.remove();
+    } else {
+      alert('Please enter a location name.');
+    }
   };
   
   const saveEventButton = document.createElement('button');
   saveEventButton.className = "w-full bg-primary rounded-sm text-white m-1";
   saveEventButton.innerText = 'Save Event';
   saveEventButton.onclick = async () => {
-    console.log(coordinates)
-    await saveCoordonneEvent(userId, coordinates);
-    // Fermer le popup
-    marker.remove();
+    const locationName = locationInput.value; // Récupérer la valeur de l'input
+    if (locationName) {
+      console.log('Location:', locationName);
+      console.log('Coordinates:', coordinates);
+      await saveCoordonneEvent(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
+      // Fermer le popup
+      marker.remove();
+    } else {
+      alert('Please enter a location name.');
+    }
   };
 
   const deleteButton = document.createElement('button');
@@ -85,6 +103,7 @@ export const addMarkerEvent = (map, userId, event) => {
   divEventCreate.appendChild(savePlaceButton);
 
   popupContent.appendChild(popupTitle);
+  popupContent.appendChild(locationInput);
   popupContent.appendChild(divEventCreate);
   popupContent.appendChild(deleteButton);
 
@@ -129,11 +148,13 @@ export const addMarkerEvent = (map, userId, event) => {
  * 
  * @param {string} userId - The ID of the user for whom to save the event.
  * @param {object} coordinates - The coordinates of the event (lngLat object).
+ * @param {string} place - The name of the place locating
  */
-export const saveCoordonneEvent = async (userId, coordinates) => {
+export const saveCoordonneEvent = async (userId, coordinates, place) => {
   try {
     // Save the coordinates to the Firestore `events` collection
     const eventDocRef = await addDoc(collection(database, 'events'), {
+      ville: place,
       longitude: coordinates.lng,
       latitude: coordinates.lat,
       event_date: "1944",
@@ -163,11 +184,13 @@ export const saveCoordonneEvent = async (userId, coordinates) => {
  * 
  * @param {string} userId - The ID of the user for whom to save the event.
  * @param {object} coordinates - The coordinates of the event (lngLat object).
+ * @param {string} place - The name of the place locating
  */
-export const saveCoordonnePlace = async (userId, coordinates) => {
+export const saveCoordonnePlace = async (userId, coordinates, place) => {
   try {
     // Save the coordinates to the Firestore `events` collection
     const eventDocRef = await addDoc(collection(database, 'lieu'), {
+      ville: place,
       longitude: coordinates.lng,
       latitude: coordinates.lat,
       etat: 0,

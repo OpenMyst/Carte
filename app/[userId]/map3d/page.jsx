@@ -48,7 +48,7 @@ const Map3DComponent = ({ params }) => {
       loadEvangileMarker(map);
       getUserPlayEvent(map);
     }
-  }, [evangileEvents, map]);
+  }, [evangileEvents, lieux, map]);
 
   useEffect(() => {
     if (map) {
@@ -82,7 +82,7 @@ const Map3DComponent = ({ params }) => {
     if (map && locationPlayId) {
       getUserPlayEvent(map);
     }
-  }, [locationPlayId, evangileEvents, map, winterDark, summerLight]);
+  }, [locationPlayId, evangileEvents, lieux, map, winterDark, summerLight]);
 
   useEffect(() => {
     if (locationPlayId) {
@@ -342,9 +342,9 @@ const Map3DComponent = ({ params }) => {
           const options1 = {
             obj: '/assets/jerusalem2.gltf',
             type: 'gltf',
-            scale: { x: scale * 5 * 2, y: scale * 1.5 * heightMultiple, z: scale * 5 * 2 },
+            scale: { x: scale * 5 * 4, y: scale * 4 * heightMultiple, z: scale * 5 * 4 },
             units: 'meters',
-            rotation: { x: 90, y: -90, z: 1 },
+            rotation: { x: 90, y: -90, z: 0 },
             altitude: 0
           };
           loadAndPlaceModel(options1, [35.2297, 31.7738]);
