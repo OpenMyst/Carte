@@ -193,6 +193,55 @@ export const saveCoordonneEvent = async (userId, coordinates, place) => {
 }
 
 /**
+ * Saves the coordinates of an EreChretien to Firestore and associates it with a user.
+ * 
+ * @param {string} userId - The ID of the user for whom to save the event.
+ * @param {object} coordinates - The coordinates of the event (lngLat object).
+ * @param {string} place - The name of the place locating
+ */
+export const saveCoordonneEreChretien = async (userId, coordinates, place) => {
+  try {
+    // Check if the location already exists in the database
+    const lieuQuery = query(
+      collection(database, 'erechretiene'),
+      where('ville', '==', place)
+    );
+    
+    const querySnapshot = await getDocs(lieuQuery);
+
+    if (!querySnapshot.empty) {
+      // If the location already exists, show an error alert
+      alert('Le lieu existe déjà dans la base de données.');
+      return;
+    }
+    // Save the coordinates to the Firestore `events` collection
+    const eventDocRef = await addDoc(collection(database, 'erechretiene'), {
+      ville: place,
+      longitude: coordinates.lng,
+      latitude: coordinates.lat,
+      event_date: "1944",
+      etat: 0,
+      description : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam consectetur tincidunt aliquam. Proin ut consequat tortor, sed pellentesque ex. Fusce elementum ultrices lectus, sed aliquam dolor sodales eget. Mauris dictum porttitor libero at lacinia. Maecenas at arcu eu nunc posuere sollicitudin. Donec vel varius nisl. Vestibulum rutrum nulla diam, non bibendum ante auctor ut. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed augue vitae erat facilisis vulputate. Nam aliquam nibh vitae dui vulputate efficitur. Nulla bibendum at magna vitae ultrices.",
+      label :"Lorem ipsum"
+    });
+
+    const eventId = eventDocRef.id;
+
+    // Update the `location` collection with the new event ID and userId
+    const location = await addDoc(collection(database, 'location'), {
+      idUser: userId,
+      idEvents: eventId,
+      isPlay: false
+    });
+
+    console.log('Event and location successfully created with ID:', eventId);
+    console.log('Location:', location);
+  } catch (error) {
+    console.error('Error adding event and location to Firestore:', error);
+  }
+}
+
+/**
  * Saves the coordinates of an place to Firestore and associates it with a user.
  * 
  * @param {string} userId - The ID of the user for whom to save the event.
@@ -201,7 +250,7 @@ export const saveCoordonneEvent = async (userId, coordinates, place) => {
  */
 export const saveCoordonnePlace = async (userId, coordinates, place) => {
   try {
-    // Vérifier si le lieu existe déjà dans la base de données
+    // Check if the location already exists in the database
     const lieuQuery = query(
       collection(database, 'lieu'),
       where('ville', '==', place)
@@ -210,12 +259,12 @@ export const saveCoordonnePlace = async (userId, coordinates, place) => {
     const querySnapshot = await getDocs(lieuQuery);
 
     if (!querySnapshot.empty) {
-      // Si le lieu existe déjà, afficher une alerte d'erreur
+      // If the location already exists, show an error alert
       alert('Le lieu existe déjà dans la base de données.');
       return;
     }
 
-    // Si le lieu n'existe pas, l'ajouter à la base de données
+    // Save the coordinates to the Firestore `lieu` collection
     const eventDocRef = await addDoc(collection(database, 'lieu'), {
       ville: place,
       longitude: coordinates.lng,
@@ -227,5 +276,35 @@ export const saveCoordonnePlace = async (userId, coordinates, place) => {
     console.log('Coordonnées du lieu :', coordinates);
   } catch (error) {
     console.error('Erreur lors de l\'ajout du lieu à Firestore :', error);
+  }
+}
+
+/**
+ * Saves is user try to click in Plus button
+ * 
+ * @param {string} userId - The ID of the user for whom to save the event.
+ */
+export const createUserOpenFormulaire = async (userId) => {
+  try {
+    const hasCreateUser = query(
+      collection(database, 'openFormulaire'),
+      where('idUser', '==', userId)
+    )
+
+    if(hasCreateUser) {
+      return;
+    }
+
+    const addFormulaire = await addDoc(
+      collection(database, 'openFormulaire'), {
+        idUser: userId,
+        isClique: true
+      }
+    )
+
+    console.log('Lieu ajouté avec succès avec l\'ID :', addFormulaire.id);
+    return;
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout du formulaire à Firestore :', error);
   }
 }

@@ -7,7 +7,7 @@ import { database } from "@/tool/firebase";
 import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
 import { Button } from "@/components/ui/button";
-import { addMarkerEvent, userPlayEvent } from "@/tool/service";
+import { addMarkerEvent, userPlayEvent, createUserOpenFormulaire } from "@/tool/service";
 import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -399,6 +399,12 @@ export default function MapByUserId({ params }) {
     //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
     // }
 
+    const handleOpenFormulaire = (e) => {
+        e.preventDefault();
+        createUserOpenFormulaire(userId); 
+        setCanAddEvent(!canAddEvent);
+    }
+
     return (
         <main className="m-2">
             <div id="map" ref={mapContainer}></div>
@@ -421,7 +427,7 @@ export default function MapByUserId({ params }) {
                         </Button>
                     </fieldset>
                     <fieldset>
-                        <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={() => setCanAddEvent(!canAddEvent)}>
+                        <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={handleOpenFormulaire}>
                             <Plus />
                         </Button>
                     </fieldset>

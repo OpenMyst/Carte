@@ -54,21 +54,21 @@ const PageGenealogie = () => {
  * @returns {THREE.Mesh} - A Three.js mesh representing the node, including a sphere and a label.
  */
   const nodeThreeObject = (node) => {
-    const sphereGeometry = new THREE.SphereGeometry(node.nom === "Jésus " ? 10 : 5, 32, 32); // Change size based on node name
+    const sphereGeometry = new THREE.SphereGeometry(node.nom === "Jesus" ? 10 : 5, 32, 32); // Change size based on node name
     const sphereMaterial = new THREE.MeshBasicMaterial({
-      color: node.nom === "Jésus " ? 0xFFFFFF :
+      color: node.nom === "Jesus" ? 0xFFFFFF :
         node.testament === "encien" ? 0xF47512 : 0xD9EB71
     });
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
     // Add label as a child of the sphere
     const sprite = new SpriteText(node.nom);
-    sprite.color = node.nom === "Jesus " ? '#ff0000' : 'white';
-    sprite.textHeight = node.nom === "Jésus " ? 8 : 4;
+    sprite.color = node.nom === "Jesus" ? '#ff0000' : 'white';
+    sprite.textHeight = node.nom === "Jesus" ? 8 : 4;
     sphere.add(sprite);
 
     // Adjust label position
-    sprite.position.set(0, 0, node.nom === "Jésus " ? 10 : 6);
+    sprite.position.set(0, 0, node.nom === "Jesus" ? 10 : 6);
 
     return sphere;
   };
@@ -77,7 +77,7 @@ const PageGenealogie = () => {
     <ForceGraph3D
       ref={fgRef}
       graphData={data}
-      nodeColor={node => node.nom === "Jésus " ? "#F5501C" : "#D9EB71"}
+      nodeColor={node => node.nom === "Jesus" ? "#F5501C" : "#D9EB71"}
       nodeLabel="nom"
       onNodeClick={handleClick}
       nodeThreeObject={nodeThreeObject}

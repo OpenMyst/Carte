@@ -8,7 +8,7 @@ import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { addMarkerEvent, userPlayEvent } from "@/tool/service";
+import { addMarkerEvent, createUserOpenFormulaire, userPlayEvent } from "@/tool/service";
 import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
 import Spline from "@splinetool/react-spline";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
@@ -501,6 +501,12 @@ const Map3DComponent = ({ params }) => {
   //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
   // }
 
+  const handleOpenFormulaire = (e) => {
+    e.preventDefault();
+    createUserOpenFormulaire(userId); 
+    setCanAddEvent(!canAddEvent);
+  }
+
   return (
     <div>
       <div id="map" ref={mapContainer} />
@@ -540,7 +546,7 @@ const Map3DComponent = ({ params }) => {
             </Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={() => setCanAddEvent(!canAddEvent)}>
+            <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={handleOpenFormulaire}>
               <Plus />
             </Button>
           </fieldset>
