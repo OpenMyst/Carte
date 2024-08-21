@@ -63,7 +63,7 @@ const PageGenealogie = () => {
 
     // Add label as a child of the sphere
     const sprite = new SpriteText(node.nom);
-    sprite.color = node.nom === "Jésus " ? '#ff0000' : 'white';
+    sprite.color = node.nom === "Jesus " ? '#ff0000' : 'white';
     sprite.textHeight = node.nom === "Jésus " ? 8 : 4;
     sphere.add(sprite);
 
