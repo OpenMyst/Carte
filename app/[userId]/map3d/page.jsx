@@ -9,9 +9,10 @@ import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { addMarkerEvent, userPlayEvent } from "@/tool/service";
-import { PanelTopOpen } from "lucide-react";
+import { PanelTopOpen, Plus, Volume } from "lucide-react";
 import Spline from "@splinetool/react-spline";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 /*
@@ -480,6 +481,26 @@ const Map3DComponent = ({ params }) => {
     }
   };
 
+  // const handlePathClicked = (e) => {
+  //   e.preventDefault();
+  //   setShowRoad(!showRoad);
+  //   handleCheckboxChange('road-primary', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-street', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-minor', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-major-link', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
+  //   handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
+  //   handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
+  //   handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
+  // }
+
+  // const handleBuildingClicked = (e) => {
+  //   e.preventDefault();
+  //     setShowBuilding(!showBuilding);
+  //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
+  // }
+
   return (
     <div>
       <div id="map" ref={mapContainer} />
@@ -506,57 +527,20 @@ const Map3DComponent = ({ params }) => {
             </DrawerContent>
           </Drawer>
           <fieldset>
-            <Label htmlFor="show-building">Building</Label>
-            <Switch
-              id="show-building"
-              checked={showBuilding}
-              onCheckedChange={() => {
-                setShowBuilding(!showBuilding);
-                handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
-              }} />
+            <Button variant="outlined m-0" className="text-white" >EN</Button>
           </fieldset>
           <fieldset>
-            <Label htmlFor="show-building">Add Event</Label>
-            <Switch
-              id="show-building"
-              checked={canAddEvent}
-              onCheckedChange={() => {
-                setCanAddEvent(!canAddEvent);
-                // handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
-              }} />
+            <Button variant="outlined m-0" className="text-white">
+              <Volume />
+            </Button>
           </fieldset>
           <fieldset>
-            <Label htmlFor="showRoad">Paths</Label>
-            <Switch
-              id="showRoad"
-              checked={showRoad}
-              onCheckedChange={() => {
-                setShowRoad(!showRoad);
-                handleCheckboxChange('road-primary', 'visibility', !showRoad);
-                handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
-                handleCheckboxChange('road-street', 'visibility', !showRoad);
-                handleCheckboxChange('road-minor', 'visibility', !showRoad);
-                handleCheckboxChange('road-major-link', 'visibility', !showRoad);
-                handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
-                handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
-                handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
-                handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-              }}
-            />
+            <Button variant="outlined" className="text-white" onClick={() => setShowMap3D(!showMap3D)}>2D</Button>
           </fieldset>
           <fieldset>
-            <Label htmlFor="show-building">3D</Label>
-            <Switch
-              id="show-building"
-              checked={showMap3D}
-              onCheckedChange={() => {
-                setShowMap3D(!showMap3D);
-              }} />
-          </fieldset>
-          <fieldset>
-            <Label>My position</Label>
-            <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
-            <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
+            <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"}`} onClick={() => setCanAddEvent(!canAddEvent)}>
+              <Plus />
+            </Button>
           </fieldset>
         </div>
       </div>

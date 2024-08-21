@@ -9,7 +9,7 @@ import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { userPlayEvent } from "@/tool/service";
-import { PanelTopOpen } from "lucide-react";
+import { PanelTopOpen, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -208,6 +208,26 @@ export default function Map2DByUserId({ params }) {
     window.open("https://prytane.com/login", "_blank");
   };
 
+  const handlePathClicked = (e) => {
+    e.preventDefault();
+    setShowRoad(!showRoad);
+    handleCheckboxChange('road-primary', 'visibility', !showRoad);
+    handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
+    handleCheckboxChange('road-street', 'visibility', !showRoad);
+    handleCheckboxChange('road-minor', 'visibility', !showRoad);
+    handleCheckboxChange('road-major-link', 'visibility', !showRoad);
+    handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
+    handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
+    handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
+    handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
+  }
+
+  const handleBuildingClicked = (e) => {
+    e.preventDefault();
+    setShowBuilding(!showBuilding);
+    handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
+  }
+
   return (
     <main className="m-2">
       <div id="map" ref={mapContainer}></div>
@@ -220,11 +240,11 @@ export default function Map2DByUserId({ params }) {
             <DialogContent className="w-52">
               <DialogHeader>
                 <DialogTitle>This feature requires having an account</DialogTitle>
-                <DialogDescription>Creating an account takes 1 minute and is free. <br/>
+                <DialogDescription>Creating an account takes 1 minute and is free. <br />
                   You will then be able to view the map in 3D, resume reading where you left off, enrich the application thanks to the collaborative mode and more.</DialogDescription>
               </DialogHeader>
               <div className="flex gap-2">
-                <Button variant="outlined" className="border border-black w-full"  onClick={handleLogIn}>
+                <Button variant="outlined" className="border border-black w-full" onClick={handleLogIn}>
                   Log In
                 </Button>
                 <Button className="bg-gradient-to-r from-[#fdb642] to-[#fd5003] w-full" onClick={handleRegisterClick}>
@@ -234,57 +254,18 @@ export default function Map2DByUserId({ params }) {
             </DialogContent>
           </Dialog>
           <fieldset>
-            <Label htmlFor="show-building">Building</Label>
-            <Switch
-              id="show-building"
-              checked={showBuilding}
-              onCheckedChange={() => {
-                setShowBuilding(!showBuilding);
-                handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
-              }} />
+            <Button variant="outlined m-0" className="text-white" onClick={handleBuildingClicked}>Building</Button>
           </fieldset>
           <fieldset>
-            <Label htmlFor="show-building">Add Event</Label>
-            <Switch
-              id="show-building"
-              checked={openDialogCity}
-              onCheckedChange={() => {
-                setOpenDialogCity(!openDialogCity);
-                // handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
-              }} />
+            <Button variant="outlined m-0" className="text-white" onClick={handlePathClicked}>Paths</Button>
           </fieldset>
           <fieldset>
-            <Label htmlFor="showRoad">Paths</Label>
-            <Switch
-              id="showRoad"
-              checked={showRoad}
-              onCheckedChange={() => {
-                setShowRoad(!showRoad);
-                handleCheckboxChange('road-primary', 'visibility', !showRoad);
-                handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
-                handleCheckboxChange('road-street', 'visibility', !showRoad);
-                handleCheckboxChange('road-minor', 'visibility', !showRoad);
-                handleCheckboxChange('road-major-link', 'visibility', !showRoad);
-                handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
-                handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
-                handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
-                handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-              }}
-            />
+            <Button variant="outlined" className="text-white" onClick={() => setOpenDialogCity(!openDialogCity)}>3D</Button>
           </fieldset>
           <fieldset>
-            <Label htmlFor="show-building">3D</Label>
-            <Switch
-              id="show-building"
-              checked={openDialogCity}
-              onCheckedChange={() => {
-                setOpenDialogCity(!openDialogCity);
-              }} />
-          </fieldset>
-          <fieldset>
-            <Label>My position</Label>
-            <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
-            <input type="number" value="" step="any" className="w-20 bg-transparent" readOnly />
+            <Button variant="outlined m-0" className="text-white" onClick={() => setOpenDialogCity(!openDialogCity)}>
+              <Plus />
+            </Button>
           </fieldset>
         </div>
       </div>

@@ -21,7 +21,7 @@ body {
 .map-overlay {
   font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
   position: absolute;
-  width: 300px;
+  width: 100px;
   top: 0;
   left: 0;
   padding: 10px;
@@ -33,13 +33,6 @@ body {
   border-radius: 3px;
   padding: 10px;
   margin-bottom: 10px;
-}
-
-.map-overlay-inner fieldset {
-  margin: 1px;
-  display: flex;
-  justify-content: space-between;
-  border: none;
 }
 
 .map-overlay-inner label {
