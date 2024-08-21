@@ -156,7 +156,7 @@ export default function MapByUserId({ params }) {
                 const eventData = doc.data();
 
                 // Trouver les coordonnées correspondantes à l'ID de ville dans 'ville'
-                const villeInfo = villes.find(ville => ville.id === eventData.villeId);
+                const villeInfo = villes.find(ville => ville.ville === eventData.ville);
 
                 if (villeInfo) {
                     // Ajouter les coordonnées de la ville à l'événement
@@ -182,7 +182,7 @@ export default function MapByUserId({ params }) {
                 const lieuData = doc.data();
 
                 // Trouver les coordonnées correspondantes à l'ID de ville dans 'ville'
-                const villeInfo = villes.find(ville => ville.id === lieuData.villeId);
+                const villeInfo = villes.find(ville => ville.ville === lieuData.ville);
 
                 if (villeInfo) {
                     // Ajouter les coordonnées de la ville au lieu
