@@ -83,7 +83,7 @@ export default function Map2DByUserId({ params }) {
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
-    const q = query(collection(database, 'events'));
+    const q = query(collection(database, 'erechretiene'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let eventsArray = [];
 
