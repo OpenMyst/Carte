@@ -475,9 +475,9 @@ const Map3DComponent = ({ params }) => {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
-          closeButton.style.fontSize = '50px'; // Augmenter la taille de la croix
-          closeButton.style.width = '50px'; // Augmenter la taille de la zone cliquable
-          closeButton.style.height = '50px';
+          closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+          closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.height = '30px';
         }
         // Add event listener when popup is opened
         const button = document.getElementById('showJerusalemButton');
