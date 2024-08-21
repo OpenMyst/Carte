@@ -152,6 +152,19 @@ export const addMarkerEvent = (map, userId, event) => {
  */
 export const saveCoordonneEvent = async (userId, coordinates, place) => {
   try {
+    // Check if the location already exists in the database
+    const lieuQuery = query(
+      collection(database, 'events'),
+      where('ville', '==', place)
+    );
+    
+    const querySnapshot = await getDocs(lieuQuery);
+
+    if (!querySnapshot.empty) {
+      // If the location already exists, show an error alert
+      alert('Le lieu existe déjà dans la base de données.');
+      return;
+    }
     // Save the coordinates to the Firestore `events` collection
     const eventDocRef = await addDoc(collection(database, 'events'), {
       ville: place,
@@ -188,7 +201,21 @@ export const saveCoordonneEvent = async (userId, coordinates, place) => {
  */
 export const saveCoordonnePlace = async (userId, coordinates, place) => {
   try {
-    // Save the coordinates to the Firestore `events` collection
+    // Vérifier si le lieu existe déjà dans la base de données
+    const lieuQuery = query(
+      collection(database, 'lieu'),
+      where('ville', '==', place)
+    );
+    
+    const querySnapshot = await getDocs(lieuQuery);
+
+    if (!querySnapshot.empty) {
+      // Si le lieu existe déjà, afficher une alerte d'erreur
+      alert('Le lieu existe déjà dans la base de données.');
+      return;
+    }
+
+    // Si le lieu n'existe pas, l'ajouter à la base de données
     const eventDocRef = await addDoc(collection(database, 'lieu'), {
       ville: place,
       longitude: coordinates.lng,
@@ -196,9 +223,9 @@ export const saveCoordonnePlace = async (userId, coordinates, place) => {
       etat: 0,
     });
 
-    console.log('Event and location successfully created with ID:', eventDocRef);
-    console.log('Location:', coordinates);
+    console.log('Lieu ajouté avec succès avec l\'ID :', eventDocRef.id);
+    console.log('Coordonnées du lieu :', coordinates);
   } catch (error) {
-    console.error('Error adding event and location to Firestore:', error);
+    console.error('Erreur lors de l\'ajout du lieu à Firestore :', error);
   }
 }
