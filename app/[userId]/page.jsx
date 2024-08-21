@@ -416,7 +416,9 @@ export default function MapByUserId({ params }) {
                         </Button>
                     </fieldset>
                     <fieldset>
-                        <Button variant="outlined" className="text-white" onClick={() => setShowMap3D(!showMap3D)}>2D</Button>
+                        <Button variant="outlined" className="text-white" onClick={() => setShowMap3D(!showMap3D)}>
+                            {showMap3D ? "2D" : "3D"}
+                        </Button>
                     </fieldset>
                     <fieldset>
                         <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"}`} onClick={() => setCanAddEvent(!canAddEvent)}>
