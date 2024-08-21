@@ -246,15 +246,7 @@ export default function MapByUserId({ params }) {
                 <p class="h-[110px] overflow-y-scroll">${currentEvents.description}</p>
               </div>
             </div>
-          `);
-
-            const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
-                .setLngLat([currentEvents.longitude, currentEvents.latitude])
-                .setPopup(popup)  // Associe le popup au marqueur
-                .addTo(mapEvent)
-                .togglePopup();
-
-            popup.on('open', () => {
+          `).on('open', () => {
                 //Increase the size of the popup closing cross
                 const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
                 if (closeButton) {
@@ -263,6 +255,13 @@ export default function MapByUserId({ params }) {
                     closeButton.style.height = '30px';
                 }
             });
+
+            const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
+                .setLngLat([currentEvents.longitude, currentEvents.latitude])
+                .setPopup(popup)  // Associe le popup au marqueur
+                .addTo(mapEvent)
+                .togglePopup();
+
             mapEvent.flyTo({
                 center: [currentEvents.longitude, currentEvents.latitude],
                 zoom: 15
