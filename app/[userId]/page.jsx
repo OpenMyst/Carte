@@ -389,7 +389,6 @@ export default function MapByUserId({ params }) {
         });
 
         lieux.forEach((loc) => {
-            console.log(loc)
             const marker = new mapboxgl.Marker({ color: '#0769C5' })
                 .setLngLat([loc.longitude, loc.latitude])
                 .addTo(mapEvent);

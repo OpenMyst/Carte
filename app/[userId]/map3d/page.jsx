@@ -161,7 +161,6 @@ const Map3DComponent = ({ params }) => {
 
         // Trouver les coordonnées correspondantes à l'ID de ville dans 'ville'
         const villeInfo = villes.find(ville => ville.id === eventData.villeId);
-        console.log(villeInfo)
         if (villeInfo) {
           // Ajouter les coordonnées de la ville à l'événement
           eventsArray.push({
@@ -442,7 +441,6 @@ const Map3DComponent = ({ params }) => {
 
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
-    console.log(evangileEvents)
     evangileEvents.forEach((location) => {
       const saveButton = document.createElement('button');
       saveButton.className = "w-full";
@@ -501,7 +499,6 @@ const Map3DComponent = ({ params }) => {
 
     });
     lieux.forEach((loc) => {
-      console.log(loc)
       const marker = new mapboxgl.Marker({ color: '#0769C5' })
         .setLngLat([loc.longitude, loc.latitude])
         .addTo(mapEvent);
