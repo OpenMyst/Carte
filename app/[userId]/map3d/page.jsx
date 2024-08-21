@@ -327,7 +327,7 @@ const Map3DComponent = ({ params }) => {
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
               model.setCoords(coords);
-              model.setRotation({ x: 0, y: 0, z: 241 });
+              model.setRotation({ x: -2, y: -2, z: 241 });
               // Traverse the model to set opacity
               model.traverse((child) => {
                 if (child.isMesh) {
