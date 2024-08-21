@@ -83,15 +83,40 @@ export default function Map2DByUserId({ params }) {
 
   // Fetch all events from Firebase
   const getAllEvent = () => {
-    const q = query(collection(database, 'erechretiene'));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const villes = []
+    // Récupération des données de la collection 'ville'
+    const qVille = query(collection(database, 'ville'));
+    const unsubscribeVille = onSnapshot(qVille, (querySnapshot) => {
+      querySnapshot.forEach(doc => {
+        villes.push({ ...doc.data(), id: doc.id });
+      });
+    });
+
+    // Récupération des événements de la collection 'erechretiene'
+    const qEvangile = query(collection(database, 'erechretiene'));
+    const unsubscribeEvangile = onSnapshot(qEvangile, (querySnapshot) => {
       let eventsArray = [];
 
       querySnapshot.forEach(doc => {
-        eventsArray.push({ ...doc.data(), id: doc.id });
-      })
+        const eventData = doc.data();
+
+        // Trouver les coordonnées correspondantes à l'ID de ville dans 'ville'
+        const villeInfo = villes.find(ville => ville.ville === eventData.ville);
+
+        if (villeInfo) {
+          // Ajouter les coordonnées de la ville à l'événement
+          eventsArray.push({
+            ...eventData,
+            longitude: villeInfo.longitude,
+            latitude: villeInfo.latitude
+          });
+        } else {
+          // Si aucune correspondance, ajouter l'événement sans coordonnées
+          eventsArray.push(eventData);
+        }
+      });
       setEvangileEvents(eventsArray);
-    })
+    });
   }
 
   const updateMapSettings = () => {
@@ -118,6 +143,7 @@ export default function Map2DByUserId({ params }) {
   };
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
+    console.log(evangileEvents)
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
                 <div class="flex flex-row h-[300px] w-[220px] static">
