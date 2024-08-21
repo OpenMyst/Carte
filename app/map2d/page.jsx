@@ -9,7 +9,7 @@ import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { userPlayEvent } from "@/tool/service";
-import { PanelTopOpen, Plus } from "lucide-react";
+import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -254,16 +254,18 @@ export default function Map2DByUserId({ params }) {
             </DialogContent>
           </Dialog>
           <fieldset>
-            <Button variant="outlined m-0" className="text-white" onClick={handleBuildingClicked}>Building</Button>
+            <Button variant="outlined m-0" className="text-white font-bold" >EN</Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined m-0" className="text-white" onClick={handlePathClicked}>Paths</Button>
+            <Button variant="outlined m-0" className="text-white font-bold">
+              <Volume1 />
+            </Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined" className="text-white" onClick={() => setOpenDialogCity(!openDialogCity)}>3D</Button>
+            <Button variant="outlined" className="text-white font-bold" onClick={() => setOpenDialogCity(!openDialogCity)}>3D</Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined m-0" className="text-white" onClick={() => setOpenDialogCity(!openDialogCity)}>
+            <Button variant="outlined m-0" className="text-white font-bold" onClick={() => setOpenDialogCity(!openDialogCity)}>
               <Plus />
             </Button>
           </fieldset>

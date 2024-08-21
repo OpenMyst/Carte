@@ -9,7 +9,7 @@ import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { addMarkerEvent, userPlayEvent } from "@/tool/service";
-import { PanelTopOpen, Plus, Volume } from "lucide-react";
+import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
 import Spline from "@splinetool/react-spline";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
@@ -527,20 +527,20 @@ const Map3DComponent = ({ params }) => {
             </DrawerContent>
           </Drawer>
           <fieldset>
-            <Button variant="outlined m-0" className="text-white" >EN</Button>
+            <Button variant="outlined m-0" className="text-white font-bold" >EN</Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined m-0" className="text-white">
-              <Volume />
+            <Button variant="outlined m-0" className="text-white font-bold">
+              <Volume1 />
             </Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined" className="text-white" onClick={() => setShowMap3D(!showMap3D)}>
+            <Button variant="outlined" className="text-white font-bold" onClick={() => setShowMap3D(!showMap3D)}>
             {showMap3D ? "2D" : "3D"}
             </Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"}`} onClick={() => setCanAddEvent(!canAddEvent)}>
+            <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={() => setCanAddEvent(!canAddEvent)}>
               <Plus />
             </Button>
           </fieldset>

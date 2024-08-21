@@ -8,7 +8,7 @@ import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
 import { Button } from "@/components/ui/button";
 import { addMarkerEvent, userPlayEvent } from "@/tool/service";
-import { PanelTopOpen, Plus, Volume } from "lucide-react";
+import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -408,20 +408,20 @@ export default function MapByUserId({ params }) {
                 </button>
                 <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
                     <fieldset>
-                        <Button variant="outlined m-0" className="text-white" >EN</Button>
+                        <Button variant="outlined m-0" className="text-white font-bold" >EN</Button>
                     </fieldset>
                     <fieldset>
-                        <Button variant="outlined m-0" className="text-white">
-                            <Volume />
+                        <Button variant="outlined m-0" className="text-white font-bold">
+                            <Volume1 />
                         </Button>
                     </fieldset>
                     <fieldset>
-                        <Button variant="outlined" className="text-white" onClick={() => setShowMap3D(!showMap3D)}>
+                        <Button variant="outlined" className="text-white font-bold" onClick={() => setShowMap3D(!showMap3D)}>
                             {showMap3D ? "2D" : "3D"}
                         </Button>
                     </fieldset>
                     <fieldset>
-                        <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"}`} onClick={() => setCanAddEvent(!canAddEvent)}>
+                        <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={() => setCanAddEvent(!canAddEvent)}>
                             <Plus />
                         </Button>
                     </fieldset>
