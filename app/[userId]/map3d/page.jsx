@@ -501,9 +501,9 @@ const Map3DComponent = ({ params }) => {
   //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
   // }
 
-  const handleOpenFormulaire = (e) => {
+  const handleOpenFormulaire = async (e) => {
     e.preventDefault();
-    createUserOpenFormulaire(userId); 
+    await createUserOpenFormulaire(userId); 
     setCanAddEvent(!canAddEvent);
   }
 

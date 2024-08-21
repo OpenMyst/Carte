@@ -1,5 +1,5 @@
 "use client"
-import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, updateDoc, doc } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import mapboxgl from 'mapbox-gl';
 
@@ -286,24 +286,34 @@ export const saveCoordonnePlace = async (userId, coordinates, place) => {
  */
 export const createUserOpenFormulaire = async (userId) => {
   try {
-    const hasCreateUser = query(
+    console.log("has clicked")
+    const queryFetch = query(
       collection(database, 'openFormulaire'),
       where('idUser', '==', userId)
     )
 
-    if(hasCreateUser) {
-      return;
+    const hasCreateUser = await getDocs(queryFetch)
+
+    if (!hasCreateUser.empty) {
+      const docId = hasCreateUser.docs[0].id; // Récupère l'ID du document existant
+      const hasCliqued = hasCreateUser.docs[0].data().isClique;
+      const docRef = doc(database, 'openFormulaire', docId);
+    
+      await updateDoc(docRef, {
+        isClique: !hasCliqued
+      });
+    
+      console.log('Document mis à jour avec succès');
+    } else {
+      const addFormulaire = await addDoc(
+        collection(database, 'openFormulaire'), {
+          idUser: userId,
+          isClique: true
+        }
+      );
+    
+      console.log('Nouveau document créé avec succès');
     }
-
-    const addFormulaire = await addDoc(
-      collection(database, 'openFormulaire'), {
-        idUser: userId,
-        isClique: true
-      }
-    )
-
-    console.log('Lieu ajouté avec succès avec l\'ID :', addFormulaire.id);
-    return;
   } catch (error) {
     console.error('Erreur lors de l\'ajout du formulaire à Firestore :', error);
   }
