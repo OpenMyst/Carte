@@ -57,31 +57,31 @@ export const addMarkerEvent = (map, userId, event) => {
   locationInput.className = 'w-full p-2 border border-gray-300 rounded-sm';
   locationInput.placeholder = 'Enter location name';
 
-  const savePlaceButton = document.createElement('button');
-  savePlaceButton.className = "w-full bg-secondary rounded-sm text-white m-1";
-  savePlaceButton.innerText = 'Save Place';
-  savePlaceButton.onclick = async () => {
-    const locationName = locationInput.value; // Récupérer la valeur de l'input
-    if (locationName) {
-      console.log('Location:', locationName);
-      console.log('Coordinates:', coordinates);
-      await saveCoordonnePlace(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
-      // Fermer le popup
-      marker.remove();
-    } else {
-      alert('Please enter a location name.');
-    }
-  };
+  // const savePlaceButton = document.createElement('button');
+  // savePlaceButton.className = "w-full bg-secondary rounded-sm text-white m-1";
+  // savePlaceButton.innerText = 'Save Place';
+  // savePlaceButton.onclick = async () => {
+  //   const locationName = locationInput.value; // Récupérer la valeur de l'input
+  //   if (locationName) {
+  //     console.log('Location:', locationName);
+  //     console.log('Coordinates:', coordinates);
+  //     await saveCoordonnePlace(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
+  //     // Fermer le popup
+  //     marker.remove();
+  //   } else {
+  //     alert('Please enter a location name.');
+  //   }
+  // };
   
   const saveEventButton = document.createElement('button');
   saveEventButton.className = "w-full bg-primary rounded-sm text-white m-1";
-  saveEventButton.innerText = 'Save Event';
+  saveEventButton.innerText = 'Save location';
   saveEventButton.onclick = async () => {
     const locationName = locationInput.value; // Récupérer la valeur de l'input
     if (locationName) {
       console.log('Location:', locationName);
       console.log('Coordinates:', coordinates);
-      await saveCoordonneEreChretien(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
+      await saveCoordonneEvent(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
       // Fermer le popup
       marker.remove();
     } else {
@@ -100,7 +100,7 @@ export const addMarkerEvent = (map, userId, event) => {
   const divEventCreate = document.createElement('div');
   divEventCreate.className = "flex gap-1";
   divEventCreate.appendChild(saveEventButton);
-  divEventCreate.appendChild(savePlaceButton);
+  // divEventCreate.appendChild(savePlaceButton);
 
   popupContent.appendChild(popupTitle);
   popupContent.appendChild(locationInput);
@@ -154,7 +154,7 @@ export const saveCoordonneEvent = async (userId, coordinates, place) => {
   try {
     // Check if the location already exists in the database
     const lieuQuery = query(
-      collection(database, 'events'),
+      collection(database, 'ville'),
       where('ville', '==', place)
     );
     
@@ -166,26 +166,12 @@ export const saveCoordonneEvent = async (userId, coordinates, place) => {
       return;
     }
     // Save the coordinates to the Firestore `events` collection
-    const eventDocRef = await addDoc(collection(database, 'events'), {
+    const eventDocRef = await addDoc(collection(database, 'ville'), {
       ville: place,
       longitude: coordinates.lng,
       latitude: coordinates.lat,
-      event_date: "1944",
-      etat: 0,
-      description : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam consectetur tincidunt aliquam. Proin ut consequat tortor, sed pellentesque ex. Fusce elementum ultrices lectus, sed aliquam dolor sodales eget. Mauris dictum porttitor libero at lacinia. Maecenas at arcu eu nunc posuere sollicitudin. Donec vel varius nisl. Vestibulum rutrum nulla diam, non bibendum ante auctor ut. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed augue vitae erat facilisis vulputate. Nam aliquam nibh vitae dui vulputate efficitur. Nulla bibendum at magna vitae ultrices.",
-      label :"Lorem ipsum"
     });
 
-    const eventId = eventDocRef.id;
-
-    // Update the `location` collection with the new event ID and userId
-    const location = await addDoc(collection(database, 'location'), {
-      idUser: userId,
-      idEvents: eventId,
-      isPlay: false
-    });
-
-    console.log('Event and location successfully created with ID:', eventId);
     console.log('Location:', location);
   } catch (error) {
     console.error('Error adding event and location to Firestore:', error);

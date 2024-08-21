@@ -26,6 +26,7 @@ export default function MapByUserId({ params }) {
     const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
     const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
     const [lieux, setLieux] = useState([]); // State for storing place
+    const [villes, setVilles] = useState([]); // State for storing ville
     const [open, setOpen] = useState(true); // Toggle for overlay visibility
     const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
     const [endTravel, setEndTravel] = useState([]); // End coordinates for route
@@ -138,25 +139,68 @@ export default function MapByUserId({ params }) {
 
     // Fetch all events and lieu from Firebase
     const getAllEvent = () => {
-        const q = query(collection(database, 'erechretiene'));
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        // Récupération des données de la collection 'ville'
+        const qVille = query(collection(database, 'ville'));
+        const unsubscribeVille = onSnapshot(qVille, (querySnapshot) => {
+            let villesArray = [];
+
+            querySnapshot.forEach(doc => {
+                villesArray.push({ ...doc.data(), id: doc.id });
+            });
+            setVilles(villesArray);
+        });
+
+        // Récupération des événements de la collection 'erechretiene'
+        const qEvangile = query(collection(database, 'erechretiene'));
+        const unsubscribeEvangile = onSnapshot(qEvangile, (querySnapshot) => {
             let eventsArray = [];
 
             querySnapshot.forEach(doc => {
-                eventsArray.push({ ...doc.data(), id: doc.id });
-            })
-            setEvangileEvents(eventsArray);
-        })
+                const eventData = doc.data();
 
+                // Trouver les coordonnées correspondantes à l'ID de ville dans 'ville'
+                const villeInfo = villes.find(ville => ville.id === eventData.villeId);
+
+                if (villeInfo) {
+                    // Ajouter les coordonnées de la ville à l'événement
+                    eventsArray.push({
+                        ...eventData,
+                        longitude: villeInfo.longitude,
+                        latitude: villeInfo.latitude
+                    });
+                } else {
+                    // Si aucune correspondance, ajouter l'événement sans coordonnées
+                    eventsArray.push(eventData);
+                }
+            });
+            setEvangileEvents(eventsArray);
+        });
+
+        // Récupération des lieux de la collection 'lieu'
         const qLieu = query(collection(database, 'lieu'));
         const unsubscribeLieu = onSnapshot(qLieu, (querySnapshot) => {
-            let eventsArray = [];
+            let lieuxArray = [];
 
             querySnapshot.forEach(doc => {
-                eventsArray.push({ ...doc.data(), id: doc.id });
-            })
-            setLieux(eventsArray);
-        })
+                const lieuData = doc.data();
+
+                // Trouver les coordonnées correspondantes à l'ID de ville dans 'ville'
+                const villeInfo = villes.find(ville => ville.id === lieuData.villeId);
+
+                if (villeInfo) {
+                    // Ajouter les coordonnées de la ville au lieu
+                    lieuxArray.push({
+                        ...lieuData,
+                        longitude: villeInfo.longitude,
+                        latitude: villeInfo.latitude
+                    });
+                } else {
+                    // Si aucune correspondance, ajouter le lieu sans coordonnées
+                    lieuxArray.push(lieuData);
+                }
+            });
+            setLieux(lieuxArray);
+        });
     }
 
     //Received the location of the event who play by user and zoom in them
@@ -401,7 +445,7 @@ export default function MapByUserId({ params }) {
 
     const handleOpenFormulaire = (e) => {
         e.preventDefault();
-        createUserOpenFormulaire(userId); 
+        createUserOpenFormulaire(userId);
         setCanAddEvent(!canAddEvent);
     }
 
