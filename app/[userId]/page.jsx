@@ -26,7 +26,6 @@ export default function MapByUserId({ params }) {
     const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
     const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
     const [lieux, setLieux] = useState([]); // State for storing place
-    const [villes, setVilles] = useState([]); // State for storing ville
     const [open, setOpen] = useState(true); // Toggle for overlay visibility
     const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
     const [endTravel, setEndTravel] = useState([]); // End coordinates for route
@@ -139,15 +138,13 @@ export default function MapByUserId({ params }) {
 
     // Fetch all events and lieu from Firebase
     const getAllEvent = () => {
+        const villes = []
         // Récupération des données de la collection 'ville'
         const qVille = query(collection(database, 'ville'));
         const unsubscribeVille = onSnapshot(qVille, (querySnapshot) => {
-            let villesArray = [];
-
             querySnapshot.forEach(doc => {
-                villesArray.push({ ...doc.data(), id: doc.id });
+                villes.push({ ...doc.data(), id: doc.id });
             });
-            setVilles(villesArray);
         });
 
         // Récupération des événements de la collection 'erechretiene'
