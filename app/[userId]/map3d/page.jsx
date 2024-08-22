@@ -29,7 +29,7 @@ const Map3DComponent = ({ params }) => {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-  const [mountainHeight, setMountainHeight] = useState(85); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(80); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [lieux, setLieux] = useState([]); // State for storing place
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
@@ -212,9 +212,9 @@ const Map3DComponent = ({ params }) => {
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(85);
+        setMountainHeight(80);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 85, false);
+        updateTerrain(mapEvent, 80, false);
       } else {
         setMountainHeight(0);
         setShowBuilding(false);
@@ -363,12 +363,12 @@ const Map3DComponent = ({ params }) => {
         renderingMode: '3d',
         onAdd: function () {
           const scale = 2;
-          const heightMultiple = mountainHeight < 70 ? 1 : 3;
+          const heightMultiple = mountainHeight < 80 ? 1 : 3;
 
           const loadAndPlaceModel = (options, coords) => {
             tb.loadObj(options, (model) => {
               model.setCoords(coords);
-              model.setRotation({ x: -2, y: -2, z: 241 });
+              model.setRotation({ x: -1.5, y: -1.5, z: 241 });
               // Traverse the model to set opacity
               model.traverse((child) => {
                 if (child.isMesh) {
