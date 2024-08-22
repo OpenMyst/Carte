@@ -29,7 +29,7 @@ const Map3DComponent = ({ params }) => {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-  const [mountainHeight, setMountainHeight] = useState(70); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(85); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [lieux, setLieux] = useState([]); // State for storing place
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
@@ -212,9 +212,9 @@ const Map3DComponent = ({ params }) => {
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(70);
+        setMountainHeight(85);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 70, false);
+        updateTerrain(mapEvent, 85, false);
       } else {
         setMountainHeight(0);
         setShowBuilding(false);
@@ -337,7 +337,7 @@ const Map3DComponent = ({ params }) => {
           source: 'mapbox-dem',
           paint: {
             'hillshade-exaggeration': mountainHeight / 100,
-            'hillshade-highlight-color': '#6B7280',
+            'hillshade-highlight-color': '#9CA2AD',
             'hillshade-shadow-color': '#596575',
             'hillshade-accent-color': '#596575'
           }
