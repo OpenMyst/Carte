@@ -501,9 +501,9 @@ const Map3DComponent = ({ params }) => {
     lieux.forEach((loc) => {
       const popup = new mapboxgl.Popup().setHTML(`
         <div>
-          <div class="flex flex-row h-[300px] w-[220px] static">
+          <div class="flex flex-row h-[100px] w-[200px] static">
             <div class="mt-[150px] fixed">
-              <h3 class="text-base font-bold text-center">${loc.nom}</h3>
+              <h3 class="text-base font-bold text-center">${loc.ville}</h3>
               <p class="h-[100px] overflow-y-scroll">${loc.description}</p>
             </div>
           </div>
