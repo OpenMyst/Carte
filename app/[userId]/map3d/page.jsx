@@ -502,11 +502,8 @@ const Map3DComponent = ({ params }) => {
       const popup = new mapboxgl.Popup().setHTML(`
         <div>
           <div class="flex flex-row h-[300px] w-[220px] static">
-            <div class="w-full h-[60px] relative">
-              <img src="${loc.image}" alt="${loc.name}" class="w-full h-[150px]"/>
-            </div>
             <div class="mt-[150px] fixed">
-              <h3 class="text-base font-bold text-center">${loc.name}</h3>
+              <h3 class="text-base font-bold text-center">${loc.nom}</h3>
               <p class="h-[100px] overflow-y-scroll">${loc.description}</p>
             </div>
           </div>
@@ -517,8 +514,6 @@ const Map3DComponent = ({ params }) => {
         .setLngLat([loc.longitude, loc.latitude])
         .setPopup(popup)
         .addTo(mapEvent);
-
-    
     })
   };
 
