@@ -404,7 +404,8 @@ export default function MapByUserId({ params }) {
         .setLngLat([loc.longitude, loc.latitude])
         .setPopup(popup)
         .addTo(mapEvent);
-        })
+        });
+    });
     };
 
     //update the terrain in the map when the height of mountain has changed
