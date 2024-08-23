@@ -388,7 +388,7 @@ const Map3DComponent = ({ params }) => {
             rotation: { x: 90, y: -90, z: 0 },
             altitude: 0
           };
-          loadAndPlaceModel(options1, [35.2297, 31.7738]);
+          loadAndPlaceModel(options1, [35.2280, 31.7720]);
 
           const options2 = {
             obj: '/assets/golgot.gltf',
