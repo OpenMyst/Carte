@@ -389,9 +389,21 @@ export default function MapByUserId({ params }) {
         });
 
         lieux.forEach((loc) => {
-            const marker = new mapboxgl.Marker({ color: '#0769C5' })
-                .setLngLat([loc.longitude, loc.latitude])
-                .addTo(mapEvent);
+            const popup = new mapboxgl.Popup().setHTML(`
+        <div>
+          <div class="flex flex-row h-[300px] w-[220px] static">
+            <div class="mt-[150px] fixed">
+              <h3 class="text-base font-bold text-center">${loc.nom}</h3>
+              <p class="h-[100px] overflow-y-scroll">${loc.description}</p>
+            </div>
+          </div>
+        </div>
+        `);
+
+      const marker = new mapboxgl.Marker({ color: '#0769C5' })
+        .setLngLat([loc.longitude, loc.latitude])
+        .setPopup(popup)
+        .addTo(mapEvent);
         })
     };
 
