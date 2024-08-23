@@ -99,13 +99,12 @@ export const addMarkerEvent = (map, userId, event) => {
 
   const divEventCreate = document.createElement('div');
   divEventCreate.className = "flex gap-1";
+  divEventCreate.appendChild(deleteButton);
   divEventCreate.appendChild(saveEventButton);
-  // divEventCreate.appendChild(savePlaceButton);
 
   popupContent.appendChild(popupTitle);
   popupContent.appendChild(locationInput);
   popupContent.appendChild(divEventCreate);
-  popupContent.appendChild(deleteButton);
 
   const popup = new mapboxgl.Popup().setDOMContent(popupContent)
   .on('open', () => {
