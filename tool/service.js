@@ -169,6 +169,7 @@ export const saveCoordonneEvent = async (userId, coordinates, place) => {
       ville: place,
       longitude: coordinates.lng,
       latitude: coordinates.lat,
+      etat: 0
     });
 
     console.log('Location:', location);
