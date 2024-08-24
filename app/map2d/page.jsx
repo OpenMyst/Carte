@@ -326,10 +326,10 @@ export default function Map2DByUserId({ params }) {
                   enrich the application thanks to the collaborative mode and more.</DialogDescription>
               </DialogHeader>
               <div className="flex gap-2">
-                <Button variant="outlined" className="border border-black w-full" onClick={handleLogIn}>
+                <Button variant="outlined" className="border border-black w-full text-lg" onClick={handleLogIn}>
                   Log In
                 </Button>
-                <Button className="bg-gradient-to-r from-[#fdb642] to-[#fd5003] w-full" onClick={handleRegisterClick}>
+                <Button className="bg-gradient-to-r from-[#fdb642] to-[#fd5003] w-full text-lg" onClick={handleRegisterClick}>
                   Register
                 </Button>
               </div>
