@@ -85,7 +85,7 @@ export default function Map2DByUserId({ params }) {
   // Fetch all events from Firebase
   const getAllEvent = () => {
     const villes = []
-    // Récupération des données de la collection 'ville'
+    // Retrieving city from the 'ville' collection
     const qVille = query(collection(database, 'ville'));
     const unsubscribeVille = onSnapshot(qVille, (querySnapshot) => {
       querySnapshot.forEach(doc => {
@@ -93,33 +93,34 @@ export default function Map2DByUserId({ params }) {
       });
     });
 
-    // Récupération des événements de la collection 'erechretiene'
+    // Retrieving Event from the 'erechretiene' collection
     const qEvangile = query(collection(database, 'erechretiene'));
     const unsubscribeEvangile = onSnapshot(qEvangile, (querySnapshot) => {
       let eventsArray = [];
 
       querySnapshot.forEach(doc => {
         const eventData = doc.data();
-
-        // Trouver les coordonnées correspondantes à l'ID de ville dans 'ville'
-        const villeInfo = villes.find(ville => ville.ville === eventData.ville);
-
-        if (villeInfo) {
-          // Ajouter les coordonnées de la ville à l'événement
-          eventsArray.push({
-            ...eventData,
-            longitude: villeInfo.longitude,
-            latitude: villeInfo.latitude
-          });
-        } else {
-          // Si aucune correspondance, ajouter l'événement sans coordonnées
-          eventsArray.push(eventData);
+        if (eventData.etat === 15) {
+          // Find coordinates corresponding to city ID in 'ville'
+          const villeInfo = villes.find(ville => ville.ville === eventData.ville);
+          if (villeInfo) {
+            // Add city coordinates instead
+            eventsArray.push({
+              ...eventData,
+              longitude: villeInfo.longitude,
+              latitude: villeInfo.latitude
+            });
+          } else {
+            // If no match, add location without coordinates
+            eventsArray.push(eventData);
+          }
         }
+
       });
       setEvangileEvents(eventsArray);
     });
 
-    // Récupération des lieux de la collection 'lieu'
+    // Retrieving places from the 'lieu' collection
     const qLieu = query(collection(database, 'lieu'));
     const unsubscribeLieu = onSnapshot(qLieu, (querySnapshot) => {
       let lieuxArray = [];
@@ -127,19 +128,21 @@ export default function Map2DByUserId({ params }) {
       querySnapshot.forEach(doc => {
         const lieuData = doc.data();
 
-        // Trouver les coordonnées correspondantes à l'ID de ville dans 'ville'
-        const villeInfo = villes.find(ville => ville.ville === lieuData.ville);
+        if (lieuData.etat === 15) {
+          // Find coordinates corresponding to city ID in 'ville'
+          const villeInfo = villes.find(ville => ville.ville === lieuData.ville);
 
-        if (villeInfo) {
-          // Ajouter les coordonnées de la ville au lieu
-          lieuxArray.push({
-            ...lieuData,
-            longitude: villeInfo.longitude,
-            latitude: villeInfo.latitude
-          });
-        } else {
-          // Si aucune correspondance, ajouter le lieu sans coordonnées
-          lieuxArray.push(lieuData);
+          if (villeInfo) {
+            // Add city coordinates instead
+            lieuxArray.push({
+              ...lieuData,
+              longitude: villeInfo.longitude,
+              latitude: villeInfo.latitude
+            });
+          } else {
+            // If no match, add location without coordinates
+            lieuxArray.push(lieuData);
+          }
         }
       });
       setLieux(lieuxArray);
