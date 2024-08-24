@@ -318,11 +318,12 @@ export default function Map2DByUserId({ params }) {
         </button> */}
         <div className={`map-overlay-inner block`}>
           <Dialog open={openDialogCity} onOpenChange={setOpenDialogCity}>
-            <DialogContent className="w-52">
+            <DialogContent className="w-[400px]">
               <DialogHeader>
-                <DialogTitle>This feature requires having an account</DialogTitle>
-                <DialogDescription>Creating an account takes 1 minute and is free. <br />
-                  You will then be able to view the map in 3D, resume reading where you left off, enrich the application thanks to the collaborative mode and more.</DialogDescription>
+                <DialogTitle className="mt-2 mb-2 font-bold text-2xl">This feature <br /> requires having an account</DialogTitle>
+                <DialogDescription className="mt-2 mb-4 leading-loose ">Creating an account takes 1 minute and is free. <br />
+                  You will then be able to view the map in 3D, <br /> resume reading where you left off, <br />
+                  enrich the application thanks to the collaborative mode and more.</DialogDescription>
               </DialogHeader>
               <div className="flex gap-2">
                 <Button variant="outlined" className="border border-black w-full" onClick={handleLogIn}>
