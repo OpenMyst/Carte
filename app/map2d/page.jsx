@@ -28,6 +28,7 @@ export default function Map2DByUserId({ params }) {
   const [season, setSeason] = useState('spring'); // Season state
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
+  const [lieux, setLieux] = useState([]); // State for storing events
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
@@ -117,6 +118,32 @@ export default function Map2DByUserId({ params }) {
       });
       setEvangileEvents(eventsArray);
     });
+
+    // Récupération des lieux de la collection 'lieu'
+    const qLieu = query(collection(database, 'lieu'));
+    const unsubscribeLieu = onSnapshot(qLieu, (querySnapshot) => {
+      let lieuxArray = [];
+
+      querySnapshot.forEach(doc => {
+        const lieuData = doc.data();
+
+        // Trouver les coordonnées correspondantes à l'ID de ville dans 'ville'
+        const villeInfo = villes.find(ville => ville.ville === lieuData.ville);
+
+        if (villeInfo) {
+          // Ajouter les coordonnées de la ville au lieu
+          lieuxArray.push({
+            ...lieuData,
+            longitude: villeInfo.longitude,
+            latitude: villeInfo.latitude
+          });
+        } else {
+          // Si aucune correspondance, ajouter le lieu sans coordonnées
+          lieuxArray.push(lieuData);
+        }
+      });
+      setLieux(lieuxArray);
+    });
   }
 
   const updateMapSettings = () => {
@@ -143,7 +170,6 @@ export default function Map2DByUserId({ params }) {
   };
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
-    console.log(evangileEvents)
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
                 <div class="flex flex-row h-[300px] w-[220px] static">
@@ -197,6 +223,32 @@ export default function Map2DByUserId({ params }) {
         mapEvent.setStyle(winterDark);
         addSnowLayer(mapEvent);
       }
+    });
+    console.log(lieux)
+    lieux.forEach((loc) => {
+      const popup = new mapboxgl.Popup().setHTML(`
+        <div>
+          <div class="flex flex-row h-[150px] w-[100px] static">
+              <div class="mt-2 fixed">
+              <h3 class="text-base font-bold text-center">${loc.ville}</h3>
+              <p class="ml-[-5px] mr-1 h-[120px]">${loc.description}</p>
+              </div>
+          </div>
+        </div>
+      `);
+
+      const marker = new mapboxgl.Marker({ color: '#0769C5' })
+        .setLngLat([loc.longitude, loc.latitude])
+        .setPopup(popup)
+        .addTo(mapEvent);
+
+      marker.getElement().addEventListener('click', () => {
+        // setOpenDialogCity(true);
+        mapEvent.flyTo({
+          center: [loc.longitude, loc.latitude],
+          zoom: 20
+        });
+      });
     });
   };
 
