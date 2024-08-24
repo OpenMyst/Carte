@@ -318,7 +318,7 @@ export default function Map2DByUserId({ params }) {
         </button> */}
         <div className={`map-overlay-inner block`}>
           <Dialog open={openDialogCity} onOpenChange={setOpenDialogCity}>
-            <DialogContent className="w-[400px]">
+            <DialogContent className="w-[370px]">
               <DialogHeader>
                 <DialogTitle className="mt-2 mb-2 font-bold text-2xl">This feature <br /> requires having an account</DialogTitle>
                 <DialogDescription className="mt-2 mb-4 leading-loose ">Creating an account takes 1 minute and is free. <br />
