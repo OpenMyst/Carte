@@ -324,10 +324,13 @@ export default function MapByUserId({ params }) {
 
             map.once('idle', () => {
                 map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+                map.on('style.load', () => {
+                    if (map.getLayer('hillshade')) {
+                      map.removeLayer('hillshade');
+                    }
+                  });
             });
-            if (map.getLayer('hillshade')) {
-                map.removeLayer('hillshade');
-            }
+
             if (mapStyle === nightStyle) {
                 map.addLayer({
                     id: 'hillshade-layer',
