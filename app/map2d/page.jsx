@@ -67,7 +67,7 @@ export default function Map2DByUserId({ params }) {
     if (map.current) {
       loadEvangileMarker(map.current);
     }
-  }, [evangileEvents, map]);
+  }, [evangileEvents, lieux, map]);
 
   useEffect(() => {
     if (map.current) {
@@ -224,9 +224,9 @@ export default function Map2DByUserId({ params }) {
         addSnowLayer(mapEvent);
       }
     });
-    console.log(lieux)
     lieux.forEach((loc) => {
-      const popup = new mapboxgl.Popup().setHTML(`
+      console.log(loc)
+      const popupLieu = new mapboxgl.Popup().setHTML(`
         <div>
           <div class="flex flex-row h-[150px] w-[100px] static">
               <div class="mt-2 fixed">
@@ -237,12 +237,12 @@ export default function Map2DByUserId({ params }) {
         </div>
       `);
 
-      const marker = new mapboxgl.Marker({ color: '#0769C5' })
+      const mark = new mapboxgl.Marker({ color: '#0769C5' })
         .setLngLat([loc.longitude, loc.latitude])
-        .setPopup(popup)
+        .setPopup(popupLieu)
         .addTo(mapEvent);
 
-      marker.getElement().addEventListener('click', () => {
+      mark.getElement().addEventListener('click', () => {
         // setOpenDialogCity(true);
         mapEvent.flyTo({
           center: [loc.longitude, loc.latitude],

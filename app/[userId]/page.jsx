@@ -247,15 +247,15 @@ export default function MapByUserId({ params }) {
               </div>
             </div>
           `)
-        //   .on('open', () => {
-        //         //Increase the size of the popup closing cross
-        //         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-        //         if (closeButton) {
-        //             closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
-        //             closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
-        //             closeButton.style.height = '30px';
-        //         }
-        //     });
+            //   .on('open', () => {
+            //         //Increase the size of the popup closing cross
+            //         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+            //         if (closeButton) {
+            //             closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+            //             closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+            //             closeButton.style.height = '30px';
+            //         }
+            //     });
 
             const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
                 .setLngLat([currentEvents.longitude, currentEvents.latitude])
@@ -319,7 +319,9 @@ export default function MapByUserId({ params }) {
                 url: 'mapbox://mapbox.terrain-rgb'
             });
 
-            map.setTerrain({ source: 'mapbox-dem', exaggeration: 50 / 100 });
+            map.once('idle', () => {
+                map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+            });
             if (mapStyle === nightStyle) {
                 map.addLayer({
                     id: 'hillshade-layer',
@@ -374,9 +376,9 @@ export default function MapByUserId({ params }) {
                 //Increase the size of the popup closing cross
                 const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
                 if (closeButton) {
-                    closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
-                    closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
-                    closeButton.style.height = '30px';
+                    closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
+                    closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
+                    closeButton.style.height = '25px';
                 }
             });
 
@@ -390,21 +392,30 @@ export default function MapByUserId({ params }) {
 
         lieux.forEach((loc) => {
             const popup = new mapboxgl.Popup().setHTML(`
-            <div>
-                <div class="flex flex-row h-[150px] w-[100px] static">
-                    <div class="mt-2 fixed">
-                    <h3 class="text-base font-bold text-center">${loc.ville}</h3>
-                    <p class="ml-[-5px] mr-1 h-[120px]">${loc.description}</p>
+                <div>
+                    <div class="flex flex-row h-[150px] w-[100px] static">
+                        <div class="mt-2 fixed">
+                        <h3 class="text-base font-bold text-center">${loc.ville}</h3>
+                        <p class="ml-[-5px] mr-1 h-[120px]">${loc.description}</p>
+                        </div>
                     </div>
                 </div>
-                </div>
-                `);
+            `);
+            popup.on('open', () => {
+                //Increase the size of the popup closing cross
+                const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+                if (closeButton) {
+                    closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
+                    closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
+                    closeButton.style.height = '25px';
+                }
+            });
 
             const marker = new mapboxgl.Marker({ color: '#0769C5' })
                 .setLngLat([loc.longitude, loc.latitude])
                 .setPopup(popup)
                 .addTo(mapEvent);
-            
+
             marker.getElement().addEventListener('click', () => {
                 // setOpenDialogCity(true);
                 mapEvent.flyTo({

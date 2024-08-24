@@ -250,7 +250,7 @@ const Map3DComponent = ({ params }) => {
               <p class="h-[100px] overflow-y-scroll">${currentEvents.description}</p>
             </div>
           </div>
-          <button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button>
+          <!--<button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button> -->
         </div>
       `)
       // .on('open', () => {
@@ -329,7 +329,9 @@ const Map3DComponent = ({ params }) => {
         type: 'raster-dem',
         url: 'mapbox://mapbox.terrain-rgb'
       });
-      map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      map.once('idle', () => {
+        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      });
       if (mapStyle === nightStyle) {
         map.addLayer({
           id: 'hillshade-layer',
@@ -442,16 +444,6 @@ const Map3DComponent = ({ params }) => {
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
-      const saveButton = document.createElement('button');
-      saveButton.className = "w-full";
-      saveButton.style.backgroundColor = "blue";
-      saveButton.style.color = "white";
-      saveButton.style.margin = "1px";
-      saveButton.style.padding = "5px";
-      saveButton.innerText = 'Show Jerusalem';
-      saveButton.onclick = () => {
-        setOpenDialogCity(true);
-      };
       const popup = new mapboxgl.Popup().setHTML(`
         <div>
           <div class="flex flex-row h-[300px] w-[220px] static">
@@ -462,8 +454,8 @@ const Map3DComponent = ({ params }) => {
               <h3 class="text-base font-bold text-center">${location.name}</h3>
               <p class="h-[100px] overflow-y-scroll">${location.description}</p>
             </div>
+            <!--<button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button> -->
           </div>
-          <button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button>
         </div>
         `);
 
@@ -476,17 +468,17 @@ const Map3DComponent = ({ params }) => {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
-          closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
-          closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
-          closeButton.style.height = '30px';
+          closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
+          closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.height = '25px';
         }
         // Add event listener when popup is opened
-        const button = document.getElementById('showJerusalemButton');
-        if (button) {
-          button.addEventListener('click', () => {
-            setOpenDialogCity(true);
-          });
-        }
+        // const button = document.getElementById('showJerusalemButton');
+        // if (button) {
+        //   button.addEventListener('click', () => {
+        //     setOpenDialogCity(true);
+        //   });
+        // }
       });
 
       marker.getElement().addEventListener('click', () => {
@@ -502,15 +494,21 @@ const Map3DComponent = ({ params }) => {
       const popup = new mapboxgl.Popup().setHTML(`
         <div>
           <div class="flex flex-row h-[150px] w-[100px] static">
-            <div class="mt-2 fixed">
+            <div class="mt-5 fixed">
               <h3 class="text-base font-bold text-center">${loc.ville}</h3>
               <p class="ml-[-5px] mr-1 h-[120px]">${loc.description}</p>
             </div>
           </div>
         </div>
-        `);
-
-      
+        `).on('open', () => {
+          //Increase the size of the popup closing cross
+          const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+          if (closeButton) {
+            closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
+            closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
+            closeButton.style.height = '25px';
+          }
+        });
 
       const marker = new mapboxgl.Marker({ color: '#0769C5' })
         .setLngLat([loc.longitude, loc.latitude])
@@ -576,9 +574,9 @@ const Map3DComponent = ({ params }) => {
           <PanelTopOpen className="text-black" />
         </button>
         <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
-          <Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>
+          {/*<Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>
             <DrawerTrigger>
-              {/*<fieldset>
+              <fieldset>
                 <Label htmlFor="show-building">Show Jerusalem City</Label>
                 <Switch
                   className="ml-[75px]"
@@ -587,12 +585,12 @@ const Map3DComponent = ({ params }) => {
                   onCheckedChange={() => {
                     setOpenDialogCity(!openDialogCity);
                   }} />
-              </fieldset> */}
+              </fieldset> 
             </DrawerTrigger>
             <DrawerContent >
               <Spline scene="https://prod.spline.design/3k6H1cbqT90axTHH/scene.splinecode" />
             </DrawerContent>
-          </Drawer>
+          </Drawer> */}
           <fieldset>
             <Button variant="outlined m-0" className="text-white font-bold" >EN</Button>
           </fieldset>
