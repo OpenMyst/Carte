@@ -579,10 +579,10 @@ const Map3DComponent = ({ params }) => {
     <div>
       <div id="map" ref={mapContainer} />
       <div className={`map-overlay top w-[20vw]`}>
-        <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
+        {/* <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
           <PanelTopOpen className="text-black" />
-        </button>
-        <div className={`map-overlay-inner ${open ? "block" : "hidden"}`}>
+        </button> */}
+        <div className={`map-overlay-inner block`}>
           {/*<Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>
             <DrawerTrigger>
               <fieldset>
