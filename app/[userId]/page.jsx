@@ -322,6 +322,9 @@ export default function MapByUserId({ params }) {
             map.once('idle', () => {
                 map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
             });
+            if (map.getLayer('hillshade')) {
+                map.removeLayer('hillshade');
+              }
             if (mapStyle === nightStyle) {
                 map.addLayer({
                     id: 'hillshade-layer',

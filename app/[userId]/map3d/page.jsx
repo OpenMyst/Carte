@@ -329,9 +329,14 @@ const Map3DComponent = ({ params }) => {
         type: 'raster-dem',
         url: 'mapbox://mapbox.terrain-rgb'
       });
+      
       map.once('idle', () => {
         map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
       });
+
+      if (map.getLayer('hillshade')) {
+        map.removeLayer('hillshade');
+      }
       if (mapStyle === nightStyle) {
         map.addLayer({
           id: 'hillshade-layer',
@@ -404,7 +409,7 @@ const Map3DComponent = ({ params }) => {
           const options3 = {
             obj: '/assets/Palais_de_Lazare.gltf',
             type: 'gltf',
-            scale: { x: scale, y: scale * heightMultiple, z: 2 },
+            scale: { x: scale * 5, y: scale * 5, z: scale * 5 },
             units: 'meters',
             rotation: { x: 90, y: -90, z: 0 }
           };
