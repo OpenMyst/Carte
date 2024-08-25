@@ -1,21 +1,27 @@
-"use client";
-import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight, automnStyle } from "@/tool/security";
+"use client"
+import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from 'mapbox-gl';
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
-import { Button } from "@/components/ui/button";
-import { addMarkerEvent, userPlayEvent, createUserOpenFormulaire } from "@/tool/service";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { addMarkerEvent, createUserOpenFormulaire, userPlayEvent } from "@/tool/service";
 import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
+import Spline from "@splinetool/react-spline";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
-
-export default function MapByUserId({ params }) {
+/*
+* Map3DComponent: a react page that displays 3D maps with 3D objects on top
+*/
+const Map3DComponent = ({ params }) => {
   const userId = params.userId;
-  const mapContainer = useRef(null); // Reference to the map container
-  const [map, setMap] = useState(null); // Reference to the map object
+  const mapContainer = useRef(null);
+  const [map, setMap] = useState(null);
   const [lng, setLng] = useState(35.21633); // Longitude state
   const [lat, setLat] = useState(31.76904); // Latitude state
   const [zoom, setZoom] = useState(9); // Zoom level state
@@ -23,23 +29,20 @@ export default function MapByUserId({ params }) {
   const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
-  const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
+  const [mountainHeight, setMountainHeight] = useState(80); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [lieux, setLieux] = useState([]); // State for storing place
   const [open, setOpen] = useState(true); // Toggle for overlay visibility
+  const [canAddEvent, setCanAddEvent] = useState(false); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
   const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
-  const [canAddEvent, setCanAddEvent] = useState(false); // Toggle for overlay visibility
+  const [openDialogCity, setOpenDialogCity] = useState(false);
 
   useEffect(() => {
     getAllEvent();
+    loadThreeboxScript();
   }, []);
-
-  useEffect(() => {
-    if (map) return;
-    initializeMap();
-  }, [map, mapStyle, evangileEvents, showMap3D, showBuilding]);
 
   useEffect(() => {
     if (map) {
@@ -56,18 +59,18 @@ export default function MapByUserId({ params }) {
   }, [mountainHeight, showBuilding, showRoad]);
 
   // useEffect(() => {
-  //     const fetchLocationPlayId = async () => {
-  //         const location = await userPlayEvent(userId);
-  //         setLocationPlayId(location);
-  //     };
+  //   const fetchLocationPlayId = async () => {
+  //     const location = await userPlayEvent(userId);
+  //     setLocationPlayId(location);
+  //   };
 
-  //     // Load the changment in the firebase
-  //     const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-  //         fetchLocationPlayId();
-  //     });
-
+  //   // Load the changment in the firebase
+  //   const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
   //     fetchLocationPlayId();
-  //     return () => unsubscribe();
+  //   });
+
+  //   fetchLocationPlayId();
+  //   return () => unsubscribe();
   // }, [userId]);
 
   useEffect(() => {
@@ -77,10 +80,10 @@ export default function MapByUserId({ params }) {
   }, [showMap3D]);
 
   // useEffect(() => {
-  //     if (map && locationPlayId) {
-  //         getUserPlayEvent(map);
-  //     }
-  // }, [locationPlayId, evangileEvents, map]);
+  //   if (map && locationPlayId) {
+  //     getUserPlayEvent(map);
+  //   }
+  // }, [locationPlayId, evangileEvents, lieux, map, winterDark, summerLight]);
 
   useEffect(() => {
     if (locationPlayId) {
@@ -102,6 +105,7 @@ export default function MapByUserId({ params }) {
     }
   }, [map, startTravel, endTravel]);
 
+  //assurer un middleware qui bien determiner les user connecter et celui qui ne pas connecter
   const handleMapClick = useCallback((event) => {
     addMarkerEvent(map, userId, event);
   }, [map, userId]);
@@ -212,13 +216,13 @@ export default function MapByUserId({ params }) {
     if (currentEvents) {
       const anneeEvent = parseInt(currentEvents.event_date);
       if (anneeEvent < 0) {
-        setMountainHeight(100);
+        setMountainHeight(80);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 100, false);
+        updateTerrain(mapEvent, 80, false);
       } else {
         setMountainHeight(0);
         setShowBuilding(false);
-        updateTerrain(mapEvent, 10, false);
+        updateTerrain(mapEvent, 20, false);
       }
 
       const day = location.detail_jour;
@@ -240,62 +244,64 @@ export default function MapByUserId({ params }) {
       }
 
       const popup = new mapboxgl.Popup().setHTML(`
-            <div class="flex flex-row h-[300px] w-[220px] static">
-              <div class="w-full h-[60px] relative">
-                <img src="${currentEvents.image}" alt="${currentEvents.label}" class="w-full h-[150px]"/>
-              </div>
-              <div class="mt-[150px] fixed">
-                <h3 class="text-base font-bold text-center">${currentEvents.label}</h3>
-                <p class="h-[110px] overflow-y-scroll">${currentEvents.description}</p>
-              </div>
+        <div>
+          <div class="flex flex-row h-[300px] w-[220px] static">
+            <div class="w-full h-[60px] relative">
+              <img src="${currentEvents.image}" alt="${currentEvents.name}" class="w-full h-[150px]"/>
             </div>
-          `)
-      //   .on('open', () => {
-      //         //Increase the size of the popup closing cross
-      //         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-      //         if (closeButton) {
-      //             closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
-      //             closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
-      //             closeButton.style.height = '30px';
-      //         }
+            <div class="mt-[150px] fixed">
+              <h3 class="text-base font-bold text-center">${currentEvents.name}</h3>
+              <p class="h-[100px] overflow-y-scroll">${currentEvents.description}</p>
+            </div>
+          </div>
+          <!--<button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button> -->
+        </div>
+      `)
+      // .on('open', () => {
+      //   //Increase the size of the popup closing cross
+      //   const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+      //   if (closeButton) {
+      //     closeButton.style.fontSize = '30px';
+      //     closeButton.style.width = '30px'; 
+      //     closeButton.style.height = '30px';
+      //   }
+      //   // Add event listener when popup is opened
+      //   const button = document.getElementById('showJerusalemButton');
+      //   if (button) {
+      //     button.addEventListener('click', () => {
+      //       setOpenDialogCity(true);
       //     });
+      //   }
+      // });
 
       const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([currentEvents.longitude, currentEvents.latitude])
         .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent)
-        .togglePopup();
+      //   .togglePopup();
 
-      mapEvent.flyTo({
-        center: [currentEvents.longitude, currentEvents.latitude],
-        zoom: 15
-      });
+      // mapEvent.flyTo({
+      //   center: [currentEvents.longitude, currentEvents.latitude],
+      //   zoom: 15
+      // });
     }
   }
 
-  const updateMapSettings = () => {
-    if (map) {
-      map.on('style.load', () => {
-        map.addSource('mapbox-dem', {
-          type: 'raster-dem',
-          url: 'mapbox://mapbox.terrain-rgb'
-        });
-        handleCheckboxChange(map, 'building-extrusion', 'visibility', showBuilding);
-        handleCheckboxChange('road-primary', 'visibility', showRoad);
-        handleCheckboxChange('road-secondary-tertiary', 'visibility', showRoad);
-        handleCheckboxChange('road-street', 'visibility', showRoad);
-        handleCheckboxChange('road-minor', 'visibility', showRoad);
-        handleCheckboxChange('road-major-link', 'visibility', showRoad);
-        handleCheckboxChange('road-motorway-trunk', 'visibility', showRoad);
-        handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
-        handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
-        handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
-        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
-      });
-    }
+  //Load the Threebox librairie
+  const loadThreeboxScript = () => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/gh/jscastro76/threebox@v.2.2.2/dist/threebox.min.js';
+    script.type = 'text/javascript';
+    script.async = true;
+    script.onload = () => {
+      if (mapContainer.current && !map) {
+        initializeMap();
+      }
+    };
+    document.head.appendChild(script);
   };
 
-  // Initialize the map into 3D
+  //Initialize the map with every 3D object loading with Threebox.js 
   const initializeMap = () => {
     const map = new mapboxgl.Map({
       container: mapContainer.current,
@@ -314,7 +320,13 @@ export default function MapByUserId({ params }) {
 
     map.addControl(new mapboxgl.NavigationControl());
 
-    addRouteLayer(map, startTravel, endTravel);
+    const tb = (window.tb = new Threebox(
+      map,
+      map.getCanvas().getContext('webgl'),
+      {
+        defaultLights: true
+      }
+    ));
 
     map.on('style.load', () => {
       map.addSource('mapbox-dem', {
@@ -338,12 +350,13 @@ export default function MapByUserId({ params }) {
           source: 'mapbox-dem',
           paint: {
             'hillshade-exaggeration': mountainHeight / 100,
-            'hillshade-highlight-color': '#6B7280',
+            'hillshade-highlight-color': '#9CA2AD',
             'hillshade-shadow-color': '#596575',
             'hillshade-accent-color': '#596575'
           }
         });
       }
+
       map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
       map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible" : "none");
       map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
@@ -356,29 +369,110 @@ export default function MapByUserId({ params }) {
       map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
 
       loadEvangileMarker(map);
+
+      map.addLayer({
+        id: 'custom-threebox-model',
+        type: 'custom',
+        renderingMode: '3d',
+        onAdd: function () {
+          const scale = 2;
+          const heightMultiple = mountainHeight < 80 ? 1 : 3;
+
+          const loadAndPlaceModel = (options, coords) => {
+            tb.loadObj(options, (model) => {
+              model.setCoords(coords);
+              model.setRotation({ x: -1.5, y: -1.5, z: 241 });
+              // Traverse the model to set opacity
+              model.traverse((child) => {
+                if (child.isMesh) {
+                  child.material.transparent = true;
+                  child.material.opacity = 0.77;
+                }
+              });
+              tb.add(model);
+            });
+          };
+
+          const options1 = {
+            obj: '/assets/jerusalem2.gltf',
+            type: 'gltf',
+            scale: { x: scale * 5 * 4, y: scale * 4 * heightMultiple, z: scale * 5 * 4 },
+            units: 'meters',
+            rotation: { x: 90, y: -90, z: 0 },
+            altitude: 0
+          };
+          loadAndPlaceModel(options1, [35.2280, 31.7720]);
+
+          const options2 = {
+            obj: '/assets/golgot.gltf',
+            type: 'gltf',
+            scale: { x: scale * 5, y: scale * 4 * heightMultiple, z: 10 },
+            units: 'meters',
+            rotation: { x: 90, y: -90, z: 0 }
+          };
+          loadAndPlaceModel(options2, [35.2298, 31.7781]);
+
+          const options3 = {
+            obj: '/assets/Palais_de_Lazare.gltf',
+            type: 'gltf',
+            scale: { x: scale * 5, y: scale * 5, z: scale * 5 },
+            units: 'meters',
+            rotation: { x: 90, y: -90, z: 0 }
+          };
+          loadAndPlaceModel(options3, [35.2615, 31.7714]);
+        },
+        render: function () {
+          tb.update();
+        }
+      });
     });
 
     setMap(map);
-  }
+  };
+
+  const updateMapSettings = () => {
+    if (map) {
+      map.on('style.load', () => {
+        map.addSource('mapbox-dem', {
+          type: 'raster-dem',
+          url: 'mapbox://mapbox.terrain-rgb'
+        });
+        handleCheckboxChange(map, 'building-extrusion', 'visibility', showBuilding);
+        handleCheckboxChange('road-primary', 'visibility', showRoad);
+        handleCheckboxChange('road-secondary-tertiary', 'visibility', showRoad);
+        handleCheckboxChange('road-street', 'visibility', showRoad);
+        handleCheckboxChange('road-minor', 'visibility', showRoad);
+        handleCheckboxChange('road-major-link', 'visibility', showRoad);
+        handleCheckboxChange('road-motorway-trunk', 'visibility', showRoad);
+        handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
+        handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
+        handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
+        map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
+      });
+    }
+  };
 
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
-                <div class="flex flex-row h-[300px] w-[220px] static">
-                    <div class="w-full h-[60px] relative">
-                        <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
-                    </div>
-                    <div class="mt-[150px] fixed">
-                        <h3 class="text-base font-bold text-center">${location.label}</h3>
-                        <p class="h-[110px] overflow-y-scroll">${location.description}</p>
-                    </div>
-                </div>
-                `);
+        <div>
+          <div class="flex flex-row h-[300px] w-[220px] static">
+            <div class="w-full h-[60px] relative">
+              <img src="${location.image}" alt="${location.name}" class="w-full h-[150px]"/>
+            </div>
+            <div class="mt-[150px] fixed">
+              <h3 class="text-base font-bold text-center">${location.name}</h3>
+              <p class="h-[100px] overflow-y-scroll">${location.description}</p>
+            </div>
+            <!--<button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button> -->
+          </div>
+        </div>
+        `);
 
       const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([location.longitude, location.latitude])
-        .setPopup(popup) // Associe le popup au marqueur
+        .setPopup(popup)  // Associe le popup au marqueur
         .addTo(mapEvent);
 
       popup.on('open', () => {
@@ -389,28 +483,35 @@ export default function MapByUserId({ params }) {
           closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
           closeButton.style.height = '25px';
         }
+        // Add event listener when popup is opened
+        // const button = document.getElementById('showJerusalemButton');
+        // if (button) {
+        //   button.addEventListener('click', () => {
+        //     setOpenDialogCity(true);
+        //   });
+        // }
       });
 
       marker.getElement().addEventListener('click', () => {
+        // setOpenDialogCity(true);
         mapEvent.flyTo({
           center: [location.longitude, location.latitude],
           zoom: 20
         });
       })
-    });
 
+    });
     lieux.forEach((loc) => {
       const popup = new mapboxgl.Popup().setHTML(`
-                <div>
-                    <div class="flex flex-row h-[150px] w-[100px] static">
-                        <div class="mt-2 fixed">
-                        <h3 class="text-base font-bold text-center">${loc.ville}</h3>
-                        <p class="ml-[-5px] mr-1 h-[120px]">${loc.description}</p>
-                        </div>
-                    </div>
-                </div>
-            `);
-      popup.on('open', () => {
+        <div>
+          <div class="flex flex-row h-[150px] w-[100px] static">
+            <div class="mt-5 fixed">
+              <h3 class="text-base font-bold text-center">${loc.ville}</h3>
+              <p class="ml-[-5px] mr-1 h-[120px]">${loc.description}</p>
+            </div>
+          </div>
+        </div>
+        `).on('open', () => {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
@@ -431,8 +532,8 @@ export default function MapByUserId({ params }) {
           center: [loc.longitude, loc.latitude],
           zoom: 20
         });
-      });
-    });
+      })
+    })
   };
 
   //update the terrain in the map when the height of mountain has changed
@@ -450,49 +551,57 @@ export default function MapByUserId({ params }) {
     }
   };
 
-  // Handle mountain height change
-  const handleMountainHeightChange = (event) => {
-    const height = event.target.value;
-    setMountainHeight(height);
-    if (map.getTerrain()) {
-      map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
-    }
-  };
-
   // const handlePathClicked = (e) => {
-  //     e.preventDefault();
-  //     setShowRoad(!showRoad);
-  //     handleCheckboxChange('road-primary', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-street', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-minor', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-major-link', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
-  //     handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
-  //     handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
-  //     handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
+  //   e.preventDefault();
+  //   setShowRoad(!showRoad);
+  //   handleCheckboxChange('road-primary', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-street', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-minor', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-major-link', 'visibility', !showRoad);
+  //   handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
+  //   handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
+  //   handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
+  //   handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
   // }
 
   // const handleBuildingClicked = (e) => {
-  //     e.preventDefault();
+  //   e.preventDefault();
   //     setShowBuilding(!showBuilding);
   //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
   // }
 
-  const handleOpenFormulaire = (e) => {
+  const handleOpenFormulaire = async (e) => {
     e.preventDefault();
-    createUserOpenFormulaire(userId);
+    await createUserOpenFormulaire(userId);
     setCanAddEvent(!canAddEvent);
   }
 
   return (
-    <main className="m-2">
-      <div id="map" ref={mapContainer}></div>
+    <div>
+      <div id="map" ref={mapContainer} />
       <div className={`map-overlay top w-[20vw]`}>
         {/* <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-                    <PanelTopOpen className="text-black" />
-                </button> */}
+          <PanelTopOpen className="text-black" />
+        </button> */}
         <div className={`map-overlay-inner block`}>
+          {/*<Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>
+            <DrawerTrigger>
+              <fieldset>
+                <Label htmlFor="show-building">Show Jerusalem City</Label>
+                <Switch
+                  className="ml-[75px]"
+                  id="show-building"
+                  checked={openDialogCity}
+                  onCheckedChange={() => {
+                    setOpenDialogCity(!openDialogCity);
+                  }} />
+              </fieldset> 
+            </DrawerTrigger>
+            <DrawerContent >
+              <Spline scene="https://prod.spline.design/3k6H1cbqT90axTHH/scene.splinecode" />
+            </DrawerContent>
+          </Drawer> */}
           <fieldset>
             <Button variant="outlined m-0" className="text-white font-bold" >EN</Button>
           </fieldset>
@@ -513,6 +622,8 @@ export default function MapByUserId({ params }) {
           </fieldset>
         </div>
       </div>
-    </main>
+    </div>
   );
-}
+};
+
+export default Map3DComponent;
