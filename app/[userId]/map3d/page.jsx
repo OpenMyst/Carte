@@ -102,39 +102,38 @@ export default function MapByUserId({ params }) {
     }
   }, [map, startTravel, endTravel]);
 
-  // const handleMapClick = useCallback((event) => {
-  //   addMarkerEvent(map, userId, event);
-  // }, [map, userId]);
+  const handleMapClick = useCallback((event) => {
+    addMarkerEvent(map, userId, event);
+  }, [map, userId]);
+
+  useEffect(() => {
+
+    if (map) {
+      if (canAddEvent) {
+        // Activer l'ajout de markers sur un clic droit
+        map.on('contextmenu', handleMapClick);
+      } else {
+        map.off('contextmenu', handleMapClick);
+      }
+    }
+
+    // Cleanup pour éviter les fuites de mémoire
+    return () => {
+      if (map) {
+        map.off('contextmenu', handleMapClick);
+      }
+    };
+  }, [canAddEvent, map, handleMapClick]);
 
   // useEffect(() => {
 
   //   if (map) {
   //     if (canAddEvent) {
   //       addMarkerEventInCenter(map, userId);
-  //       // Activer l'ajout de markers sur un clic droit
-  //       map.on('contextmenu', handleMapClick);
-  //     } else {
-  //       map.off('contextmenu', handleMapClick);
   //     }
   //   }
 
-  //   // Cleanup pour éviter les fuites de mémoire
-  //   return () => {
-  //     if (map) {
-  //       map.off('contextmenu', handleMapClick);
-  //     }
-  //   };
-  // }, [canAddEvent, map, handleMapClick]);
-
-  useEffect(() => {
-
-    if (map) {
-      if (canAddEvent) {
-        addMarkerEventInCenter(map, userId);
-      }
-    }
-
-  }, [canAddEvent, map]);
+  // }, [canAddEvent, map]);
 
   // Initialize the start and End travel using the locationPlayId
   const getTravelRoute = () => {
@@ -519,7 +518,7 @@ export default function MapByUserId({ params }) {
             </Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined m-0" className={`text-white font-bold`} >
+            <Button variant="outlined m-0" className={`${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={() => setCanAddEvent(!canAddEvent)}>
               <Plus />
             </Button>
           </fieldset>
