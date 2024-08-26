@@ -8,10 +8,9 @@ import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { addMarkerEvent, createUserOpenFormulaire, userPlayEvent } from "@/tool/service";
+import { createUserOpenFormulaire, userPlayEvent } from "@/tool/service";
 import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
 import Spline from "@splinetool/react-spline";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -32,7 +31,6 @@ const Map3DComponent = ({ params }) => {
   const [mountainHeight, setMountainHeight] = useState(80); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [lieux, setLieux] = useState([]); // State for storing place
-  const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [canAddEvent, setCanAddEvent] = useState(false); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
@@ -104,29 +102,6 @@ const Map3DComponent = ({ params }) => {
       }
     }
   }, [map, startTravel, endTravel]);
-
-  //assurer un middleware qui bien determiner les user connecter et celui qui ne pas connecter
-  const handleMapClick = useCallback((event) => {
-    addMarkerEvent(map, userId, event);
-  }, [map, userId]);
-
-  useEffect(() => {
-    if (map) {
-      console.log(canAddEvent);
-      if (canAddEvent) {
-        map.on('contextmenu', handleMapClick);
-      } else {
-        map.off('contextmenu', handleMapClick);
-      }
-    }
-
-    // Cleanup pour éviter les fuites de mémoire
-    return () => {
-      if (map) {
-        map.off('contextmenu', handleMapClick);
-      }
-    };
-  }, [canAddEvent, map, handleMapClick]);
 
   // Initialize the start and End travel using the locationPlayId
   const getTravelRoute = () => {
@@ -581,9 +556,6 @@ const Map3DComponent = ({ params }) => {
     <div>
       <div id="map" ref={mapContainer} />
       <div className={`map-overlay top w-[20vw]`}>
-        {/* <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <PanelTopOpen className="text-black" />
-        </button> */}
         <div className={`map-overlay-inner block`}>
           {/*<Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>
             <DrawerTrigger>

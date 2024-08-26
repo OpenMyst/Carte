@@ -33,7 +33,8 @@
     "three": "^0.167.1",
     "three-spritetext": "^1.8.2",
     "threebox": "^0.1.5",
-    "vaul": "^0.9.1"
+    "vaul": "^0.9.1",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "postcss": "^8",

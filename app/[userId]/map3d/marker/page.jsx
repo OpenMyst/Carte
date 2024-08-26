@@ -18,7 +18,7 @@ export default function MapByUserId({ params }) {
     const [map, setMap] = useState(null); // Reference to the map object
     const [lng, setLng] = useState(35.21633); // Longitude state
     const [lat, setLat] = useState(31.76904); // Latitude state
-    const [zoom, setZoom] = useState(9); // Zoom level state
+    const [zoom, setZoom] = useState(15); // Zoom level state
     const [mapStyle, setMapStyle] = useState(nightStyle); // Map style state
     const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
     const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
@@ -30,7 +30,7 @@ export default function MapByUserId({ params }) {
     const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
     const [endTravel, setEndTravel] = useState([]); // End coordinates for route
     const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
-    const [canAddEvent, setCanAddEvent] = useState(false); // Toggle for overlay visibility
+    const [canAddEvent, setCanAddEvent] = useState(true); // Toggle for overlay visibility
 
     useEffect(() => {
         getAllEvent();
@@ -316,6 +316,10 @@ export default function MapByUserId({ params }) {
             bearing: 0,
         });
 
+        const container = mapContainer.current;
+        container.classList.add('bg-slate-950');
+        container.style.filter = 'contrast(1.2) brightness(0.8)';
+
         map.on('move', () => {
             setLng(map.getCenter().lng.toFixed(4));
             setLat(map.getCenter().lat.toFixed(4));
@@ -496,7 +500,7 @@ export default function MapByUserId({ params }) {
     }
 
     return (
-        <main className="m-2">
+        <main className="m-2 ">
             <div id="map" ref={mapContainer}></div>
             <div className={`map-overlay top w-[20vw]`}>
                 {/* <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
@@ -517,7 +521,7 @@ export default function MapByUserId({ params }) {
                         </Button>
                     </fieldset>
                     <fieldset>
-                        <Button variant="outlined m-0" className={`text-white font-bold`}>
+                        <Button variant="outlined m-0" className={`text-white font-bold`} >
                             <Plus />
                         </Button>
                     </fieldset>

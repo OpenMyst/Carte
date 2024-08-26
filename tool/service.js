@@ -56,26 +56,10 @@ export const addMarkerEvent = (map, userId, event) => {
   locationInput.type = 'text';
   locationInput.className = 'w-full p-2 border border-gray-300 rounded-sm';
   locationInput.placeholder = 'Enter location name';
-
-  // const savePlaceButton = document.createElement('button');
-  // savePlaceButton.className = "w-full bg-secondary rounded-sm text-white m-1";
-  // savePlaceButton.innerText = 'Save Place';
-  // savePlaceButton.onclick = async () => {
-  //   const locationName = locationInput.value; // Récupérer la valeur de l'input
-  //   if (locationName) {
-  //     console.log('Location:', locationName);
-  //     console.log('Coordinates:', coordinates);
-  //     await saveCoordonnePlace(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
-  //     // Fermer le popup
-  //     marker.remove();
-  //   } else {
-  //     alert('Please enter a location name.');
-  //   }
-  // };
   
   const saveEventButton = document.createElement('button');
   saveEventButton.className = "w-full bg-primary rounded-sm text-white m-1";
-  saveEventButton.innerText = 'Save location';
+  saveEventButton.innerText = 'Validate';
   saveEventButton.onclick = async () => {
     const locationName = locationInput.value; // Récupérer la valeur de l'input
     if (locationName) {
@@ -92,7 +76,7 @@ export const addMarkerEvent = (map, userId, event) => {
   const deleteButton = document.createElement('button');
   deleteButton.className = "w-full rounded-sm text-white m-1";
   deleteButton.style.backgroundColor = "red";
-  deleteButton.innerText = 'Delete';
+  deleteButton.innerText = 'Cancel';
   deleteButton.onclick = () => {
     marker.remove();
   };
@@ -143,6 +127,99 @@ export const addMarkerEvent = (map, userId, event) => {
 }
 
 /**
+ * Adds a new marker to the map on click, saves its coordinates to Firestore,
+ * and associates the event with the user.
+ * 
+ * @param {object} map - The Mapbox GL JS map instance.
+ * @param {string} userId - The ID of the user for whom to save the event.
+ */
+export const addMarkerEventInCenter = (map, userId) => {
+  let coordinates = map.getCenter();
+
+  const popupContent = document.createElement('div');
+  popupContent.className = 'h-[200px] w-[200px] static';
+
+  const popupTitle = document.createElement('h4');
+  popupTitle.className = "text-sm text-center";
+  popupTitle.innerText = "Deplacer et Zoomer sur la carte jusqu'à ce que le marqueur soit à l'endroite précis où vous souhaiter ajouter le lieu, puis cliquez sur:"
+
+  // Créer un input pour le nom de la ville ou de l'emplacement
+  const locationInput = document.createElement('input');
+  locationInput.type = 'text';
+  locationInput.className = 'w-full p-2 border border-gray-300 rounded-sm';
+  locationInput.placeholder = 'Enter location name';
+
+  // const savePlaceButton = document.createElement('button');
+  // savePlaceButton.className = "w-full bg-secondary rounded-sm text-white m-1";
+  // savePlaceButton.innerText = 'Save Place';
+  // savePlaceButton.onclick = async () => {
+  //   const locationName = locationInput.value; // Récupérer la valeur de l'input
+  //   if (locationName) {
+  //     console.log('Location:', locationName);
+  //     console.log('Coordinates:', coordinates);
+  //     await saveCoordonnePlace(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
+  //     // Fermer le popup
+  //     marker.remove();
+  //   } else {
+  //     alert('Please enter a location name.');
+  //   }
+  // };
+  
+  const saveEventButton = document.createElement('button');
+  saveEventButton.className = "w-full bg-primary rounded-sm text-white m-1 border-2 border-black";
+  saveEventButton.innerText = 'Validater la position';
+  saveEventButton.onclick = async () => {
+    const locationName = locationInput.value; // Récupérer la valeur de l'input
+    if (locationName) {
+      console.log('Location:', locationName);
+      console.log('Coordinates:', coordinates);
+      await saveCoordonneEvent(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
+      // Fermer le popup
+      marker.remove();
+    } else {
+      alert('Please enter a location name.');
+    }
+  };
+
+  const divEventCreate = document.createElement('div');
+  divEventCreate.className = "flex gap-1";
+  // divEventCreate.appendChild(deleteButton);
+  divEventCreate.appendChild(saveEventButton);
+
+  popupContent.appendChild(popupTitle);
+  popupContent.appendChild(locationInput);
+  popupContent.appendChild(divEventCreate);
+
+  const popup = new mapboxgl.Popup().setDOMContent(popupContent)
+  .on('open', () => {
+    // Augmenter la taille de la croix de fermeture du popup
+    const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+    if (closeButton) {
+      closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+      closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+      closeButton.style.height = '30px';
+
+      closeButton.onclick = () => {
+        marker.remove();
+      };
+    }
+  });
+
+  // Create a new marker and add it to the map
+  const marker = new mapboxgl.Marker({ color: 'red', draggable: true })
+    .setLngLat(coordinates)
+    .setPopup(popup)
+    .addTo(map)
+    .togglePopup();
+
+  marker.on('dragend', () =>  {
+    const lngLat = marker.getLngLat();
+    coordinates = lngLat;
+    console.log(coordinates)
+  });
+}
+
+/**
  * Saves the coordinates of an event to Firestore and associates it with a user.
  * 
  * @param {string} userId - The ID of the user for whom to save the event.
@@ -175,90 +252,6 @@ export const saveCoordonneEvent = async (userId, coordinates, place) => {
     console.log('Location:', location);
   } catch (error) {
     console.error('Error adding event and location to Firestore:', error);
-  }
-}
-
-/**
- * Saves the coordinates of an EreChretien to Firestore and associates it with a user.
- * 
- * @param {string} userId - The ID of the user for whom to save the event.
- * @param {object} coordinates - The coordinates of the event (lngLat object).
- * @param {string} place - The name of the place locating
- */
-export const saveCoordonneEreChretien = async (userId, coordinates, place) => {
-  try {
-    // Check if the location already exists in the database
-    const lieuQuery = query(
-      collection(database, 'erechretiene'),
-      where('ville', '==', place)
-    );
-    
-    const querySnapshot = await getDocs(lieuQuery);
-
-    if (!querySnapshot.empty) {
-      // If the location already exists, show an error alert
-      alert('Le lieu existe déjà dans la base de données.');
-      return;
-    }
-    // Save the coordinates to the Firestore `events` collection
-    const eventDocRef = await addDoc(collection(database, 'erechretiene'), {
-      ville: place,
-      longitude: coordinates.lng,
-      latitude: coordinates.lat,
-      etat: 0,
-    });
-
-    const eventId = eventDocRef.id;
-
-    // Update the `location` collection with the new event ID and userId
-    const location = await addDoc(collection(database, 'location'), {
-      idUser: userId,
-      idEvents: eventId,
-      isPlay: false
-    });
-
-    console.log('Event and location successfully created with ID:', eventId);
-    console.log('Location:', location);
-  } catch (error) {
-    console.error('Error adding event and location to Firestore:', error);
-  }
-}
-
-/**
- * Saves the coordinates of an place to Firestore and associates it with a user.
- * 
- * @param {string} userId - The ID of the user for whom to save the event.
- * @param {object} coordinates - The coordinates of the event (lngLat object).
- * @param {string} place - The name of the place locating
- */
-export const saveCoordonnePlace = async (userId, coordinates, place) => {
-  try {
-    // Check if the location already exists in the database
-    const lieuQuery = query(
-      collection(database, 'lieu'),
-      where('ville', '==', place)
-    );
-    
-    const querySnapshot = await getDocs(lieuQuery);
-
-    if (!querySnapshot.empty) {
-      // If the location already exists, show an error alert
-      alert('Le lieu existe déjà dans la base de données.');
-      return;
-    }
-
-    // Save the coordinates to the Firestore `lieu` collection
-    const eventDocRef = await addDoc(collection(database, 'lieu'), {
-      ville: place,
-      longitude: coordinates.lng,
-      latitude: coordinates.lat,
-      etat: 0,
-    });
-
-    console.log('Lieu ajouté avec succès avec l\'ID :', eventDocRef.id);
-    console.log('Coordonnées du lieu :', coordinates);
-  } catch (error) {
-    console.error('Erreur lors de l\'ajout du lieu à Firestore :', error);
   }
 }
 
