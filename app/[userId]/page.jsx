@@ -20,8 +20,8 @@ export default function MapByUserId({ params }) {
     const [lat, setLat] = useState(31.76904); // Latitude state
     const [zoom, setZoom] = useState(9); // Zoom level state
     const [mapStyle, setMapStyle] = useState(nightStyle); // Map style state
-    const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
-    const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
+    const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
+    const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
     const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
     const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
     const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
@@ -127,12 +127,12 @@ export default function MapByUserId({ params }) {
     useEffect(() => {
 
         if (map) {
-          if (canAddEvent) {
-            addMarkerEventInCenter(map, userId);
-          }
+            if (canAddEvent) {
+                addMarkerEventInCenter(map, userId);
+            }
         }
-    
-      }, [canAddEvent, map]);
+
+    }, [canAddEvent, map]);
 
     // Initialize the start and End travel using the locationPlayId
     const getTravelRoute = () => {
@@ -336,9 +336,9 @@ export default function MapByUserId({ params }) {
                 map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
                 map.on('style.load', () => {
                     if (map.getLayer('hillshade')) {
-                      map.removeLayer('hillshade');
+                        map.removeLayer('hillshade');
                     }
-                  });
+                });
             });
 
             if (mapStyle === nightStyle) {
@@ -354,16 +354,16 @@ export default function MapByUserId({ params }) {
                     }
                 });
             }
-            handleCheckboxChange('building-extrusion', 'visibility', showBuilding);
-            handleCheckboxChange('road-primary', 'visibility', showRoad);
-            handleCheckboxChange('road-secondary-tertiary', 'visibility', showRoad);
-            handleCheckboxChange('road-street', 'visibility', showRoad);
-            handleCheckboxChange('road-minor', 'visibility', showRoad);
-            handleCheckboxChange('road-major-link', 'visibility', showRoad);
-            handleCheckboxChange('road-motorway-trunk', 'visibility', showRoad);
-            handleCheckboxChange('tunnel-motorway-trunk', 'visibility', showRoad);
-            handleCheckboxChange('tunnel-primary', 'visibility', showRoad);
-            handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', showRoad);
+            map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
+            map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible" : "none");
+            map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
+            map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible" : "none");
+            map.setLayoutProperty('road-minor', 'visibility', showRoad ? "visible" : "none");
+            map.setLayoutProperty('road-major-link', 'visibility', showRoad ? "visible" : "none");
+            map.setLayoutProperty('road-motorway-trunk', 'visibility', showRoad ? "visible" : "none");
+            map.setLayoutProperty('tunnel-motorway-trunk', 'visibility', showRoad ? "visible" : "none");
+            map.setLayoutProperty('tunnel-primary', 'visibility', showRoad ? "visible" : "none");
+            map.setLayoutProperty('tunnel-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
 
             loadEvangileMarker(map);
         });
