@@ -505,10 +505,10 @@ export default function MapByUserId({ params }) {
                 </button> */}
         <div className={`map-overlay-inner block`}>
           <fieldset>
-            <Button variant="outlined m-0" className="text-white font-bold" >EN</Button>
+            <Button variant="outlined" className="text-white font-bold" >EN</Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined m-0" className="text-white font-bold">
+            <Button variant="outlined" className="text-white font-bold">
               <Volume1 />
             </Button>
           </fieldset>
@@ -518,7 +518,7 @@ export default function MapByUserId({ params }) {
             </Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined m-0" className={`${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={() => setCanAddEvent(!canAddEvent)}>
+            <Button variant="outlined" className={`${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={() => setCanAddEvent(!canAddEvent)}>
               <Plus />
             </Button>
           </fieldset>
