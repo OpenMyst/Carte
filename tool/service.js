@@ -155,7 +155,7 @@ export const addMarkerEventInCenter = (map, userId, event) => {
   
   const saveEventButton = document.createElement('button');
   saveEventButton.className = "w-full bg-primary rounded-sm text-white m-1 border-2 border-black";
-  saveEventButton.innerText = 'Validater la position';
+  saveEventButton.innerText = 'Valider la position';
   saveEventButton.onclick = async () => {
     const locationName = locationInput.value; // Récupérer la valeur de l'input
     if (locationName) {
