@@ -204,7 +204,6 @@ export const addMarkerEventInCenter = (map, userId, event) => {
     }
   }
   
-
   // marker.on('dragend', () =>  {
   //   const lngLat = marker.getLngLat();
   //   coordinates = lngLat;
@@ -234,11 +233,12 @@ export const saveCoordonneEvent = async (userId, coordinates, place) => {
       alert('Le lieu existe déjà dans la base de données.');
       return;
     }
+    console.log(coordinates)
     // Save the coordinates to the Firestore `events` collection
     const eventDocRef = await addDoc(collection(database, 'ville'), {
       ville: place,
-      longitude: coordinates.lng,
-      latitude: coordinates.lat,
+      longitude: coordinates[0],
+      latitude: coordinates[1],
       etat: 0
     });
 
