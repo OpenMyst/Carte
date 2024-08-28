@@ -317,7 +317,7 @@ export default function MapByUserId({ params }) {
         });
 
         const container = mapContainer.current;
-        container.classList.add('bg-slate-950');
+        container.classList.add('bg-[#ff4d00]');
         container.style.filter = 'contrast(1.2) brightness(0.8)';
 
         map.on('move', () => {
