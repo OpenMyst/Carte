@@ -126,6 +126,7 @@ export const addMarkerEvent = (map, userId, event) => {
   // });
 }
 
+let marker;
 /**
  * Adds a new marker to the map on click, saves its coordinates to Firestore,
  * and associates the event with the user.
@@ -133,9 +134,11 @@ export const addMarkerEvent = (map, userId, event) => {
  * @param {object} map - The Mapbox GL JS map instance.
  * @param {string} userId - The ID of the user for whom to save the event.
  */
-export const addMarkerEventInCenter = (map, userId) => {
-  let coordinates = map.getCenter();
-
+export const addMarkerEventInCenter = (map, userId, event) => {
+  // console.log(event);
+  let coordinates = event;
+  console.log(coordinates);
+  
   const popupContent = document.createElement('div');
   popupContent.className = 'h-[200px] w-[200px] static';
 
@@ -149,21 +152,6 @@ export const addMarkerEventInCenter = (map, userId) => {
   locationInput.className = 'w-full p-2 border border-gray-300 rounded-sm';
   locationInput.placeholder = 'Enter location name';
 
-  // const savePlaceButton = document.createElement('button');
-  // savePlaceButton.className = "w-full bg-secondary rounded-sm text-white m-1";
-  // savePlaceButton.innerText = 'Save Place';
-  // savePlaceButton.onclick = async () => {
-  //   const locationName = locationInput.value; // Récupérer la valeur de l'input
-  //   if (locationName) {
-  //     console.log('Location:', locationName);
-  //     console.log('Coordinates:', coordinates);
-  //     await saveCoordonnePlace(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
-  //     // Fermer le popup
-  //     marker.remove();
-  //   } else {
-  //     alert('Please enter a location name.');
-  //   }
-  // };
   
   const saveEventButton = document.createElement('button');
   saveEventButton.className = "w-full bg-primary rounded-sm text-white m-1 border-2 border-black";
@@ -183,7 +171,6 @@ export const addMarkerEventInCenter = (map, userId) => {
 
   const divEventCreate = document.createElement('div');
   divEventCreate.className = "flex gap-1";
-  // divEventCreate.appendChild(deleteButton);
   divEventCreate.appendChild(saveEventButton);
 
   popupContent.appendChild(popupTitle);
@@ -205,18 +192,24 @@ export const addMarkerEventInCenter = (map, userId) => {
     }
   });
 
-  // Create a new marker and add it to the map
-  const marker = new mapboxgl.Marker({ color: 'red', draggable: true })
-    .setLngLat(coordinates)
-    .setPopup(popup)
-    .addTo(map)
-    .togglePopup();
+  if (coordinates != [NaN, NaN]) {
+    if (!marker) {
+      marker = new mapboxgl.Marker({ color: 'red', draggable: true })
+        .setLngLat(coordinates)
+        .setPopup(popup)
+        .addTo(map)
+        .togglePopup();
+    } else {
+      marker.setLngLat(coordinates);
+    }
+  }
+  
 
-  marker.on('dragend', () =>  {
-    const lngLat = marker.getLngLat();
-    coordinates = lngLat;
-    console.log(coordinates)
-  });
+  // marker.on('dragend', () =>  {
+  //   const lngLat = marker.getLngLat();
+  //   coordinates = lngLat;
+  //   console.log(coordinates)
+  // });
 }
 
 /**

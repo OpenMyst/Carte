@@ -31,6 +31,7 @@ export default function MapByUserId({ params }) {
     const [endTravel, setEndTravel] = useState([]); // End coordinates for route
     const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
     const [canAddEvent, setCanAddEvent] = useState(true); // Toggle for overlay visibility
+    const [markerCordinate, setMarkerCordinate] = useState([lng, lat]);
 
     useEffect(() => {
         getAllEvent();
@@ -55,32 +56,12 @@ export default function MapByUserId({ params }) {
         }
     }, [mountainHeight, showBuilding, showRoad]);
 
-    // useEffect(() => {
-    //     const fetchLocationPlayId = async () => {
-    //         const location = await userPlayEvent(userId);
-    //         setLocationPlayId(location);
-    //     };
-
-    //     // Load the changment in the firebase
-    //     const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-    //         fetchLocationPlayId();
-    //     });
-
-    //     fetchLocationPlayId();
-    //     return () => unsubscribe();
-    // }, [userId]);
 
     useEffect(() => {
         if (map) {
             map.setPitch(showMap3D ? 75 : 0);
         }
     }, [showMap3D]);
-
-    // useEffect(() => {
-    //     if (map && locationPlayId) {
-    //         getUserPlayEvent(map);
-    //     }
-    // }, [locationPlayId, evangileEvents, map]);
 
     useEffect(() => {
         if (locationPlayId) {
@@ -102,37 +83,15 @@ export default function MapByUserId({ params }) {
         }
     }, [map, startTravel, endTravel]);
 
-    // const handleMapClick = useCallback((event) => {
-    //     addMarkerEvent(map, userId, event);
-    // }, [map, userId]);
-
-    // useEffect(() => {
-    //     if (map) {
-    //         console.log(canAddEvent);
-    //         if (canAddEvent) {
-    //             map.on('contextmenu', handleMapClick);
-    //         } else {
-    //             map.off('contextmenu', handleMapClick);
-    //         }
-    //     }
-
-    //     // Cleanup pour éviter les fuites de mémoire
-    //     return () => {
-    //         if (map) {
-    //             map.off('contextmenu', handleMapClick);
-    //         }
-    //     };
-    // }, [canAddEvent, map, handleMapClick]);
-
     useEffect(() => {
 
         if (map) {
           if (canAddEvent) {
-            addMarkerEventInCenter(map, userId);
+            addMarkerEventInCenter(map, userId, markerCordinate);
           }
         }
     
-      }, [canAddEvent, map]);
+      }, [canAddEvent, markerCordinate, map]);
 
     // Initialize the start and End travel using the locationPlayId
     const getTravelRoute = () => {
@@ -260,15 +219,6 @@ export default function MapByUserId({ params }) {
               </div>
             </div>
           `)
-            //   .on('open', () => {
-            //         //Increase the size of the popup closing cross
-            //         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-            //         if (closeButton) {
-            //             closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
-            //             closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
-            //             closeButton.style.height = '30px';
-            //         }
-            //     });
 
             const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
                 .setLngLat([currentEvents.longitude, currentEvents.latitude])
@@ -323,6 +273,7 @@ export default function MapByUserId({ params }) {
         map.on('move', () => {
             setLng(map.getCenter().lng.toFixed(4));
             setLat(map.getCenter().lat.toFixed(4));
+            setMarkerCordinate(map.getCenter());
             setZoom(map.getZoom().toFixed(2));
         });
 
@@ -473,26 +424,6 @@ export default function MapByUserId({ params }) {
         }
     };
 
-    // const handlePathClicked = (e) => {
-    //     e.preventDefault();
-    //     setShowRoad(!showRoad);
-    //     handleCheckboxChange('road-primary', 'visibility', !showRoad);
-    //     handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
-    //     handleCheckboxChange('road-street', 'visibility', !showRoad);
-    //     handleCheckboxChange('road-minor', 'visibility', !showRoad);
-    //     handleCheckboxChange('road-major-link', 'visibility', !showRoad);
-    //     handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
-    //     handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
-    //     handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
-    //     handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-    // }
-
-    // const handleBuildingClicked = (e) => {
-    //     e.preventDefault();
-    //     setShowBuilding(!showBuilding);
-    //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
-    // }
-
     const handleOpenFormulaire = (e) => {
         e.preventDefault();
         createUserOpenFormulaire(userId);
@@ -500,7 +431,7 @@ export default function MapByUserId({ params }) {
     }
 
     return (
-        <main className="m-2 ">
+        <main>
             <div id="map" ref={mapContainer}></div>
             <div className={`map-overlay top w-[20vw]`}>
                 {/* <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
