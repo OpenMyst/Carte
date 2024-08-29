@@ -489,9 +489,9 @@ export default function MapByUserId({ params }) {
     //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
     // }
 
-    const handleOpenFormulaire = (e) => {
+    const handleOpenFormulaire = async (e) => {
         e.preventDefault();
-        createUserOpenFormulaire(userId);
+        await createUserOpenFormulaire(userId);
         setCanAddEvent(!canAddEvent);
     }
 
@@ -517,7 +517,7 @@ export default function MapByUserId({ params }) {
                         </Button>
                     </fieldset>
                     <fieldset>
-                        <Button variant="outlined" className={`text-white font-bold`}>
+                        <Button variant="outlined" className={`text-white font-bold`} onClick={handleOpenFormulaire}>
                             <Plus />
                         </Button>
                     </fieldset>

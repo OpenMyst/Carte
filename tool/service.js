@@ -257,27 +257,27 @@ export const createUserOpenFormulaire = async (userId) => {
   try {
     console.log("has clicked")
     const queryFetch = query(
-      collection(database, 'openFormulaire'),
-      where('idUser', '==', userId)
+      collection(database, 'clicked'),
+      where('userId', '==', userId)
     )
 
     const hasCreateUser = await getDocs(queryFetch)
 
     if (!hasCreateUser.empty) {
       const docId = hasCreateUser.docs[0].id; // Récupère l'ID du document existant
-      const hasCliqued = hasCreateUser.docs[0].data().isClique;
-      const docRef = doc(database, 'openFormulaire', docId);
+      const hasCliqued = hasCreateUser.docs[0].data().iscliked;
+      const docRef = doc(database, 'clicked', docId);
     
       await updateDoc(docRef, {
-        isClique: !hasCliqued
+        iscliked: !hasCliqued
       });
     
       console.log('Document mis à jour avec succès');
     } else {
       const addFormulaire = await addDoc(
-        collection(database, 'openFormulaire'), {
-          idUser: userId,
-          isClique: true
+        collection(database, 'clicked'), {
+          userId: userId,
+          isclike: true
         }
       );
     

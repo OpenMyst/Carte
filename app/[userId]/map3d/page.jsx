@@ -189,9 +189,9 @@ export default function MapByUserId({ params }) {
     const qLieu = query(collection(database, 'lieu'));
     const unsubscribeLieu = onSnapshot(qLieu, (querySnapshot) => {
       let lieuxArray = [];
-
       querySnapshot.forEach(doc => {
         const lieuData = doc.data();
+        console.log(lieuData)
 
         if (lieuData.etat === 15) {
           // Find coordinates corresponding to city ID in 'ville'
@@ -355,7 +355,7 @@ export default function MapByUserId({ params }) {
           }
         });
       }
-      map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "vissible" : "none");
+      map.setLayoutProperty('building-extrusion', 'visibility', showBuilding ? "visible" : "none");
       map.setLayoutProperty('road-primary', 'visibility', showRoad ? "visible" : "none");
       map.setLayoutProperty('road-secondary-tertiary', 'visibility', showRoad ? "visible" : "none");
       map.setLayoutProperty('road-street', 'visibility', showRoad ? "visible" : "none");
@@ -430,7 +430,7 @@ export default function MapByUserId({ params }) {
           closeButton.style.height = '25px';
         }
       });
-
+      console.log(loc)
       const marker = new mapboxgl.Marker({ color: '#0769C5' })
         .setLngLat([loc.longitude, loc.latitude])
         .setPopup(popup)
@@ -490,9 +490,9 @@ export default function MapByUserId({ params }) {
   //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
   // }
 
-  const handleOpenFormulaire = (e) => {
+  const handleOpenFormulaire = async (e) => {
     e.preventDefault();
-    createUserOpenFormulaire(userId);
+    await createUserOpenFormulaire(userId);
     setCanAddEvent(!canAddEvent);
   }
 
@@ -518,7 +518,7 @@ export default function MapByUserId({ params }) {
             </Button>
           </fieldset>
           <fieldset>
-            <Button variant="outlined" className={`${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={() => setCanAddEvent(!canAddEvent)}>
+            <Button variant="outlined" className={`${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={handleOpenFormulaire}>
               <Plus />
             </Button>
           </fieldset>
