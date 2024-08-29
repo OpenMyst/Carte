@@ -335,8 +335,12 @@ export default function MapByUserId({ params }) {
                         <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
                     </div>
                     <div class="mt-[150px] fixed">
-                        <h3 class="text-base font-bold text-center">${location.label}</h3>
-                        <p class="h-[110px] overflow-y-scroll">${location.description}</p>
+                        <h3 class="text-base font-bold text-center">${location.name}</h3>
+                        <div class="flex gap-2">
+                        <h4 class="text-sm font-regular">Date: ${location.date_debut}</h4> -
+                        <h4 class="text-sm font-regular">${location.date_fin}</h4>
+                        </div>
+                        <p class="h-[110px] w-full overflow-y-scroll">${location.description}</p>
                     </div>
                 </div>
                 `);
