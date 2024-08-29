@@ -383,7 +383,7 @@ export default function MapByUserId({ params }) {
                     <div class="mt-[150px] fixed">
                         <h3 class="text-base font-bold text-center">${location.name}</h3>
                         <div class="flex gap-2">
-                        <h4 class="text-sm font-regular">${location.date_debut}</h4>
+                        <h4 class="text-sm font-regular">Date : ${location.date_debut}</h4> -
                         <h4 class="text-sm font-regular">${location.date_fin}</h4>
                         </div>
                         <p class="h-[110px] overflow-y-scroll">${location.description}</p>
