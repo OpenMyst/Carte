@@ -346,11 +346,11 @@ export default function Map2DByUserId({ params }) {
           <fieldset>
             <Button variant="outlined" className="text-white font-bold" onClick={() => setOpenDialogCity(!openDialogCity)}>3D</Button>
           </fieldset>
-          <fieldset>
+          {/*<fieldset>
             <Button variant="outlined m-0" className="text-white font-bold" onClick={() => setOpenDialogCity(!openDialogCity)}>
               <Plus />
             </Button>
-          </fieldset>
+          </fieldset>*/}
         </div>
       </div>
     </main>
