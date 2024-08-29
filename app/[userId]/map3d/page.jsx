@@ -20,9 +20,9 @@ export default function MapByUserId({ params }) {
   const [lat, setLat] = useState(31.76904); // Latitude state
   const [zoom, setZoom] = useState(9); // Zoom level state
   const [mapStyle, setMapStyle] = useState(nightStyle); // Map style state
-  const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
+  const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
-  const [showMap3D, setShowMap3D] = useState(false); // Toggle for 3D map view
+  const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [lieux, setLieux] = useState([]); // State for storing place
