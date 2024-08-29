@@ -517,11 +517,11 @@ export default function MapByUserId({ params }) {
               {showMap3D ? "2D" : "3D"}
             </Button>
           </fieldset>
-          <fieldset>
+          {/*<fieldset>
             <Button variant="outlined" className={`${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={handleOpenFormulaire}>
               <Plus />
             </Button>
-          </fieldset>
+          </fieldset>*/}
         </div>
       </div>
     </main>
