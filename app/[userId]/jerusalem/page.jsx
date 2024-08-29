@@ -587,11 +587,11 @@ const Map3DComponent = ({ params }) => {
               {showMap3D ? "2D" : "3D"}
             </Button>
           </fieldset>
-          <fieldset>
+          {/*<fieldset>
             <Button variant="outlined m-0" className={` ${canAddEvent ? "text-primary" : "text-white"} font-bold`} onClick={handleOpenFormulaire}>
               <Plus />
             </Button>
-          </fieldset>
+          </fieldset>*/}
         </div>
       </div>
     </div>
