@@ -277,7 +277,7 @@ export const createUserOpenFormulaire = async (userId) => {
       const addFormulaire = await addDoc(
         collection(database, 'clicked'), {
           userId: userId,
-          isclike: true
+          iscliked: true
         }
       );
     
