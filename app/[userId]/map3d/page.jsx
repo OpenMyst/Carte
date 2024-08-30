@@ -257,7 +257,7 @@ export default function MapByUserId({ params }) {
               </div>`}
               <div class="mt-[150px] fixed">
                 <div class="mt-[150px] fixed">
-                  <h3 class="text-base font-bold text-center">${currentEvents.name}</h3>
+                  <h3 class="text-base font-bold text-start">${currentEvents.name}</h3>
                   <div class="flex gap-2">
                     <h4 class="text-sm font-regular">Date : ${currentEvents.date_debut}</h4> -
                     <h4 class="text-sm font-regular">${currentEvents.date_fin}</h4>
@@ -271,9 +271,9 @@ export default function MapByUserId({ params }) {
               //Increase the size of the popup closing cross
               const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
               if (closeButton) {
-                  closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
-                  closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
-                  closeButton.style.height = '30px';
+                  closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
+                  closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+                  closeButton.style.height = '15px';
               }
           });
 
@@ -387,7 +387,7 @@ export default function MapByUserId({ params }) {
                         <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
                     </div>`}
                     <div class="mt-[150px] fixed">
-                        <h3 class="text-base font-bold text-center">${location.name}</h3>
+                        <h3 class="text-base font-bold text-start">${location.name}</h3>
                         <div class="flex gap-2">
                         <h4 class="text-sm font-regular">Date : ${location.date_debut}</h4> -
                         <h4 class="text-sm font-regular">${location.date_fin}</h4>
@@ -406,9 +406,9 @@ export default function MapByUserId({ params }) {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
-          closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
-          closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
-          closeButton.style.height = '25px';
+          closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
+          closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.height = '15px';
         }
       });
 
@@ -425,7 +425,7 @@ export default function MapByUserId({ params }) {
                 <div>
                     <div class="flex flex-row h-[150px] w-[100px] static">
                         <div class="mt-2 fixed">
-                        <h3 class="text-base font-bold text-center">${loc.ville}</h3>
+                        <h3 class="text-base font-bold text-start">${loc.ville}</h3>
                         <p class="ml-[-5px] mr-1 h-[120px]">${loc.description}</p>
                         </div>
                     </div>
@@ -435,9 +435,9 @@ export default function MapByUserId({ params }) {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
-          closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
-          closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
-          closeButton.style.height = '25px';
+          closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
+          closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.height = '15px';
         }
       });
       console.log(loc)
