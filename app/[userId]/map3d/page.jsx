@@ -20,8 +20,8 @@ export default function MapByUserId({ params }) {
   const [lat, setLat] = useState(31.76904); // Latitude state
   const [zoom, setZoom] = useState(9); // Zoom level state
   const [mapStyle, setMapStyle] = useState(nightStyle); // Map style state
-  const [showBuilding, setShowBuilding] = useState(false); // Toggle for building visibility
-  const [showRoad, setShowRoad] = useState(false); // Toggle for road visibility
+  const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
+  const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(true); // Toggle for 3D map view
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
@@ -377,9 +377,9 @@ export default function MapByUserId({ params }) {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
                 <div class="flex flex-row h-[300px] w-[220px] static">
-                    <div class="w-full h-[60px] relative">
+                    ${location.image && `<div class="w-full h-[60px] relative">
                         <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
-                    </div>
+                    </div>`}
                     <div class="mt-[150px] fixed">
                         <h3 class="text-base font-bold text-center">${location.name}</h3>
                         <div class="flex gap-2">
