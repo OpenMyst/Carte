@@ -55,20 +55,20 @@ export default function MapByUserId({ params }) {
     }
   }, [mountainHeight, showBuilding, showRoad]);
 
-  // useEffect(() => {
-  //     const fetchLocationPlayId = async () => {
-  //         const location = await userPlayEvent(userId);
-  //         setLocationPlayId(location);
-  //     };
+  useEffect(() => {
+      const fetchLocationPlayId = async () => {
+          const location = await userPlayEvent(userId);
+          setLocationPlayId(location);
+      };
 
-  //     // Load the changment in the firebase
-  //     const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-  //         fetchLocationPlayId();
-  //     });
+      // Load the changment in the firebase
+      const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
+          fetchLocationPlayId();
+      });
 
-  //     fetchLocationPlayId();
-  //     return () => unsubscribe();
-  // }, [userId]);
+      fetchLocationPlayId();
+      return () => unsubscribe();
+  }, [userId]);
 
   useEffect(() => {
     if (map) {
@@ -76,11 +76,11 @@ export default function MapByUserId({ params }) {
     }
   }, [showMap3D]);
 
-  // useEffect(() => {
-  //     if (map && locationPlayId) {
-  //         getUserPlayEvent(map);
-  //     }
-  // }, [locationPlayId, evangileEvents, map]);
+  useEffect(() => {
+      if (map && locationPlayId) {
+          getUserPlayEvent(map);
+      }
+  }, [locationPlayId, evangileEvents, map]);
 
   useEffect(() => {
     if (locationPlayId) {
@@ -232,7 +232,7 @@ export default function MapByUserId({ params }) {
         updateTerrain(mapEvent, 10, false);
       }
 
-      const day = location.detail_jour;
+      const day = currentEvents.detail_jour;
       if (day === "Nuit") {
         mapEvent.setStyle(sprintStyleNight);
       } else if (day === "Matin") {
@@ -252,24 +252,30 @@ export default function MapByUserId({ params }) {
 
       const popup = new mapboxgl.Popup().setHTML(`
             <div class="flex flex-row h-[300px] w-[220px] static">
-              <div class="w-full h-[60px] relative">
-                <img src="${currentEvents.image}" alt="${currentEvents.label}" class="w-full h-[150px]"/>
-              </div>
+              ${currentEvents.image && `<div class="w-full h-[60px] relative">
+                <img src="${currentEvents.image}" alt="${currentEvents.name}" class="w-full h-[150px]"/>
+              </div>`}
               <div class="mt-[150px] fixed">
-                <h3 class="text-base font-bold text-center">${currentEvents.label}</h3>
-                <p class="h-[110px] overflow-y-scroll">${currentEvents.description}</p>
+                <div class="mt-[150px] fixed">
+                  <h3 class="text-base font-bold text-center">${currentEvents.name}</h3>
+                  <div class="flex gap-2">
+                    <h4 class="text-sm font-regular">Date : ${currentEvents.date_debut}</h4> -
+                    <h4 class="text-sm font-regular">${currentEvents.date_fin}</h4>
+                  </div>
+                  <p class="h-[110px] w-full overflow-y-scroll">${currentEvents.description}</p>
+                </div>
               </div>
             </div>
           `)
-      //   .on('open', () => {
-      //         //Increase the size of the popup closing cross
-      //         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-      //         if (closeButton) {
-      //             closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
-      //             closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
-      //             closeButton.style.height = '30px';
-      //         }
-      //     });
+        .on('open', () => {
+              //Increase the size of the popup closing cross
+              const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+              if (closeButton) {
+                  closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
+                  closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+                  closeButton.style.height = '30px';
+              }
+          });
 
       const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([currentEvents.longitude, currentEvents.latitude])
