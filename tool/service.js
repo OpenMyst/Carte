@@ -146,22 +146,14 @@ export const addMarkerEventInCenter = (map, userId, event) => {
   popupTitle.className = "text-sm text-center";
   popupTitle.innerText = "Deplacer et Zoomer sur la carte jusqu'à ce que le marqueur soit à l'endroite précis où vous souhaiter ajouter le lieu, puis cliquez sur:"
 
-  // Créer un input pour le nom de la ville ou de l'emplacement
-  const locationInput = document.createElement('input');
-  locationInput.type = 'text';
-  locationInput.className = 'w-full p-2 border border-gray-300 rounded-sm';
-  locationInput.placeholder = 'Enter location name';
-
   
   const saveEventButton = document.createElement('button');
   saveEventButton.className = "w-full bg-[#ff4d00] rounded-sm text-white m-1 border-2 border-black";
   saveEventButton.innerText = 'Valider la position';
   saveEventButton.onclick = async () => {
-    const locationName = locationInput.value; // Récupérer la valeur de l'input
     if (locationName) {
-      console.log('Location:', locationName);
       console.log('Coordinates:', coordinates);
-      await saveCoordonneEvent(userId, coordinates, locationName); // Ajouter locationName aux paramètres de la fonction
+      await saveCoordonneEvent(userId, coordinates); // Ajouter locationName aux paramètres de la fonction
       // Fermer le popup
       marker.remove();
     } else {
@@ -174,7 +166,6 @@ export const addMarkerEventInCenter = (map, userId, event) => {
   divEventCreate.appendChild(saveEventButton);
 
   popupContent.appendChild(popupTitle);
-  popupContent.appendChild(locationInput);
   popupContent.appendChild(divEventCreate);
 
   const popup = new mapboxgl.Popup().setDOMContent(popupContent)
@@ -218,25 +209,11 @@ export const addMarkerEventInCenter = (map, userId, event) => {
  * @param {object} coordinates - The coordinates of the event (lngLat object).
  * @param {string} place - The name of the place locating
  */
-export const saveCoordonneEvent = async (userId, coordinates, place) => {
+export const saveCoordonneEvent = async (userId, coordinates) => {
   try {
-    // Check if the location already exists in the database
-    const lieuQuery = query(
-      collection(database, 'ville'),
-      where('ville', '==', place)
-    );
-    
-    const querySnapshot = await getDocs(lieuQuery);
-
-    if (!querySnapshot.empty) {
-      // If the location already exists, show an error alert
-      alert('Le lieu existe déjà dans la base de données.');
-      return;
-    }
     console.log(coordinates)
     // Save the coordinates to the Firestore `events` collection
     const eventDocRef = await addDoc(collection(database, 'ville'), {
-      ville: place,
       longitude: coordinates[0],
       latitude: coordinates[1],
       etat: 0
