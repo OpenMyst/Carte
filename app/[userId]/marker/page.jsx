@@ -85,12 +85,12 @@ export default function MapByUserId({ params }) {
     useEffect(() => {
 
         if (map) {
-          if (canAddEvent) {
-            addMarkerEventInCenter(map, userId, markerCordinate);
-          }
+            if (canAddEvent) {
+                addMarkerEventInCenter(map, userId, markerCordinate);
+            }
         }
-    
-      }, [canAddEvent, markerCordinate, map]);
+
+    }, [canAddEvent, markerCordinate, map]);
 
     // Initialize the start and End travel using the locationPlayId
     const getTravelRoute = () => {
@@ -229,9 +229,9 @@ export default function MapByUserId({ params }) {
                 map.setTerrain({ source: 'mapbox-dem', exaggeration: mountainHeight / 100 });
                 map.on('style.load', () => {
                     if (map.getLayer('hillshade')) {
-                      map.removeLayer('hillshade');
+                        map.removeLayer('hillshade');
                     }
-                  });
+                });
             });
 
             if (mapStyle === nightStyle) {
@@ -282,28 +282,29 @@ export default function MapByUserId({ params }) {
                     </div>
                 </div>
                 `);
+            if (location.longitude && location.latitude) {
+                const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
+                    .setLngLat([location.longitude, location.latitude])
+                    .setPopup(popup) // Associe le popup au marqueur
+                    .addTo(mapEvent);
 
-            const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
-                .setLngLat([location.longitude, location.latitude])
-                .setPopup(popup) // Associe le popup au marqueur
-                .addTo(mapEvent);
-
-            popup.on('open', () => {
-                //Increase the size of the popup closing cross
-                const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-                if (closeButton) {
-                    closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
-                    closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
-                    closeButton.style.height = '25px';
-                }
-            });
-
-            marker.getElement().addEventListener('click', () => {
-                mapEvent.flyTo({
-                    center: [location.longitude, location.latitude],
-                    zoom: 20
+                popup.on('open', () => {
+                    //Increase the size of the popup closing cross
+                    const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+                    if (closeButton) {
+                        closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
+                        closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+                        closeButton.style.height = '15px';
+                    }
                 });
-            })
+
+                marker.getElement().addEventListener('click', () => {
+                    mapEvent.flyTo({
+                        center: [location.longitude, location.latitude],
+                        zoom: 20
+                    });
+                })
+            }
         });
 
         lieux.forEach((loc) => {
@@ -326,19 +327,20 @@ export default function MapByUserId({ params }) {
                     closeButton.style.height = '25px';
                 }
             });
+            if (loc.longitude && loc.latitude) {
+                const marker = new mapboxgl.Marker({ color: '#0769C5' })
+                    .setLngLat([loc.longitude, loc.latitude])
+                    .setPopup(popup)
+                    .addTo(mapEvent);
 
-            const marker = new mapboxgl.Marker({ color: '#0769C5' })
-                .setLngLat([loc.longitude, loc.latitude])
-                .setPopup(popup)
-                .addTo(mapEvent);
-
-            marker.getElement().addEventListener('click', () => {
-                // setOpenDialogCity(true);
-                mapEvent.flyTo({
-                    center: [loc.longitude, loc.latitude],
-                    zoom: 20
+                marker.getElement().addEventListener('click', () => {
+                    // setOpenDialogCity(true);
+                    mapEvent.flyTo({
+                        center: [loc.longitude, loc.latitude],
+                        zoom: 20
+                    });
                 });
-            });
+            }
         });
     };
 
