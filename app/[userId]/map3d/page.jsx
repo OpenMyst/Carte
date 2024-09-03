@@ -55,20 +55,20 @@ export default function MapByUserId({ params }) {
     }
   }, [mountainHeight, showBuilding, showRoad]);
 
-  // useEffect(() => {
-  //     const fetchLocationPlayId = async () => {
-  //         const location = await userPlayEvent(userId);
-  //         setLocationPlayId(location);
-  //     };
+  useEffect(() => {
+      const fetchLocationPlayId = async () => {
+          const location = await userPlayEvent(userId);
+          setLocationPlayId(location);
+      };
 
-  //     // Load the changment in the firebase
-  //     const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-  //         fetchLocationPlayId();
-  //     });
+      // Load the changment in the firebase
+      const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
+          fetchLocationPlayId();
+      });
 
-  //     fetchLocationPlayId();
-  //     return () => unsubscribe();
-  // }, [userId]);
+      fetchLocationPlayId();
+      return () => unsubscribe();
+  }, [userId]);
 
   useEffect(() => {
     if (map) {
@@ -76,11 +76,11 @@ export default function MapByUserId({ params }) {
     }
   }, [showMap3D]);
 
-  // useEffect(() => {
-  //     if (map && locationPlayId) {
-  //         getUserPlayEvent(map);
-  //     }
-  // }, [locationPlayId, evangileEvents, map]);
+  useEffect(() => {
+      if (map && locationPlayId) {
+          getUserPlayEvent(map);
+      }
+  }, [locationPlayId, evangileEvents, map]);
 
   useEffect(() => {
     if (locationPlayId) {
@@ -101,39 +101,6 @@ export default function MapByUserId({ params }) {
       }
     }
   }, [map, startTravel, endTravel]);
-
-  const handleMapClick = useCallback((event) => {
-    addMarkerEvent(map, userId, event);
-  }, [map, userId]);
-
-  useEffect(() => {
-
-    if (map) {
-      if (canAddEvent) {
-        // Activer l'ajout de markers sur un clic droit
-        map.on('contextmenu', handleMapClick);
-      } else {
-        map.off('contextmenu', handleMapClick);
-      }
-    }
-
-    // Cleanup pour éviter les fuites de mémoire
-    return () => {
-      if (map) {
-        map.off('contextmenu', handleMapClick);
-      }
-    };
-  }, [canAddEvent, map, handleMapClick]);
-
-  // useEffect(() => {
-
-  //   if (map) {
-  //     if (canAddEvent) {
-  //       addMarkerEventInCenter(map, userId);
-  //     }
-  //   }
-
-  // }, [canAddEvent, map]);
 
   // Initialize the start and End travel using the locationPlayId
   const getTravelRoute = () => {

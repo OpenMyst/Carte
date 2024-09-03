@@ -56,20 +56,20 @@ const Map3DComponent = ({ params }) => {
     }
   }, [mountainHeight, showBuilding, showRoad]);
 
-  // useEffect(() => {
-  //   const fetchLocationPlayId = async () => {
-  //     const location = await userPlayEvent(userId);
-  //     setLocationPlayId(location);
-  //   };
+  useEffect(() => {
+    const fetchLocationPlayId = async () => {
+      const location = await userPlayEvent(userId);
+      setLocationPlayId(location);
+    };
 
-  //   // Load the changment in the firebase
-  //   const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-  //     fetchLocationPlayId();
-  //   });
+    // Load the changment in the firebase
+    const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
+      fetchLocationPlayId();
+    });
 
-  //   fetchLocationPlayId();
-  //   return () => unsubscribe();
-  // }, [userId]);
+    fetchLocationPlayId();
+    return () => unsubscribe();
+  }, [userId]);
 
   useEffect(() => {
     if (map) {
@@ -77,11 +77,11 @@ const Map3DComponent = ({ params }) => {
     }
   }, [showMap3D]);
 
-  // useEffect(() => {
-  //   if (map && locationPlayId) {
-  //     getUserPlayEvent(map);
-  //   }
-  // }, [locationPlayId, evangileEvents, lieux, map, winterDark, summerLight]);
+  useEffect(() => {
+    if (map && locationPlayId) {
+      getUserPlayEvent(map);
+    }
+  }, [locationPlayId, evangileEvents, lieux, map, winterDark, summerLight]);
 
   useEffect(() => {
     if (locationPlayId) {

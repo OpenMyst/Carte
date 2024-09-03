@@ -45,7 +45,6 @@ export default function MapByUserId({ params }) {
     useEffect(() => {
         if (map) {
             loadEvangileMarker(map);
-            getUserPlayEvent(map);
         }
     }, [evangileEvents, lieux, map]);
 
@@ -170,67 +169,6 @@ export default function MapByUserId({ params }) {
             });
             setLieux(lieuxArray);
         });
-    }
-
-    //Received the location of the event who play by user and zoom in them
-    const getUserPlayEvent = async (mapEvent) => {
-        // Find the next event in the list
-        const currentIndex = evangileEvents.findIndex(event => event.id === locationPlayId);
-        const currentEvents = evangileEvents[currentIndex];
-
-        if (currentEvents) {
-            const anneeEvent = parseInt(currentEvents.event_date);
-            if (anneeEvent < 0) {
-                setMountainHeight(100);
-                setShowBuilding(false);
-                updateTerrain(mapEvent, 100, false);
-            } else {
-                setMountainHeight(0);
-                setShowBuilding(false);
-                updateTerrain(mapEvent, 10, false);
-            }
-
-            const day = location.detail_jour;
-            if (day === "Nuit") {
-                mapEvent.setStyle(sprintStyleNight);
-            } else if (day === "Matin") {
-                mapEvent.setStyle(summerLight);
-            } else {
-                mapEvent.setStyle(nightStyle);
-            }
-
-            const meteo = location.meteo;
-            if (meteo === "Pluvieux") {
-                mapEvent.setStyle(sprintStyle);
-                addRainLayer(mapEvent);
-            } else if (meteo === "Neigeux") {
-                mapEvent.setStyle(winterDark);
-                addSnowLayer(mapEvent);
-            }
-
-            const popup = new mapboxgl.Popup().setHTML(`
-            <div class="flex flex-row h-[300px] w-[220px] static">
-              <div class="w-full h-[60px] relative">
-                <img src="${currentEvents.image}" alt="${currentEvents.label}" class="w-full h-[150px]"/>
-              </div>
-              <div class="mt-[150px] fixed">
-                <h3 class="text-base font-bold text-center">${currentEvents.label}</h3>
-                <p class="h-[110px] overflow-y-scroll">${currentEvents.description}</p>
-              </div>
-            </div>
-          `)
-
-            const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
-                .setLngLat([currentEvents.longitude, currentEvents.latitude])
-                .setPopup(popup)  // Associe le popup au marqueur
-                .addTo(mapEvent)
-                .togglePopup();
-
-            mapEvent.flyTo({
-                center: [currentEvents.longitude, currentEvents.latitude],
-                zoom: 15
-            });
-        }
     }
 
     const updateMapSettings = () => {
@@ -401,14 +339,6 @@ export default function MapByUserId({ params }) {
                     zoom: 20
                 });
             });
-        });
-    };
-
-    //update the terrain in the map when the height of mountain has changed
-    const updateTerrain = (map, height, show) => {
-        map.on('style.load', () => {
-            map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
-            handleCheckboxChange('building-extrusion', 'visibility', show);
         });
     };
 
