@@ -151,15 +151,11 @@ export const addMarkerEventInCenter = (map, userId, event) => {
   saveEventButton.className = "w-full bg-[#ff4d00] rounded-sm text-white m-1 border-2 border-black";
   saveEventButton.innerText = 'Valider la position';
   saveEventButton.onclick = async () => {
-    if (locationName) {
       console.log('Coordinates:', coordinates);
       await saveCoordonneEvent(userId, coordinates); // Ajouter locationName aux paramètres de la fonction
       // Fermer le popup
       marker.remove();
-    } else {
-      alert('Please enter a location name.');
-    }
-   };
+    };
 
   const divEventCreate = document.createElement('div');
   divEventCreate.className = "flex gap-1";
