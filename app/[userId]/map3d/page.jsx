@@ -56,18 +56,18 @@ export default function MapByUserId({ params }) {
   }, [mountainHeight, showBuilding, showRoad]);
 
   useEffect(() => {
-      const fetchLocationPlayId = async () => {
-          const location = await userPlayEvent(userId);
-          setLocationPlayId(location);
-      };
+    const fetchLocationPlayId = async () => {
+      const location = await userPlayEvent(userId);
+      setLocationPlayId(location);
+    };
 
-      // Load the changment in the firebase
-      const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-          fetchLocationPlayId();
-      });
-
+    // Load the changment in the firebase
+    const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
       fetchLocationPlayId();
-      return () => unsubscribe();
+    });
+
+    fetchLocationPlayId();
+    return () => unsubscribe();
   }, [userId]);
 
   useEffect(() => {
@@ -77,9 +77,9 @@ export default function MapByUserId({ params }) {
   }, [showMap3D]);
 
   useEffect(() => {
-      if (map && locationPlayId) {
-          getUserPlayEvent(map);
-      }
+    if (map && locationPlayId) {
+      getUserPlayEvent(map);
+    }
   }, [locationPlayId, evangileEvents, map]);
 
   useEffect(() => {
@@ -235,14 +235,14 @@ export default function MapByUserId({ params }) {
             </div>
           `)
         .on('open', () => {
-              //Increase the size of the popup closing cross
-              const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-              if (closeButton) {
-                  closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
-                  closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
-                  closeButton.style.height = '15px';
-              }
-          });
+          //Increase the size of the popup closing cross
+          const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+          if (closeButton) {
+            closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
+            closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+            closeButton.style.height = '15px';
+          }
+        });
 
       const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([currentEvents.longitude, currentEvents.latitude])
@@ -363,28 +363,30 @@ export default function MapByUserId({ params }) {
                     </div>
                 </div>
                 `);
+      if (location.longitude && location.latitude) {
+        const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
+          .setLngLat([location.longitude, location.latitude])
+          .setPopup(popup) // Associe le popup au marqueur
+          .addTo(mapEvent);
 
-      const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
-        .setLngLat([location.longitude, location.latitude])
-        .setPopup(popup) // Associe le popup au marqueur
-        .addTo(mapEvent);
-
-      popup.on('open', () => {
-        //Increase the size of the popup closing cross
-        const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-        if (closeButton) {
-          closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
-          closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
-          closeButton.style.height = '15px';
-        }
-      });
-
-      marker.getElement().addEventListener('click', () => {
-        mapEvent.flyTo({
-          center: [location.longitude, location.latitude],
-          zoom: 20
+        popup.on('open', () => {
+          //Increase the size of the popup closing cross
+          const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+          if (closeButton) {
+            closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
+            closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+            closeButton.style.height = '15px';
+          }
         });
-      })
+
+        marker.getElement().addEventListener('click', () => {
+          mapEvent.flyTo({
+            center: [location.longitude, location.latitude],
+            zoom: 20
+          });
+        })
+      }
+
     });
 
     lieux.forEach((loc) => {
@@ -407,19 +409,20 @@ export default function MapByUserId({ params }) {
           closeButton.style.height = '15px';
         }
       });
-      console.log(loc)
-      const marker = new mapboxgl.Marker({ color: '#0769C5' })
-        .setLngLat([loc.longitude, loc.latitude])
-        .setPopup(popup)
-        .addTo(mapEvent);
+      if (loc.longitude && loc.latitude) {
+        const marker = new mapboxgl.Marker({ color: '#0769C5' })
+          .setLngLat([loc.longitude, loc.latitude])
+          .setPopup(popup)
+          .addTo(mapEvent);
 
-      marker.getElement().addEventListener('click', () => {
-        // setOpenDialogCity(true);
-        mapEvent.flyTo({
-          center: [loc.longitude, loc.latitude],
-          zoom: 20
+        marker.getElement().addEventListener('click', () => {
+          // setOpenDialogCity(true);
+          mapEvent.flyTo({
+            center: [loc.longitude, loc.latitude],
+            zoom: 20
+          });
         });
-      });
+      }
     });
   };
 
