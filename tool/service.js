@@ -150,15 +150,11 @@ export const addMarkerEventInCenter = (map, userId, event) => {
   saveEventButton.onclick = async () => {
     if (marker) {
       const lngLat = marker.getLngLat();
-      if (locationName) {
-        console.log('Coordinates:', [lngLat.lng, lngLat.lat]);
-        await saveCoordonneEvent( [lngLat.lng, lngLat.lat]); // Ajouter locationName aux paramètres de la fonction
-        // Fermer le popup
-        marker.remove();
-        marker = null; // Réinitialiser le marqueur après suppression
-      } else {
-        alert('Please enter a location name.');
-      }
+      console.log('Coordinates:', [lngLat.lng, lngLat.lat]);
+      await saveCoordonneEvent([lngLat.lng, lngLat.lat]); // Ajouter locationName aux paramètres de la fonction
+      // Fermer le popup
+      marker.remove();
+      marker = null; // Réinitialiser le marqueur après suppression
     }
   };
 
