@@ -150,7 +150,6 @@ export const addMarkerEventInCenter = (map, userId, event) => {
   saveEventButton.onclick = async () => {
     if (marker) {
       const lngLat = marker.getLngLat();
-      console.log('Coordinates:', [lngLat.lng, lngLat.lat]);
       await saveCoordonneEvent([lngLat.lng, lngLat.lat]); // Ajouter locationName aux paramètres de la fonction
       // Fermer le popup
       marker.remove();
@@ -207,15 +206,12 @@ export const addMarkerEventInCenter = (map, userId, event) => {
  */
 export const saveCoordonneEvent = async (coordinates) => {
   try {
-    console.log(coordinates)
     // Save the coordinates to the Firestore `events` collection
     const eventDocRef = await addDoc(collection(database, 'ville'), {
       longitude: coordinates[0],
       latitude: coordinates[1],
       etat: 0
     });
-
-    console.log('Location:', location);
   } catch (error) {
     console.error('Error adding event and location to Firestore:', error);
   }
