@@ -2,9 +2,6 @@
 import { collection, query, where, getDocs, addDoc, updateDoc, doc } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import mapboxgl from 'mapbox-gl';
-import { MAPBOX_TOKEN } from "@/tool/security";
-
-mapboxgl.accessToken = MAPBOX_TOKEN;
 
 /**
  * Retrieves the first event associated with a given user's play locations.
@@ -153,10 +150,9 @@ export const addMarkerEventInCenter = (map, userId, event) => {
   saveEventButton.onclick = async () => {
     if (marker) {
       const lngLat = marker.getLngLat();
-      const locationName = await getCityName(lngLat.lng, lngLat.lat);
       if (locationName) {
         console.log('Coordinates:', [lngLat.lng, lngLat.lat]);
-        await saveCoordonneEvent( [lngLat.lng, lngLat.lat], locationName); // Ajouter locationName aux paramètres de la fonction
+        await saveCoordonneEvent( [lngLat.lng, lngLat.lat]); // Ajouter locationName aux paramètres de la fonction
         // Fermer le popup
         marker.remove();
         marker = null; // Réinitialiser le marqueur après suppression
@@ -206,19 +202,6 @@ export const addMarkerEventInCenter = (map, userId, event) => {
   });
 }
 
-export const getCityName = async (longitude, latitude) => {
-  try {
-    const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxgl.accessToken}`);
-    const data = await response.json();
-    const placeName = data.features[0].place_name;
-
-    return placeName;
-  } catch (error) {
-    console.error('Error:', error);
-    return null;
-  }
-}
-
 /**
  * Saves the coordinates of an event to Firestore and associates it with a user.
  * 
@@ -226,12 +209,11 @@ export const getCityName = async (longitude, latitude) => {
  * @param {object} coordinates - The coordinates of the event (lngLat object).
  * @param {string} place - The name of the place locating
  */
-export const saveCoordonneEvent = async (coordinates, place) => {
+export const saveCoordonneEvent = async (coordinates) => {
   try {
     console.log(coordinates)
     // Save the coordinates to the Firestore `events` collection
     const eventDocRef = await addDoc(collection(database, 'ville'), {
-      ville: place,
       longitude: coordinates[0],
       latitude: coordinates[1],
       etat: 0
