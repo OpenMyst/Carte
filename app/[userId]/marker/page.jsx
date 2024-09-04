@@ -31,7 +31,7 @@ export default function MapByUserId({ params }) {
     const [endTravel, setEndTravel] = useState([]); // End coordinates for route
     const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
     const [canAddEvent, setCanAddEvent] = useState(true); // Toggle for overlay visibility
-    const [markerCordinate, setMarkerCordinate] = useState([lng, lat]);
+    const [markerCordinate, setMarkerCordinate] = useState([lng, lat]); // coordinate of the marker in center
 
     useEffect(() => {
         getAllEvent();
@@ -285,15 +285,15 @@ export default function MapByUserId({ params }) {
             if (location.longitude && location.latitude) {
                 const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
                     .setLngLat([location.longitude, location.latitude])
-                    .setPopup(popup) // Associe le popup au marqueur
+                    .setPopup(popup)
                     .addTo(mapEvent);
 
                 popup.on('open', () => {
                     //Increase the size of the popup closing cross
                     const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
                     if (closeButton) {
-                        closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
-                        closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+                        closeButton.style.fontSize = '15px'; 
+                        closeButton.style.width = '15px'; 
                         closeButton.style.height = '15px';
                     }
                 });
@@ -322,8 +322,8 @@ export default function MapByUserId({ params }) {
                 //Increase the size of the popup closing cross
                 const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
                 if (closeButton) {
-                    closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
-                    closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
+                    closeButton.style.fontSize = '25px'; 
+                    closeButton.style.width = '25px'; 
                     closeButton.style.height = '25px';
                 }
             });
@@ -334,7 +334,6 @@ export default function MapByUserId({ params }) {
                     .addTo(mapEvent);
 
                 marker.getElement().addEventListener('click', () => {
-                    // setOpenDialogCity(true);
                     mapEvent.flyTo({
                         center: [loc.longitude, loc.latitude],
                         zoom: 20

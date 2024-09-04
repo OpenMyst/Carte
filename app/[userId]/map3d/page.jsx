@@ -1,14 +1,14 @@
 "use client";
-import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight, automnStyle } from "@/tool/security";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
+import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
 import { Button } from "@/components/ui/button";
-import { addMarkerEvent, userPlayEvent, createUserOpenFormulaire, addMarkerEventInCenter } from "@/tool/service";
-import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
+import { userPlayEvent, createUserOpenFormulaire } from "@/tool/service";
+import { Plus, Volume1 } from "lucide-react";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -26,7 +26,6 @@ export default function MapByUserId({ params }) {
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [lieux, setLieux] = useState([]); // State for storing place
-  const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
   const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
@@ -238,15 +237,15 @@ export default function MapByUserId({ params }) {
           //Increase the size of the popup closing cross
           const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
           if (closeButton) {
-            closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
-            closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+            closeButton.style.fontSize = '15px'; 
+            closeButton.style.width = '15px'; 
             closeButton.style.height = '15px';
           }
         });
 
       const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([currentEvents.longitude, currentEvents.latitude])
-        .setPopup(popup)  // Associe le popup au marqueur
+        .setPopup(popup) 
         .addTo(mapEvent)
         .togglePopup();
 
@@ -366,15 +365,15 @@ export default function MapByUserId({ params }) {
       if (location.longitude && location.latitude) {
         const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
           .setLngLat([location.longitude, location.latitude])
-          .setPopup(popup) // Associe le popup au marqueur
+          .setPopup(popup)
           .addTo(mapEvent);
 
         popup.on('open', () => {
           //Increase the size of the popup closing cross
           const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
           if (closeButton) {
-            closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
-            closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+            closeButton.style.fontSize = '15px'; 
+            closeButton.style.width = '15px'; 
             closeButton.style.height = '15px';
           }
         });
@@ -404,8 +403,8 @@ export default function MapByUserId({ params }) {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
-          closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
-          closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.fontSize = '15px'; 
+          closeButton.style.width = '15px'; 
           closeButton.style.height = '15px';
         }
       });
@@ -416,7 +415,6 @@ export default function MapByUserId({ params }) {
           .addTo(mapEvent);
 
         marker.getElement().addEventListener('click', () => {
-          // setOpenDialogCity(true);
           mapEvent.flyTo({
             center: [loc.longitude, loc.latitude],
             zoom: 20
@@ -450,26 +448,6 @@ export default function MapByUserId({ params }) {
     }
   };
 
-  // const handlePathClicked = (e) => {
-  //     e.preventDefault();
-  //     setShowRoad(!showRoad);
-  //     handleCheckboxChange('road-primary', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-street', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-minor', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-major-link', 'visibility', !showRoad);
-  //     handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
-  //     handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
-  //     handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
-  //     handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-  // }
-
-  // const handleBuildingClicked = (e) => {
-  //     e.preventDefault();
-  //     setShowBuilding(!showBuilding);
-  //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
-  // }
-
   const handleOpenFormulaire = async (e) => {
     e.preventDefault();
     await createUserOpenFormulaire(userId);
@@ -480,9 +458,6 @@ export default function MapByUserId({ params }) {
     <main>
       <div id="map" ref={mapContainer}></div>
       <div className={`map-overlay top w-[20vw]`}>
-        {/* <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-                    <PanelTopOpen className="text-black" />
-                </button> */}
         <div className={`map-overlay-inner block`}>
           <fieldset>
             <Button variant="outlined" className="text-white font-bold" >EN</Button>

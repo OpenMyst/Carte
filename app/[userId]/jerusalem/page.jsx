@@ -1,15 +1,13 @@
 "use client"
 import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight } from "@/tool/security";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
-import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { createUserOpenFormulaire, userPlayEvent } from "@/tool/service";
-import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
+import { Plus, Volume1 } from "lucide-react";
 import Spline from "@splinetool/react-spline";
 import { Button } from "@/components/ui/button";
 
@@ -35,7 +33,6 @@ const Map3DComponent = ({ params }) => {
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
   const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
-  const [openDialogCity, setOpenDialogCity] = useState(false);
 
   useEffect(() => {
     getAllEvent();
@@ -232,33 +229,33 @@ const Map3DComponent = ({ params }) => {
           <!--<button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button> -->
         </div>
       `)
-      // .on('open', () => {
-      //   //Increase the size of the popup closing cross
-      //   const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
-      //   if (closeButton) {
-      //     closeButton.style.fontSize = '30px';
-      //     closeButton.style.width = '30px'; 
-      //     closeButton.style.height = '30px';
-      //   }
-      //   // Add event listener when popup is opened
-      //   const button = document.getElementById('showJerusalemButton');
-      //   if (button) {
-      //     button.addEventListener('click', () => {
-      //       setOpenDialogCity(true);
-      //     });
-      //   }
-      // });
+      .on('open', () => {
+        //Increase the size of the popup closing cross
+        const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+        if (closeButton) {
+          closeButton.style.fontSize = '30px';
+          closeButton.style.width = '30px'; 
+          closeButton.style.height = '30px';
+        }
+        // Add event listener when popup is opened
+        const button = document.getElementById('showJerusalemButton');
+        if (button) {
+          button.addEventListener('click', () => {
+            setOpenDialogCity(true);
+          });
+        }
+      });
 
       const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([currentEvents.longitude, currentEvents.latitude])
-        .setPopup(popup)  // Associe le popup au marqueur
+        .setPopup(popup) 
         .addTo(mapEvent)
-      //   .togglePopup();
+        .togglePopup();
 
-      // mapEvent.flyTo({
-      //   center: [currentEvents.longitude, currentEvents.latitude],
-      //   zoom: 15
-      // });
+      mapEvent.flyTo({
+        center: [currentEvents.longitude, currentEvents.latitude],
+        zoom: 15
+      });
     }
   }
 
@@ -451,15 +448,15 @@ const Map3DComponent = ({ params }) => {
 
       const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([location.longitude, location.latitude])
-        .setPopup(popup)  // Associe le popup au marqueur
+        .setPopup(popup) 
         .addTo(mapEvent);
 
       popup.on('open', () => {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
-          closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
-          closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.fontSize = '25px'; 
+          closeButton.style.width = '25px'; 
           closeButton.style.height = '25px';
         }
         // Add event listener when popup is opened
@@ -494,8 +491,8 @@ const Map3DComponent = ({ params }) => {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
-          closeButton.style.fontSize = '25px'; // Augmenter la taille de la croix
-          closeButton.style.width = '25px'; // Augmenter la taille de la zone cliquable
+          closeButton.style.fontSize = '25px'; 
+          closeButton.style.width = '25px'; 
           closeButton.style.height = '25px';
         }
       });
@@ -529,26 +526,6 @@ const Map3DComponent = ({ params }) => {
       map.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
     }
   };
-
-  // const handlePathClicked = (e) => {
-  //   e.preventDefault();
-  //   setShowRoad(!showRoad);
-  //   handleCheckboxChange('road-primary', 'visibility', !showRoad);
-  //   handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
-  //   handleCheckboxChange('road-street', 'visibility', !showRoad);
-  //   handleCheckboxChange('road-minor', 'visibility', !showRoad);
-  //   handleCheckboxChange('road-major-link', 'visibility', !showRoad);
-  //   handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
-  //   handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
-  //   handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
-  //   handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-  // }
-
-  // const handleBuildingClicked = (e) => {
-  //   e.preventDefault();
-  //     setShowBuilding(!showBuilding);
-  //     handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
-  // }
 
   const handleOpenFormulaire = async (e) => {
     e.preventDefault();
