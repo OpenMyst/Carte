@@ -9,8 +9,20 @@ import { Button } from "@/components/ui/button";
 import { createUserOpenFormulaire, addMarkerEventInCenter } from "@/tool/service";
 import { Volume1 } from "lucide-react";
 
+// Set the Mapbox access token
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
+/**
+ * This component is responsible for adding a marker to the map,
+ * allowing users to select the location where they want to add
+ * a place or an event. The marker's position is updated based
+ * on user interactions, and various map settings and layers
+ * are managed dynamically. This functionality supports both
+ * 2D and 3D map views and integrates with Firebase for event
+ * and place data.
+ * @param {Object} params - The parameters passed to the component.
+ * @param {string} params.userId - The ID of the user whose data will be used for map customization.
+ */
 export default function MapByUserId({ params }) {
     const userId = params.userId;
     const mapContainer = useRef(null); // Reference to the map container
@@ -169,6 +181,8 @@ export default function MapByUserId({ params }) {
         });
     }
 
+    //This function updates the map settings by adding a terrain source, adjusting the visibility of various road 
+    //and building layers based on user selections, and setting the terrain's exaggeration level.
     const updateMapSettings = () => {
         if (map) {
             map.on('style.load', () => {
@@ -191,7 +205,9 @@ export default function MapByUserId({ params }) {
         }
     };
 
-    // Initialize the map into 3D
+    // Initializes a Mapbox map with specified settings (center, zoom, pitch, etc.), 
+    // adds controls, handles map movement to update coordinates, 
+    // adds terrain and hillshade layers based on the style, and toggles visibility of various map layers.
     const initializeMap = () => {
         const map = new mapboxgl.Map({
             container: mapContainer.current,

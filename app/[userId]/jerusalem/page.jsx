@@ -10,10 +10,23 @@ import { createUserOpenFormulaire, userPlayEvent } from "@/tool/service";
 import { Plus, Volume1 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+// Set the Mapbox access token
 mapboxgl.accessToken = MAPBOX_TOKEN;
-/*
-* Map3DComponent: a react page that displays 3D maps with 3D objects on top
-*/
+/**
+ * This component renders a Mapbox map with 3D objects using Threebox.js.
+ * 
+ * It initializes the map with Mapbox and overlays 3D models of significant locations on top of it. 
+ * The visibility of buildings, roads, and the 3D map view is managed by state variables. 
+ * The component also handles fetching event data from Firebase and updating the map accordingly.
+ * 
+ * The key features include:
+ * - Displaying 3D models on the map, such as Jerusalem and Golgotha, with adjustable height and visibility settings.
+ * - Dynamic updates based on user events and Firebase data.
+ * - Integration of weather layers and terrain adjustments to enhance map visualization.
+ * 
+ * @param {Object} params - The parameters object.
+ * @param {string} params.userId - The ID of the current user, used for fetching user-specific events.
+ */
 const Map3DComponent = ({ params }) => {
   const userId = params.userId;
   const mapContainer = useRef(null);

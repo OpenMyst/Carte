@@ -4,7 +4,39 @@ import SpriteText from 'three-spritetext';
 import { getFamilyTreeFromFirebase } from './action';
 import dynamic from 'next/dynamic';
 
+/**
+ * Dynamically imports the `ForceGraph3D` component from the `react-force-graph` library.
+ * This approach uses Next.js's `dynamic` function to enable client-side rendering only,
+ * as specified by `ssr: false`. This prevents server-side rendering of the `ForceGraph3D` component,
+ * which is important for components that rely on browser-specific APIs or have large bundles.
+ * 
+ * The `ForceGraph3D` component is imported asynchronously and made available for use in the component.
+ * The `then` method ensures that the import resolves to the `ForceGraph3D` export from the module.
+ * 
+ * @type {React.ComponentType}
+ */
 const ForceGraph3D = dynamic(() => import('react-force-graph').then(mod => mod.ForceGraph3D), { ssr: false });
+
+/**
+ * PageGenealogie is a React component that renders a 3D force graph using the `react-force-graph` library.
+ * It visualizes a family tree with nodes and links, where each node represents a person and each link
+ * represents a relationship between people. The component fetches family tree data from Firebase,
+ * sets up the graph with custom node and link rendering, and provides interactivity for clicking on nodes.
+ * 
+ * The component uses:
+ * - `useState` to manage the graph data (nodes and links).
+ * - `useEffect` to fetch data from Firebase when the component mounts.
+ * - `useRef` to keep a reference to the ForceGraph3D instance for camera manipulation.
+ * - `useCallback` to handle node click events, adjusting the camera position to focus on the clicked node.
+ * 
+ * Nodes are represented as spheres with labels, and their appearance is customized based on their properties.
+ * Links are rendered with text sprites and have dynamic visual properties.
+ * 
+ * @component
+ * @example
+ * // Usage
+ * <PageGenealogie />
+ */
 const PageGenealogie = () => {
   const [data, setData] = useState({ nodes: [], links: [] });
   const fgRef = useRef();

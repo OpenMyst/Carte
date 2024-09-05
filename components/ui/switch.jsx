@@ -5,6 +5,17 @@ import * as SwitchPrimitives from "@radix-ui/react-switch"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * `Switch` is a customizable switch component using Radix UI primitives.
+ * It renders a toggle switch with configurable styling based on its state.
+ * 
+ * @component
+ * @param {Object} props - The properties passed to the switch component.
+ * @param {string} [props.className] - Additional CSS class names to apply to the switch.
+ * @param {React.Ref} ref - Reference to the switch element.
+ * 
+ * @returns {JSX.Element} - The rendered switch component.
+ */
 const Switch = React.forwardRef(({ className, ...props }, ref) => (
   <SwitchPrimitives.Root
     className={cn(

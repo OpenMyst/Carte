@@ -10,8 +10,14 @@ import { Plus, Volume1 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
+// Set the Mapbox access token
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
+/**
+ * This is the main function for rendering a 2D Mapbox map with dynamic event data and user interaction.
+ * The function integrates Firebase Firestore for fetching event data, Mapbox for displaying the map and layers, 
+ * and React hooks for managing the state and side effects. 
+ */
 export default function Map2DByUserId({ params }) {
   const mapContainer = useRef(null); // Reference to the map container
   const map = useRef(null); // Reference to the map object
@@ -29,41 +35,50 @@ export default function Map2DByUserId({ params }) {
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
   const [openDialogCity, setOpenDialogCity] = useState(false);
 
+  // useEffect to initially fetch all event data from Firebase when the component mounts
   useEffect(() => {
     getAllEvent();
   }, [])
 
+  // useEffect to initialize the Mapbox map when the component mounts
   useEffect(() => {
-    if (map.current) return;
+    if (map.current) return; // Prevent re-initialization of the map if it already exists
+
+    // Initialize Mapbox with container, style, and initial settings
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: mapStyle,
       center: [lng, lat],
       zoom: zoom,
-      pitch: 0,
-      pitchWithRotate: false,
+      pitch: 0, // Default pitch (flat view)
+      pitchWithRotate: false, // Disable pitch rotation
       bearing: 0,
     });
 
+    // Update longitude, latitude, and zoom when the map is moved by the user
     map.current.on('move', () => {
       setLng(map.current.getCenter().lng.toFixed(4));
       setLat(map.current.getCenter().lat.toFixed(4));
       setZoom(map.current.getZoom().toFixed(2));
     });
 
+    // Add navigation control (zoom in/out)
     map.current.addControl(new mapboxgl.NavigationControl());
 
+    // Update the map settings and load event markers
     updateMapSettings();
     loadEvangileMarker(map.current);
     addRouteLayer(map.current, startTravel, endTravel);
   }, []);
 
+  // useEffect to re-render event markers whenever events or places (lieux) data changes
   useEffect(() => {
     if (map.current) {
       loadEvangileMarker(map.current);
     }
   }, [evangileEvents, lieux, map]);
 
+  // useEffect to update the map settings whenever terrain height, building visibility, or road visibility changes
   useEffect(() => {
     if (map.current) {
       updateMapSettings();
@@ -71,6 +86,7 @@ export default function Map2DByUserId({ params }) {
     }
   }, [mountainHeight, evangileEvents, showBuilding, showRoad]);
 
+  // useEffect to adjust the map's 3D view based on showMap3D state
   useEffect(() => {
     if (map.current) {
       map.current.setPitch(showMap3D ? 62 : 0);
@@ -144,6 +160,8 @@ export default function Map2DByUserId({ params }) {
     });
   }
 
+  //This function updates the map settings by adding a terrain source, adjusting the visibility of various road 
+  //and building layers based on user selections, and setting the terrain's exaggeration level.
   const updateMapSettings = () => {
     if (map.current) {
       map.current.on('style.load', () => {
@@ -166,6 +184,7 @@ export default function Map2DByUserId({ params }) {
       });
     }
   };
+
   // Load markers for evangile events
   const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
@@ -250,7 +269,7 @@ export default function Map2DByUserId({ params }) {
     });
   };
 
-  //update the terrain in the map when the height of mountain has changed
+  // update the terrain in the map when the height of mountain has changed
   const updateTerrain = (map, height, show) => {
     map.on('style.load', () => {
       map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
@@ -265,11 +284,13 @@ export default function Map2DByUserId({ params }) {
     }
   };
 
+  // function opens the registration page in a new tab and closes the city dialog.
   const handleRegisterClick = () => {
     window.open("https://prytane.com/registration", "_blank");
     setOpenDialogCity(false)
   };
 
+  // function opens the login page in a new tab and closes the city dialog.
   const handleLogIn = () => {
     setOpenDialogCity(false)
     window.open("https://prytane.com/login", "_blank");
