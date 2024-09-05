@@ -412,8 +412,8 @@ export default function MapByUserId({ params }) {
                 //Increase the size of the popup closing cross
                 const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
                 if (closeButton) {
-                    closeButton.style.fontSize = '15px'; // Augmenter la taille de la croix
-                    closeButton.style.width = '15px'; // Augmenter la taille de la zone cliquable
+                    closeButton.style.fontSize = '15px'; 
+                    closeButton.style.width = '15px';
                     closeButton.style.height = '15px';
                 }
             });
@@ -447,15 +447,6 @@ export default function MapByUserId({ params }) {
     const handleCheckboxChange = (layerId, property, value) => {
         if (map) {
             map.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
-        }
-    };
-
-    // Handle mountain height change
-    const handleMountainHeightChange = (event) => {
-        const height = event.target.value;
-        setMountainHeight(height);
-        if (map.getTerrain()) {
-            map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
         }
     };
 

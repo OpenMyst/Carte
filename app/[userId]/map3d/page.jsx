@@ -43,7 +43,7 @@ export default function MapByUserId({ params }) {
   useEffect(() => {
     if (map) {
       loadEvangileMarker(map);
-      // getUserPlayEvent(map);
+      getUserPlayEvent(map);
     }
   }, [evangileEvents, lieux, map]);
 
@@ -436,15 +436,6 @@ export default function MapByUserId({ params }) {
   const handleCheckboxChange = (layerId, property, value) => {
     if (map) {
       map.setLayoutProperty(layerId, property, value ? 'visible' : 'none');
-    }
-  };
-
-  // Handle mountain height change
-  const handleMountainHeightChange = (event) => {
-    const height = event.target.value;
-    setMountainHeight(height);
-    if (map.getTerrain()) {
-      map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
     }
   };
 

@@ -8,7 +8,6 @@ import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
 import { createUserOpenFormulaire, userPlayEvent } from "@/tool/service";
 import { Plus, Volume1 } from "lucide-react";
-import Spline from "@splinetool/react-spline";
 import { Button } from "@/components/ui/button";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
@@ -441,7 +440,6 @@ const Map3DComponent = ({ params }) => {
               </div>
               <p class="h-[100px] w-full overflow-y-scroll">${location.description}</p>
             </div>
-            <!--<button id="showJerusalemButton" class="bg-slate-500 w-full text-white ">Show Jerusalem</button> -->
           </div>
         </div>
         `);
@@ -459,13 +457,6 @@ const Map3DComponent = ({ params }) => {
           closeButton.style.width = '25px'; 
           closeButton.style.height = '25px';
         }
-        // Add event listener when popup is opened
-        // const button = document.getElementById('showJerusalemButton');
-        // if (button) {
-        //   button.addEventListener('click', () => {
-        //     setOpenDialogCity(true);
-        //   });
-        // }
       });
 
       marker.getElement().addEventListener('click', () => {
@@ -538,23 +529,6 @@ const Map3DComponent = ({ params }) => {
       <div id="map" ref={mapContainer} />
       <div className={`map-overlay top w-[20vw]`}>
         <div className={`map-overlay-inner block`}>
-          {/*<Drawer direction="right" open={openDialogCity} onOpenChange={setOpenDialogCity}>
-            <DrawerTrigger>
-              <fieldset>
-                <Label htmlFor="show-building">Show Jerusalem City</Label>
-                <Switch
-                  className="ml-[75px]"
-                  id="show-building"
-                  checked={openDialogCity}
-                  onCheckedChange={() => {
-                    setOpenDialogCity(!openDialogCity);
-                  }} />
-              </fieldset> 
-            </DrawerTrigger>
-            <DrawerContent >
-              <Spline scene="https://prod.spline.design/3k6H1cbqT90axTHH/scene.splinecode" />
-            </DrawerContent>
-          </Drawer> */}
           <fieldset>
             <Button variant="outlined m-0" className="text-white font-bold" >EN</Button>
           </fieldset>

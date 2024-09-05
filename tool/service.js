@@ -58,10 +58,10 @@ export const addMarkerEventInCenter = (map, userId, event) => {
   saveEventButton.onclick = async () => {
     if (marker) {
       const lngLat = marker.getLngLat();
-      await saveCoordonneEvent([lngLat.lng, lngLat.lat]); // Ajouter locationName aux paramètres de la fonction
-      // Fermer le popup
+      await saveCoordonneEvent([lngLat.lng, lngLat.lat]); 
+      // close the popup
       marker.remove();
-      marker = null; // Réinitialiser le marqueur après suppression
+      marker = null; 
     }
   };
 
@@ -76,13 +76,13 @@ export const addMarkerEventInCenter = (map, userId, event) => {
     .on('open', () => {
       const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
       if (closeButton) {
-        closeButton.style.fontSize = '30px'; // Augmenter la taille de la croix
-        closeButton.style.width = '30px'; // Augmenter la taille de la zone cliquable
+        closeButton.style.fontSize = '30px'; 
+        closeButton.style.width = '30px'; 
         closeButton.style.height = '30px';
 
         closeButton.onclick = () => {
           marker.remove();
-          marker = null; // Réinitialiser le marqueur après suppression
+          marker = null; 
         };
       }
     });
@@ -141,7 +141,7 @@ export const createUserOpenFormulaire = async (userId) => {
     const hasCreateUser = await getDocs(queryFetch)
 
     if (!hasCreateUser.empty) {
-      const docId = hasCreateUser.docs[0].id; // Récupère l'ID du document existant
+      const docId = hasCreateUser.docs[0].id;
       const hasCliqued = hasCreateUser.docs[0].data().iscliked;
       const docRef = doc(database, 'clicked', docId);
 

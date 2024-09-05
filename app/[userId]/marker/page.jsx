@@ -1,14 +1,13 @@
 "use client";
-import { MAPBOX_TOKEN, sprintStyleNight, nightStyle, sprintStyle, winterDark, summerLight, automnStyle } from "@/tool/security";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { MAPBOX_TOKEN, nightStyle } from "@/tool/security";
+import React, { useState, useEffect, useRef } from "react";
 import mapboxgl from 'mapbox-gl';
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
-import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
 import { Button } from "@/components/ui/button";
-import { addMarkerEvent, userPlayEvent, createUserOpenFormulaire, addMarkerEventInCenter } from "@/tool/service";
-import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
+import { createUserOpenFormulaire, addMarkerEventInCenter } from "@/tool/service";
+import { Volume1 } from "lucide-react";
 
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -26,7 +25,6 @@ export default function MapByUserId({ params }) {
     const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
     const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
     const [lieux, setLieux] = useState([]); // State for storing place
-    const [open, setOpen] = useState(true); // Toggle for overlay visibility
     const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
     const [endTravel, setEndTravel] = useState([]); // End coordinates for route
     const [locationPlayId, setLocationPlayId] = useState(""); // Id of the location of event
@@ -350,15 +348,6 @@ export default function MapByUserId({ params }) {
         }
     };
 
-    // Handle mountain height change
-    const handleMountainHeightChange = (event) => {
-        const height = event.target.value;
-        setMountainHeight(height);
-        if (map.getTerrain()) {
-            map.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
-        }
-    };
-
     const handleOpenFormulaire = (e) => {
         e.preventDefault();
         createUserOpenFormulaire(userId);
@@ -369,9 +358,6 @@ export default function MapByUserId({ params }) {
         <main>
             <div id="map" ref={mapContainer}></div>
             <div className={`map-overlay top w-[20vw]`}>
-                {/* <button className="bg-[#2E2F31]/20 p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-                    <PanelTopOpen className="text-black" />
-                </button> */}
                 <div className={`map-overlay-inner block`}>
                     <fieldset>
                         <Button variant="outlined" className="text-white font-bold" >EN</Button>
@@ -386,11 +372,6 @@ export default function MapByUserId({ params }) {
                             {showMap3D ? "2D" : "3D"}
                         </Button>
                     </fieldset>
-                    {/*<fieldset>
-                        <Button variant="outlined" className={`text-white font-bold`} >
-                            <Plus />
-                        </Button>
-                    </fieldset>*/}
                 </div>
             </div>
         </main>

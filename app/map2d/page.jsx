@@ -6,10 +6,7 @@ import { collection, onSnapshot, query } from "firebase/firestore";
 import { database } from "@/tool/firebase";
 import { addSnowLayer, addRainLayer, } from "@/lib/climat";
 import { addRouteLayer } from "@/lib/layers";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { userPlayEvent } from "@/tool/service";
-import { PanelTopOpen, Plus, Volume1 } from "lucide-react";
+import { Plus, Volume1 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -25,11 +22,9 @@ export default function Map2DByUserId({ params }) {
   const [showBuilding, setShowBuilding] = useState(true); // Toggle for building visibility
   const [showRoad, setShowRoad] = useState(true); // Toggle for road visibility
   const [showMap3D, setShowMap3D] = useState(false); // Toggle for 3D map view
-  const [season, setSeason] = useState('spring'); // Season state
   const [mountainHeight, setMountainHeight] = useState(100); // Mountain height state
   const [evangileEvents, setEvangileEvents] = useState([]); // State for storing events
   const [lieux, setLieux] = useState([]); // State for storing events
-  const [open, setOpen] = useState(true); // Toggle for overlay visibility
   const [startTravel, setStartTravel] = useState([]); // Start coordinates for route
   const [endTravel, setEndTravel] = useState([]); // End coordinates for route
   const [openDialogCity, setOpenDialogCity] = useState(false);
@@ -270,15 +265,6 @@ export default function Map2DByUserId({ params }) {
     }
   };
 
-  // Handle mountain height change
-  const handleMountainHeightChange = (event) => {
-    const height = event.target.value;
-    setMountainHeight(height);
-    if (map.current.getTerrain()) {
-      map.current.setTerrain({ source: 'mapbox-dem', exaggeration: height / 100 });
-    }
-  };
-
   const handleRegisterClick = () => {
     window.open("https://prytane.com/registration", "_blank");
     setOpenDialogCity(false)
@@ -289,33 +275,10 @@ export default function Map2DByUserId({ params }) {
     window.open("https://prytane.com/login", "_blank");
   };
 
-  const handlePathClicked = (e) => {
-    e.preventDefault();
-    setShowRoad(!showRoad);
-    handleCheckboxChange('road-primary', 'visibility', !showRoad);
-    handleCheckboxChange('road-secondary-tertiary', 'visibility', !showRoad);
-    handleCheckboxChange('road-street', 'visibility', !showRoad);
-    handleCheckboxChange('road-minor', 'visibility', !showRoad);
-    handleCheckboxChange('road-major-link', 'visibility', !showRoad);
-    handleCheckboxChange('road-motorway-trunk', 'visibility', !showRoad);
-    handleCheckboxChange('tunnel-motorway-trunk', 'visibility', !showRoad);
-    handleCheckboxChange('tunnel-primary', 'visibility', !showRoad);
-    handleCheckboxChange('tunnel-secondary-tertiary', 'visibility', !showRoad);
-  }
-
-  const handleBuildingClicked = (e) => {
-    e.preventDefault();
-    setShowBuilding(!showBuilding);
-    handleCheckboxChange('building-extrusion', 'visibility', !showBuilding);
-  }
-
   return (
     <main className="m-2">
       <div id="map" ref={mapContainer}></div>
       <div className={`map-overlay top w-[20vw]`}>
-        {/* <button className="bg-[#2E2F31]/20  p-2 m-1 text-white rounded sm:block md:hidden" onClick={e => { e.preventDefault(); setOpen(!open) }}>
-          <PanelTopOpen className="text-black" />
-        </button> */}
         <div className={`map-overlay-inner block`}>
           <Dialog open={openDialogCity} onOpenChange={setOpenDialogCity}>
             <DialogContent className="w-[370px]">
