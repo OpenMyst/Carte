@@ -230,14 +230,12 @@ export default function MapByUserId({ params }) {
                 <img src="${currentEvents.image}" alt="${currentEvents.name}" class="w-full h-[150px]"/>
               </div>`}
               <div class="mt-[150px] fixed">
-                <div class="mt-[150px] fixed">
-                  <h3 class="text-base font-bold text-start">${currentEvents.name}</h3>
-                  <div class="flex gap-2">
-                    <h4 class="text-sm font-regular">Date : ${currentEvents.date_debut}</h4> -
-                    <h4 class="text-sm font-regular">${currentEvents.date_fin}</h4>
-                  </div>
-                  <p class="h-[110px] w-full overflow-y-scroll">${currentEvents.description}</p>
+                <h3 class="text-base font-bold text-start">${currentEvents.name}</h3>
+                <div class="flex gap-2">
+                  <h4 class="text-sm font-regular">Date : ${currentEvents.date_debut}</h4> -
+                  <h4 class="text-sm font-regular">${currentEvents.date_fin}</h4>
                 </div>
+                <p class="h-[110px] w-full overflow-y-scroll">${currentEvents.description}</p>
               </div>
             </div>
           `)
@@ -245,15 +243,15 @@ export default function MapByUserId({ params }) {
           //Increase the size of the popup closing cross
           const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
           if (closeButton) {
-            closeButton.style.fontSize = '15px'; 
-            closeButton.style.width = '15px'; 
+            closeButton.style.fontSize = '15px';
+            closeButton.style.width = '15px';
             closeButton.style.height = '15px';
           }
         });
 
       const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
         .setLngLat([currentEvents.longitude, currentEvents.latitude])
-        .setPopup(popup) 
+        .setPopup(popup)
         .addTo(mapEvent)
         .togglePopup();
 
@@ -361,9 +359,9 @@ export default function MapByUserId({ params }) {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
                 <div class="flex flex-row h-[300px] w-[220px] static">
-                    <div class="w-full h-[60px] relative">
-                        <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
-                    </div>
+                ${location.image && `<div class="w-full h-[60px] relative">
+                  <img src="${location.image}" alt="${location.name}" class="w-full h-[150px]"/>
+                </div>`}
                     <div class="mt-[150px] fixed">
                         <h3 class="text-base font-bold text-start">${location.name}</h3>
                         <div class="flex gap-2">
@@ -384,8 +382,8 @@ export default function MapByUserId({ params }) {
           //Increase the size of the popup closing cross
           const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
           if (closeButton) {
-            closeButton.style.fontSize = '15px'; 
-            closeButton.style.width = '15px'; 
+            closeButton.style.fontSize = '15px';
+            closeButton.style.width = '15px';
             closeButton.style.height = '15px';
           }
         });
@@ -415,8 +413,8 @@ export default function MapByUserId({ params }) {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
-          closeButton.style.fontSize = '15px'; 
-          closeButton.style.width = '15px'; 
+          closeButton.style.fontSize = '15px';
+          closeButton.style.width = '15px';
           closeButton.style.height = '15px';
         }
       });

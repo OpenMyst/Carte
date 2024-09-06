@@ -236,19 +236,17 @@ export default function MapByUserId({ params }) {
 
             const popup = new mapboxgl.Popup().setHTML(`
             <div class="flex flex-row h-[300px] w-[220px] static">
-                ${currentEvents.image && `<div class="w-full h-[60px] relative">
-                    <img src="${currentEvents.image}" alt="${currentEvents.name}" class="w-full h-[150px]"/>
-                </div>`}
-                <div class="mt-[150px] fixed">
-                    <div class="mt-[150px] fixed">
-                    <h3 class="text-base font-bold text-center">${currentEvents.name}</h3>
-                    <div class="flex gap-2">
-                        <h4 class="text-sm font-regular">Date : ${currentEvents.date_debut}</h4> -
-                        <h4 class="text-sm font-regular">${currentEvents.date_fin}</h4>
-                    </div>
-                    <p class="h-[110px] w-full overflow-y-scroll">${currentEvents.description}</p>
-                    </div>
+              ${currentEvents.image && `<div class="w-full h-[60px] relative">
+                <img src="${currentEvents.image}" alt="${currentEvents.name}" class="w-full h-[150px]"/>
+              </div>`}
+              <div class="mt-[150px] fixed">
+                <h3 class="text-base font-bold text-start">${currentEvents.name}</h3>
+                <div class="flex gap-2">
+                  <h4 class="text-sm font-regular">Date : ${currentEvents.date_debut}</h4> -
+                  <h4 class="text-sm font-regular">${currentEvents.date_fin}</h4>
                 </div>
+                <p class="h-[110px] w-full overflow-y-scroll">${currentEvents.description}</p>
+              </div>
             </div>
           `)
                 .on('open', () => {
@@ -374,13 +372,13 @@ export default function MapByUserId({ params }) {
                     <div class="w-full h-[60px] relative">
                         <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
                     </div>
-                    <div class="mt-[150px] fixed">
+                    <div class="mt-[10px] fixed">
                         <h3 class="text-base font-extrabold text-start">${location.name}</h3>
                         <div class="flex gap-2">
                         <h4 class="text-sm font-regular">Date: ${location.date_debut}</h4> -
                         <h4 class="text-sm font-regular">${location.date_fin}</h4>
                         </div>
-                        <p class="h-[110px] w-full overflow-y-scroll">${location.description}</p>
+                        <p class="h-[100px] w-full overflow-y-scroll">${location.description}</p>
                     </div>
                 </div>
                 `);
