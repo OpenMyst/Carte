@@ -486,7 +486,7 @@ const Map3DComponent = ({ params }) => {
           <div class="flex flex-row h-[150px] w-[100px] static">
             <div class="mt-5 fixed">
               <h3 class="text-base font-bold text-center">${loc.ville}</h3>
-              <p class="ml-[-5px] mr-1 h-[120px]">${loc.description}</p>
+              <p class="ml-[-5px] mr-1 h-[110px] w-full overflow-y-scroll">${loc.description}</p>
             </div>
           </div>
         </div>

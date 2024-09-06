@@ -400,14 +400,14 @@ export default function MapByUserId({ params }) {
 
     lieux.forEach((loc) => {
       const popup = new mapboxgl.Popup().setHTML(`
-                <div>
-                    <div class="flex flex-row h-[120px] w-[120px] static">
-                        <div class="mt-2 fixed">
-                        <h3 class="text-base font-bold text-start">${loc.ville}</h3>
-                        <p class="mr-1 h-[90px]">${loc.description}</p>
-                        </div>
-                    </div>
+            <div>
+              <div class="flex flex-row h-[150px] w-[100px] static">
+                <div class="mt-5 fixed">
+                  <h3 class="text-base font-bold text-center">${loc.ville}</h3>
+                  <p class="ml-[-5px] mr-1 h-[110px] w-full overflow-y-scroll">${loc.description}</p>
                 </div>
+              </div>
+            </div>
             `);
       popup.on('open', () => {
         //Increase the size of the popup closing cross
