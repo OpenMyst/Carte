@@ -371,9 +371,9 @@ export default function MapByUserId({ params }) {
         evangileEvents.forEach((location) => {
             const popup = new mapboxgl.Popup().setHTML(`
                 <div class="flex flex-row h-[300px] w-[220px] static">
-                    ${location.image && `<div class="w-full h-[60px] relative">
+                    <div class="w-full h-[60px] relative">
                         <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
-                    </div>`}
+                    </div>
                     <div class="mt-[150px] fixed">
                         <h3 class="text-base font-extrabold text-start">${location.name}</h3>
                         <div class="flex gap-2">
