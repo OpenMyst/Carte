@@ -282,14 +282,14 @@ export default function MapByUserId({ params }) {
     const loadEvangileMarker = (mapEvent) => {
         evangileEvents.forEach((location) => {
             const popup = new mapboxgl.Popup().setHTML(`
-                <div class="flex flex-row h-[300px] w-[220px] static">
-                    <div class="w-full h-[60px] relative">
-                        <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
-                    </div>
-                    <div class="${location.image ? "mt-5" : "mt-[150px]"} fixed">
+                <div class="flex flex-col ${location.image ? "h-[300px]" : "200px"} w-[220px] static">
+                ${location.image && `<div class="w-full h-[60px] relative">
+                  <img src="${location.image}" alt="${location.name}" class="w-full h-[150px]"/>
+                </div>`}
+                    <div class="${location.image ? "mt-[150px]" : "mt-0"}">
                         <h3 class="text-base font-bold text-center">${location.name}</h3>
                         <div class="flex gap-2">
-                        <h4 class="text-sm font-regular">Date: ${location.date_debut}</h4> -
+                        <h4 class="text-sm font-regular">Date : ${location.date_debut}</h4> -
                         <h4 class="text-sm font-regular">${location.date_fin}</h4>
                         </div>
                         <p class="h-[110px] w-full overflow-y-scroll">${location.description}</p>
