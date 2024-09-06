@@ -229,7 +229,7 @@ export default function MapByUserId({ params }) {
               ${currentEvents.image && `<div class="w-full h-[60px] relative">
                 <img src="${currentEvents.image}" alt="${currentEvents.name}" class="w-full h-[150px]"/>
               </div>`}
-              <div class="mt-[150px] fixed">
+              <div class="${currentEvents.image ? "mt-5" : "mt-[150px]"} fixed">
                 <h3 class="text-base font-bold text-start">${currentEvents.name}</h3>
                 <div class="flex gap-2">
                   <h4 class="text-sm font-regular">Date : ${currentEvents.date_debut}</h4> -
@@ -362,7 +362,7 @@ export default function MapByUserId({ params }) {
                 ${location.image && `<div class="w-full h-[60px] relative">
                   <img src="${location.image}" alt="${location.name}" class="w-full h-[150px]"/>
                 </div>`}
-                    <div class="mt-[150px] fixed">
+                    <div class="${location.image ? "mt-5" : "mt-[150px]"} fixed">
                         <h3 class="text-base font-bold text-start">${location.name}</h3>
                         <div class="flex gap-2">
                         <h4 class="text-sm font-regular">Date : ${location.date_debut}</h4> -
