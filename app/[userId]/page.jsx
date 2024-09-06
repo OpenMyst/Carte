@@ -62,20 +62,20 @@ export default function MapByUserId({ params }) {
         }
     }, [mountainHeight, showBuilding, showRoad]);
 
-    useEffect(() => {
-        const fetchLocationPlayId = async () => {
-            const location = await userPlayEvent(userId);
-            setLocationPlayId(location);
-        };
+    // useEffect(() => {
+    //     const fetchLocationPlayId = async () => {
+    //         const location = await userPlayEvent(userId);
+    //         setLocationPlayId(location);
+    //     };
 
-        // Load the changment in the firebase
-        const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-            fetchLocationPlayId();
-        });
+    //     // Load the changment in the firebase
+    //     const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
+    //         fetchLocationPlayId();
+    //     });
 
-        fetchLocationPlayId();
-        return () => unsubscribe();
-    }, [userId]);
+    //     fetchLocationPlayId();
+    //     return () => unsubscribe();
+    // }, [userId]);
 
     useEffect(() => {
         if (map) {
@@ -83,11 +83,11 @@ export default function MapByUserId({ params }) {
         }
     }, [showMap3D]);
 
-    useEffect(() => {
-        if (map && locationPlayId) {
-            getUserPlayEvent(map);
-        }
-    }, [locationPlayId, evangileEvents, map]);
+    // useEffect(() => {
+    //     if (map && locationPlayId) {
+    //         getUserPlayEvent(map);
+    //     }
+    // }, [locationPlayId, evangileEvents, map]);
 
     useEffect(() => {
         if (locationPlayId) {

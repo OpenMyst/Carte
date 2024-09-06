@@ -62,20 +62,20 @@ export default function MapByUserId({ params }) {
     }
   }, [mountainHeight, showBuilding, showRoad]);
 
-  useEffect(() => {
-    const fetchLocationPlayId = async () => {
-      const location = await userPlayEvent(userId);
-      setLocationPlayId(location);
-    };
+  // useEffect(() => {
+  //   const fetchLocationPlayId = async () => {
+  //     const location = await userPlayEvent(userId);
+  //     setLocationPlayId(location);
+  //   };
 
-    // Load the changment in the firebase
-    const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
-      fetchLocationPlayId();
-    });
+  //   // Load the changment in the firebase
+  //   const unsubscribe = onSnapshot(query(collection(database, 'location')), (snapshot) => {
+  //     fetchLocationPlayId();
+  //   });
 
-    fetchLocationPlayId();
-    return () => unsubscribe();
-  }, [userId]);
+  //   fetchLocationPlayId();
+  //   return () => unsubscribe();
+  // }, [userId]);
 
   useEffect(() => {
     if (map) {
@@ -83,11 +83,11 @@ export default function MapByUserId({ params }) {
     }
   }, [showMap3D]);
 
-  useEffect(() => {
-    if (map && locationPlayId) {
-      getUserPlayEvent(map);
-    }
-  }, [locationPlayId, evangileEvents, map]);
+  // useEffect(() => {
+  //   if (map && locationPlayId) {
+  //     getUserPlayEvent(map);
+  //   }
+  // }, [locationPlayId, evangileEvents, map]);
 
   useEffect(() => {
     if (locationPlayId) {
@@ -362,7 +362,7 @@ export default function MapByUserId({ params }) {
                 ${location.image && `<div class="w-full h-[60px] relative">
                   <img src="${location.image}" alt="${location.name}" class="w-full h-[150px]"/>
                 </div>`}
-                    <div class="${location.image ? "mt-5" : "mt-[150px]"} fixed">
+                    <div class="${location.image ? "mt-2" : "mt-[150px]"} fixed">
                         <h3 class="text-base font-bold text-start">${location.name}</h3>
                         <div class="flex gap-2">
                         <h4 class="text-sm font-regular">Date : ${location.date_debut}</h4> -
