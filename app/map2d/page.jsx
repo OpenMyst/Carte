@@ -189,14 +189,14 @@ export default function Map2DByUserId({ params }) {
   const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
-                <div class="flex flex-row h-[300px] w-[220px] static">
-                  <div class="w-full h-[60px] relative">
-                    <img src="${location.image}" alt="${location.label}" class="w-full h-[150px]"/>
-                  </div>
-                  <div class="mt-[150px] fixed">
-                    <h3 class="text-base font-bold text-center">${location.label}</h3>
-                    <p class="h-[110px] overflow-y-scroll">${location.description}</p>
-                  </div>
+                <div class="flex flex-col ${location.image ? "h-[300px]" : "200px"} w-[220px] static">
+                ${location.image && `<div class="w-full h-[60px] relative">
+                  <img src="${location.image}" alt="${location.name}" class="w-full h-[150px]"/>
+                </div>`}
+                    <div class="${location.image ? "mt-[150px]" : "mt-0"}">
+                        <h3 class="text-base font-bold text-center">${location.name}</h3>
+                        <p class="h-[110px] w-full overflow-y-scroll">${location.description}</p>
+                    </div>
                 </div>
                 `);
 
