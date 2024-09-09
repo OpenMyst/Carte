@@ -241,10 +241,6 @@ export default function MapByUserId({ params }) {
               </div>`}
               <div class="${currentEvents.image ?  "mt-[150px]" : "mt-5"} fixed">
                 <h3 class="text-base font-bold text-center">${currentEvents.name}</h3>
-                <div class="flex gap-2">
-                  <h4 class="text-sm font-regular">Date : ${currentEvents.date_debut}</h4> -
-                  <h4 class="text-sm font-regular">${currentEvents.date_fin}</h4>
-                </div>
                 <p class="h-[110px] w-full overflow-y-scroll">${currentEvents.description}</p>
               </div>
             </div>
@@ -374,10 +370,6 @@ export default function MapByUserId({ params }) {
                 </div>`}
                     <div class="${location.image ? "mt-[150px]" : "mt-0"}">
                         <h3 class="text-base font-bold text-center">${location.name}</h3>
-                        <div class="flex gap-2">
-                        <h4 class="text-sm font-regular">Date : ${location.date_debut}</h4> -
-                        <h4 class="text-sm font-regular">${location.date_fin}</h4>
-                        </div>
                         <p class="h-[110px] w-full overflow-y-scroll">${location.description}</p>
                     </div>
                 </div>

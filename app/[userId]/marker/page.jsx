@@ -288,14 +288,10 @@ export default function MapByUserId({ params }) {
                 </div>`}
                     <div class="${location.image ? "mt-[150px]" : "mt-0"}">
                         <h3 class="text-base font-bold text-center">${location.name}</h3>
-                        <div class="flex gap-2">
-                        <h4 class="text-sm font-regular">Date : ${location.date_debut}</h4> -
-                        <h4 class="text-sm font-regular">${location.date_fin}</h4>
-                        </div>
                         <p class="h-[110px] w-full overflow-y-scroll">${location.description}</p>
                     </div>
                 </div>
-                `);
+            `);
             if (location.longitude && location.latitude) {
                 const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
                     .setLngLat([location.longitude, location.latitude])
