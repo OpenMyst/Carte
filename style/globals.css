@@ -143,6 +143,22 @@ body {
   }
 }
 
+
+/* In your global CSS file, e.g., styles.css */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px; /* Adjust the width as needed */
+  height: 4px; /* Adjust the height as needed */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust the color as needed */
+  border-radius: 9999px; /* Round the corners */
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent; /* Adjust the track color as needed */
+}
+
 @layer base {
   * {
     @apply border-border;

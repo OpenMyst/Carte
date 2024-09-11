@@ -444,11 +444,11 @@ const Map3DComponent = ({ params }) => {
           <div class="flex flex-col ${location.image ? "h-[300px]" : "200px"} w-[220px] static">
             ${location.image && `<div class="w-full h-[60px] relative">
               <img src="${location.image}" alt="${location.name}" class="w-full h-[150px]"/>
-            </div>`}
-            <div class="${location.image ? "mt-[150px]" : "mt-0"}">
-                <h3 class="text-base font-bold text-center">${location.name}</h3>
-                <p class="h-[110px] w-full overflow-y-scroll">${location.description}</p>
-            </div>
+          </div>`}
+              <div class="${location.image ? "mt-[150px]" : "mt-0"}">
+                  <h3 class="text-base font-bold text-center">${location.name}</h3>
+                  <p class="h-[110px] w-full overflow-y-scroll overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">${location.description}</p>
+              </div>
           </div>
         `);
 
@@ -478,14 +478,14 @@ const Map3DComponent = ({ params }) => {
     });
     lieux.forEach((loc) => {
       const popup = new mapboxgl.Popup().setHTML(`
-        <div>
-          <div class="flex flex-row h-[150px] w-[100px] static">
-            <div class="mt-5 fixed">
-              <h3 class="text-base font-bold text-center">${loc.ville}</h3>
-              <p class="ml-[-5px] mr-1 h-[110px] w-full overflow-y-scroll">${loc.description}</p>
+          <div>
+            <div class="flex flex-row h-[150px] w-[125px] static">
+              <div class="mt-5 fixed">
+                <h3 class="text-base font-bold text-center">${loc.ville}</h3>
+                <p class="ml-[-5px] mr-1 h-[110px] w-[115px] overflow-y-scroll overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">${loc.description}</p>
+              </div>
             </div>
           </div>
-        </div>
         `).on('open', () => {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
