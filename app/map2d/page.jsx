@@ -189,28 +189,40 @@ export default function Map2DByUserId({ params }) {
   const loadEvangileMarker = (mapEvent) => {
     evangileEvents.forEach((location) => {
       const popup = new mapboxgl.Popup().setHTML(`
-                <div class="flex flex-col ${location.image ? "h-[300px]" : "200px"} w-[220px] static">
+                 <div class="flex flex-col ${location.image ? "h-[300px]" : "200px"} w-[220px] static">
                 ${location.image && `<div class="w-full h-[60px] relative">
                   <img src="${location.image}" alt="${location.name}" class="w-full h-[150px]"/>
                 </div>`}
                     <div class="${location.image ? "mt-[150px]" : "mt-0"}">
                         <h3 class="text-base font-bold text-center">${location.name}</h3>
-                        <p class="h-[110px] w-full overflow-y-scroll">${location.description}</p>
+                        <p class="h-[110px] w-full overflow-y-scroll overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">${location.description}</p>
                     </div>
                 </div>
                 `);
 
-      const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
-        .setLngLat([location.longitude, location.latitude])
-        .setPopup(popup)  // Associe le popup au marqueur
-        .addTo(mapEvent);
+      if (location.longitude && location.latitude) {
+        const marker = new mapboxgl.Marker({ color: '#D8D4D5' })
+          .setLngLat([location.longitude, location.latitude])
+          .setPopup(popup)
+          .addTo(mapEvent);
 
-      marker.getElement().addEventListener('click', () => {
-        mapEvent.flyTo({
-          center: [location.longitude, location.latitude],
-          zoom: 20
+        popup.on('open', () => {
+          //Increase the size of the popup closing cross
+          const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
+          if (closeButton) {
+            closeButton.style.fontSize = '25px';
+            closeButton.style.width = '25px';
+            closeButton.style.height = '25px';
+          }
         });
-      })
+
+        marker.getElement().addEventListener('click', () => {
+          mapEvent.flyTo({
+            center: [location.longitude, location.latitude],
+            zoom: 20
+          });
+        })
+      }
 
       const anneeEvent = parseInt(location.event_date);
       if (anneeEvent < 0) {
@@ -244,15 +256,24 @@ export default function Map2DByUserId({ params }) {
     lieux.forEach((loc) => {
       console.log(loc)
       const popupLieu = new mapboxgl.Popup().setHTML(`
-        <div>
-          <div class="flex flex-row h-[150px] w-[100px] static">
-              <div class="mt-2 fixed">
+       <div>
+          <div class="flex flex-row h-[150px] w-[125px] static">
+            <div class="mt-5 fixed">
               <h3 class="text-base font-bold text-center">${loc.ville}</h3>
-              <p class="ml-[-5px] mr-1 h-[120px]">${loc.description}</p>
-              </div>
+              <p class="ml-[-5px] mr-1 h-[110px] w-[115px] overflow-y-scroll overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">${loc.description}</p>
+            </div>
           </div>
         </div>
       `);
+      popupLieu.on('open', () => {
+        //Increase the size of the popup closing cross
+        const closeButton = popupLieu.getElement().querySelector('.mapboxgl-popup-close-button');
+        if (closeButton) {
+          closeButton.style.fontSize = '25px';
+          closeButton.style.width = '25px';
+          closeButton.style.height = '25px';
+        }
+      });
 
       const mark = new mapboxgl.Marker({ color: '#0769C5' })
         .setLngLat([loc.longitude, loc.latitude])

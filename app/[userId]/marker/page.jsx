@@ -302,9 +302,9 @@ export default function MapByUserId({ params }) {
                     //Increase the size of the popup closing cross
                     const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
                     if (closeButton) {
-                        closeButton.style.fontSize = '15px'; 
-                        closeButton.style.width = '15px'; 
-                        closeButton.style.height = '15px';
+                        closeButton.style.fontSize = '25px'; 
+                        closeButton.style.width = '25px'; 
+                        closeButton.style.height = '25px';
                     }
                 });
 

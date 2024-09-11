@@ -206,7 +206,7 @@ export default function MapByUserId({ params }) {
         updateTerrain(mapEvent, 10, false);
       }
 
-      const day = location.detail_jour;
+      const day = currentEvents.detail_jour;
       if (day === "Nuit") {
         mapEvent.setStyle(sprintStyleNight);
       } else if (day === "Matin") {
@@ -215,7 +215,7 @@ export default function MapByUserId({ params }) {
         mapEvent.setStyle(nightStyle);
       }
 
-      const meteo = location.meteo;
+      const meteo = currentEvents.meteo;
       if (meteo === "Pluvieux") {
         mapEvent.setStyle(sprintStyle);
         addRainLayer(mapEvent);
@@ -225,27 +225,23 @@ export default function MapByUserId({ params }) {
       }
 
       const popup = new mapboxgl.Popup().setHTML(`
-            <div class="flex flex-row ${currentEvents.image ? "h-[300px]" : "200px"} w-[220px] static">
-              ${currentEvents.image && `<div class="w-full h-[60px] relative">
-                <img src="${currentEvents.image}" alt="${currentEvents.name}" class="w-full h-[150px]"/>
-              </div>`}
-              <div class="${currentEvents.image ?  "mt-[150px]" : "mt-5"} fixed">
-                <h3 class="text-base font-bold text-center">${currentEvents.name}</h3>
-                <div class="flex gap-2">
-                  <h4 class="text-sm font-regular">Date : ${currentEvents.date_debut}</h4> -
-                  <h4 class="text-sm font-regular">${currentEvents.date_fin}</h4>
-                </div>
-                <p class="h-[110px] w-full overflow-y-scroll">${currentEvents.description}</p>
+            <div class="flex flex-col ${currentEvents.image ? "h-[300px]" : "200px"} w-[220px] static">
+            ${currentEvents.image && `<div class="w-full h-[60px] relative">
+              <img src="${currentEvents.image}" alt="${currentEvents.name}" class="w-full h-[150px]"/>
+          </div>`}
+              <div class="${currentEvents.image ? "mt-[150px]" : "mt-0"}">
+                  <h3 class="text-base font-bold text-center">${currentEvents.name}</h3>
+                  <p class="h-[110px] w-full overflow-y-scroll overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">${location.description}</p>
               </div>
-            </div>
+          </div>
           `)
         .on('open', () => {
           //Increase the size of the popup closing cross
           const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
           if (closeButton) {
-            closeButton.style.fontSize = '15px';
-            closeButton.style.width = '15px';
-            closeButton.style.height = '15px';
+            closeButton.style.fontSize = '25px';
+            closeButton.style.width = '25px';
+            closeButton.style.height = '25px';
           }
         });
 
@@ -378,9 +374,9 @@ export default function MapByUserId({ params }) {
           //Increase the size of the popup closing cross
           const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
           if (closeButton) {
-            closeButton.style.fontSize = '15px';
-            closeButton.style.width = '15px';
-            closeButton.style.height = '15px';
+            closeButton.style.fontSize = '25px';
+            closeButton.style.width = '25px';
+            closeButton.style.height = '25px';
           }
         });
 
@@ -409,9 +405,9 @@ export default function MapByUserId({ params }) {
         //Increase the size of the popup closing cross
         const closeButton = popup.getElement().querySelector('.mapboxgl-popup-close-button');
         if (closeButton) {
-          closeButton.style.fontSize = '15px';
-          closeButton.style.width = '15px';
-          closeButton.style.height = '15px';
+          closeButton.style.fontSize = '25px';
+          closeButton.style.width = '25px';
+          closeButton.style.height = '25px';
         }
       });
       if (loc.longitude && loc.latitude) {
