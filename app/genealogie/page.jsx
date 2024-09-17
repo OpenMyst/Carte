@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SpriteText from 'three-spritetext';
-import { getFamilyTreeFromFirebase } from './action';
+import { getFamilyTreeFromFirebase, onPersonnageChange } from './action';
 import dynamic from 'next/dynamic';
 
 /**
@@ -41,17 +41,29 @@ const PageGenealogie = () => {
   const [data, setData] = useState({ nodes: [], links: [] });
   const fgRef = useRef();
 
+  // Function to update the graph data
+  const fetchAndUpdateTreeData = async () => {
+    try {
+      const treeData = await getFamilyTreeFromFirebase();
+      setData(treeData);
+    } catch (error) {
+      console.log("Error fetching family tree data:", error);
+    }
+  };
+
+  // Fetch data initially and set up real-time listener
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const treeData = await getFamilyTreeFromFirebase();
-        setData(treeData);
-        console.log(treeData)
-      } catch (error) {
-        console.log(error)
-      }
-    };
-    fetchData();
+    // Fetch initial tree data
+    fetchAndUpdateTreeData();
+
+    // Set up real-time listener for any changes (new, update, delete)
+    const unsubscribe = onPersonnageChange(() => {
+      // When a change is detected, fetch the updated tree data
+      fetchAndUpdateTreeData();
+    });
+
+    // Clean up the listener when component unmounts
+    return () => unsubscribe();
   }, []);
 
   /**

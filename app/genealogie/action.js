@@ -1,34 +1,36 @@
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import { database } from "@/tool/firebase"; 
-
 /**
- * Adds a disciple to the 'disciple' collection in Firestore.
- * 
- * @param {Object} disciple - The disciple data to be added.
- * @returns {Promise<void>} - A promise that resolves when the disciple is added.
+ * Listen for changes in the 'personnages' collection in Firebase.
+ * This function sets up a real-time listener that triggers the callback whenever there is a change.
+ *
+ * @param {Function} callback - The function to call when there is a change in the data.
+ * @returns {Function} - The unsubscribe function to stop listening for changes.
  */
-export const addDisciple = async (disciple) => {
-  try {
-    const docRef = await addDoc(collection(database, "disciple"), disciple); // Add disciple document
-    console.log("Document written with ID: ", docRef.id); 
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-};
+export const onPersonnageChange = (callback) => {
+  // Reference to the 'personnages' collection in Firestore
+  const personnagesRef = collection(database, "persons");
 
-/**
- * Adds a filiation (relationship) to the 'filiation' collection in Firestore.
- * 
- * @param {Object} filiation - The filiation data to be added.
- * @returns {Promise<void>} - A promise that resolves when the filiation is added.
- */
-export const addFiliation = async (filiation) => {
-  try {
-    const docRef = await addDoc(collection(database, "filiation"), filiation); // Add filiation document
-    console.log("Document written with ID: ", docRef.id); 
-  } catch (e) {
-    console.error("Error adding document: ", e); 
-  }
+  // Set up a real-time listener for changes
+  const unsubscribe = onSnapshot(personnagesRef, (snapshot) => {
+      const updatedData = [];
+
+      // Loop through the changes and build the updated data
+      snapshot.forEach((doc) => {
+          updatedData.push({
+              id: doc.id,
+              ...doc.data(), // Spread document data (nom, testament, etc.)
+          });
+      });
+
+      // Call the callback with the updated data
+      callback(updatedData);
+  }, (error) => {
+      console.error("Error listening to personnage changes:", error);
+  });
+
+  // Return the unsubscribe function to stop listening when not needed
+  return unsubscribe;
 };
 
 /**
